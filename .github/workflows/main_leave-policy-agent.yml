@@ -11,8 +11,8 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
-  PYTHON_VERSION: '3.12' # set this to the python version to use (supports 3.6, 3.7, 3.8)
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: "." # set this to the path to your web app project, defaults to the repository root
+  PYTHON_VERSION: "3.12" # set this to the python version to use (supports 3.6, 3.7, 3.8)
 
 jobs:
   build:
@@ -67,7 +67,7 @@ jobs:
         run: |
           unzip release.zip
           rm release.zip
-        
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -75,11 +75,12 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_E333EA9EFC2B4D338012B0B11554E06D }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_1D5F7935987545D18C823879950F720D }}
 
-      - name: 'Deploy to Azure Functions'
+      - name: "Deploy to Azure Functions"
         uses: Azure/functions-action@v1
         id: deploy-to-function
         with:
-          app-name: 'leave-policy-agent'
-          slot-name: 'Production'
+          app-name: "leave-policy-agent"
+          slot-name: "Production"
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          
+          scm-do-build-during-deployment: true
+          enable-oryx-build: true
