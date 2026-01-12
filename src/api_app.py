@@ -4,34 +4,11 @@ import azure.functions as func
 
 api_server = FastAPI()
 
+@api_server.get("/ping")
+async def ping():
+    return {"message": "pong"}
+
 @api_server.get('/get_weather')
-async def get_weather(city='Dallas'):
-    return {'city':city}
-    # def get_lat_long(city:str):
-    #     url = "https://geocoding-api.open-meteo.com/v1/search"
-    #     params = {
-    #         'name':city,
-    #         'count':1,
-    #         'language':'en',
-    #         'format':'json'
-    #     }
+async def get_weather():
+    return {'city': 'Dallas'}
 
-    #     resp = requests.get(url=url, params=params)
-    #     data = resp.json()
-    #     if 'results' not in data:
-    #         raise ValueError(f'City:{city} not found')
-        
-    #     result = data['results'][0]
-    #     return result['latitude'], result['longitude']
-    
-    # lat, long = get_lat_long(city)
-    # if lat and long:
-    #     url = "https://api.open-meteo.com/v1/forecast"
-    #     params = {
-    #         'latitude':lat,
-    #         'longitude':long,
-    #         'current_weather':True
-    #     }
-
-    #     resp = requests.get(url=url, params=params)
-    #     return resp.json()
