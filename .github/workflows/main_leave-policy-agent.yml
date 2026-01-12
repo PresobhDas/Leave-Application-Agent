@@ -34,12 +34,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt --target=".python_packages/lib/site-packages"
 
-      - name: Verify .python_packages exists
-        run: |
-          ls -la
-          ls -la .python_packages || true
-          du -sh .python_packages || true
-
       - name: Zip artifact for deployment
         run: zip -r release.zip . -x "venv/*" ".git/*"
 
@@ -86,6 +80,6 @@ jobs:
           app-name: "leave-policy-agent"
           slot-name: "Production"
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          scm-do-build-during-deployment: true
-          enable-oryx-build: true
-          remote-build: true
+          scm-do-build-during-deployment: false
+          enable-oryx-build: false
+          remote-build: false
