@@ -34,8 +34,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt --target=".python_packages/lib/site-packages"
 
+      - name: Verify .python_packages exists
+        run: |
+          ls -la
+          ls -la .python_packages || true
+          du -sh .python_packages || true
+
       - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+        run: zip -r release.zip . -x "venv/*" ".git/*"
+
+      - name: Verify zip contains .python_packages
+        run: |
+          unzip -l release.zip | grep -m 5 ".python_packages" || true
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
