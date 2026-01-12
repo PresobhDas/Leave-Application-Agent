@@ -6,7 +6,7 @@ api_server = FastAPI()
 
 @api_server.get('/get_weather')
 async def get_weather(city='Dallas'):
-    return func.HttpResponse(f"pong - {city}", status_code=200)
+    return {'city':city}
     # def get_lat_long(city:str):
     #     url = "https://geocoding-api.open-meteo.com/v1/search"
     #     params = {
