@@ -1,11 +1,11 @@
 import requests
-import fastapi
+from fastapi import FastAPI
 import azure.functions as func
 
-api_server = fastapi()
+api_server = FastAPI()
 
 @api_server.get('/get_weather')
-def get_weather(city='Dallas'):
+async def get_weather(city='Dallas'):
 
     def get_lat_long(city:str):
         url = "https://geocoding-api.open-meteo.com/v1/search"
