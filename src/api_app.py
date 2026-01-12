@@ -1,6 +1,5 @@
 import requests
 from fastapi import FastAPI
-import azure.functions as func
 
 api_server = FastAPI()
 
@@ -35,8 +34,3 @@ async def get_weather(city='Dallas'):
 
         resp = requests.get(url=url, params=params)
         return resp.json()
-    
-app = func.AsgiFunctionApp(
-    app=api_server,
-    http_auth_level=func.AuthLevel.ANONYMOUS,  # or FUNCTION
-)
