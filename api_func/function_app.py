@@ -1,5 +1,5 @@
 import azure.functions as func
-from src.api_app import api_server
+from api_app import api_server
 
 
 app = func.AsgiFunctionApp(
