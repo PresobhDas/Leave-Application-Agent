@@ -35,7 +35,7 @@ jobs:
           pip install -r requirements.txt --target=".python_packages/lib/site-packages"
 
       - name: Zip artifact for deployment
-        run: zip -r release.zip . -x "venv/*" ".git/*"
+        run: zip -r release.zip . -x ".venv/*" ".git/*"
 
       - name: Verify zip contains .python_packages
         run: |
@@ -45,8 +45,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: python-app
-          path: |
-            release.zip
+          path: release.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -61,10 +60,10 @@ jobs:
         with:
           name: python-app
 
-      - name: Unzip artifact for deployment
-        run: |
-          unzip release.zip
-          rm release.zip
+      # - name: Unzip artifact for deployment
+      #   run: |
+      #     unzip release.zip
+      #     rm release.zip
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -79,7 +78,8 @@ jobs:
         with:
           app-name: "leave-policy-agent"
           slot-name: "Production"
-          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          # package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          package: release.zip
           scm-do-build-during-deployment: false
           enable-oryx-build: false
           remote-build: false
