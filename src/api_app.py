@@ -1,6 +1,5 @@
 # import requests
 from fastapi import FastAPI
-import azure.functions as func
 
 api_server = FastAPI()
 

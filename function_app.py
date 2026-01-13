@@ -1,5 +1,4 @@
 import azure.functions as func
-from azure.functions import AsgiMiddleware, AsgiFunctionApp
 from src.api_app import api_server
 
 
