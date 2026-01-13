@@ -7,7 +7,7 @@ api_server = FastAPI()
 async def ping():
     return {"message": "pong"}
 
-@api_server.get('get_weather')
+@api_server.get('/get_weather')
 async def get_weather():
     return {'city': 'Dallas'}
 
