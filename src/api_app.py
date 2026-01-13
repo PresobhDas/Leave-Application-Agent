@@ -3,7 +3,7 @@ from fastapi import FastAPI
 
 api_server = FastAPI()
 
-@api_server.get("ping")
+@api_server.get("/ping")
 async def ping():
     return {"message": "pong"}
 
