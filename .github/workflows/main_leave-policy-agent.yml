@@ -28,19 +28,28 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+     
+      - name: Install uv
+        run: |
+          python -m pip install --upgrade pip
+          pip install uv
+
+      - name: Compile requirements.txt from pyproject.toml
+        run: |
+          uv pip compile pyproject.toml -o requirements.txt
 
       - name: Build package - api_func
         run: |
+          cp requirements.txt api_func/
           cd api_func
           pip install -U pip
-          python -m pip install -r requirements.txt --target=".python_packages/lib/site-packages"
           zip -r ../release_api.zip . -x "__pycache__/*"
 
       - name: Build package - mcp_func
         run: |
+          cp requirements.txt mcp_func/
           cd mcp_func
           pip install -U pip
-          python -m pip install -r requirements.txt --target=".python_packages/lib/site-packages"
           zip -r ../release_mcp.zip . -x "__pycache__/*"
 
       - name: Upload artifact for deployment job
@@ -70,14 +79,6 @@ jobs:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_7063C4A9ACB847E2A7B9204778560AD1 }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D3364DE3020246508A5A1A7C627C4BFC }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DC49250B7A774CF9A6BBD0D8662C8A14 }}
-
-      - name: Debug - confirm subscription and function apps visible
-        run: |
-          az account show -o table
-          echo "Looking for leave-policy-agent-mcp in this subscription..."
-          az resource list --name leave-policy-agent-mcp --resource-type Microsoft.Web/sites -o table
-          echo "Looking for leave-policy-agent..."
-          az resource list --name leave-policy-agent --resource-type Microsoft.Web/sites -o table
           
       - name: 'Deploy API function'
         uses: Azure/functions-action@v1
