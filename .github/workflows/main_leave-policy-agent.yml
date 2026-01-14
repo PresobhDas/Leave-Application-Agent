@@ -33,7 +33,7 @@ jobs:
         run: |
           cd api_func
           python -m venv .venv
-          source venv/bin/activate
+          source .venv/bin/activate
           pip install -U pip
           pip install -r requirements.txt
           zip -r ../release.zip . -x ".venv/*" "__pycache__/*"
