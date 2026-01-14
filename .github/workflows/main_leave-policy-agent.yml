@@ -83,6 +83,6 @@ jobs:
         uses: Azure/functions-action@v1
         id: deploy-mcp-function
         with:
-          app-name: 'leave-policy-agent'
+          app-name: 'leave-policy-agent-mcp'
           slot-name: 'Production'
           package: release_mcp.zip
