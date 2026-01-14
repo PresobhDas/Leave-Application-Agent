@@ -29,19 +29,27 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Build package
+      - name: Build package - api_func
         run: |
           cd api_func
           pip install -U pip
           python -m pip install -r requirements.txt --target=".python_packages/lib/site-packages"
-          zip -r ../release.zip . -x "__pycache__/*"
+          zip -r ../release_api.zip . -x "__pycache__/*"
+
+      - name: Build package - mcp_func
+        run: |
+          cd mcp_func
+          pip install -U pip
+          python -m pip install -r requirements.txt --target=".python_packages/lib/site-packages"
+          zip -r ../release_mcp.zip . -x "__pycache__/*"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: python-app
           path: |
-            release.zip
+            release_api.zip
+            release_mcp.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -63,11 +71,18 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D3364DE3020246508A5A1A7C627C4BFC }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DC49250B7A774CF9A6BBD0D8662C8A14 }}
 
-      - name: 'Deploy to Azure Functions'
+      - name: 'Deploy API function'
         uses: Azure/functions-action@v1
-        id: deploy-to-function
+        id: deploy-api-function
         with:
           app-name: 'leave-policy-agent'
           slot-name: 'Production'
-          package: release.zip
-          
+          package: release_api.zip
+
+      - name: 'Deploy MCP function'
+        uses: Azure/functions-action@v1
+        id: deploy-mcp-function
+        with:
+          app-name: 'leave-policy-agent'
+          slot-name: 'Production'
+          package: release_mcp.zip
