@@ -71,6 +71,14 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D3364DE3020246508A5A1A7C627C4BFC }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DC49250B7A774CF9A6BBD0D8662C8A14 }}
 
+      - name: Debug - confirm subscription and function apps visible
+        run: |
+          az account show -o table
+          echo "Looking for leave-policy-agent-mcp in this subscription..."
+          az resource list --name leave-policy-agent-mcp --resource-type Microsoft.Web/sites -o table
+          echo "Looking for leave-policy-agent..."
+          az resource list --name leave-policy-agent --resource-type Microsoft.Web/sites -o table
+          
       - name: 'Deploy API function'
         uses: Azure/functions-action@v1
         id: deploy-api-function
