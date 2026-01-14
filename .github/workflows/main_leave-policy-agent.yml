@@ -41,15 +41,13 @@ jobs:
       - name: Build package - api_func
         run: |
           cp requirements.txt api_func/
-          cd api_func
-          pip install -U pip
+          python -m pip install -r requirements.txt --target="api_func/.python_packages/lib/site-packages"
           zip -r ../release_api.zip . -x "__pycache__/*"
 
       - name: Build package - mcp_func
         run: |
           cp requirements.txt mcp_func/
-          cd mcp_func
-          pip install -U pip
+          python -m pip install -r requirements.txt --target="mcp_func/.python_packages/lib/site-packages"
           zip -r ../release_mcp.zip . -x "__pycache__/*"
 
       - name: Upload artifact for deployment job
