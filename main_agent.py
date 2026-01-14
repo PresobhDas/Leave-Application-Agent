@@ -1,5 +1,11 @@
 import requests
+from pydantic import BaseModel
 
-url = 'https://leave-policy-agent-aaavdzbuf3bcexej.westus2-01.azurewebsites.net/ping'
+class InputDetails(BaseModel):
+    inp_query:str
 
-response = requests.get(url=url)
+url = 'https://leave-policy-agent-aaavdzbuf3bcexej.westus2-01.azurewebsites.net/agent'
+inp_details = InputDetails(inp_query='Hello How are you')
+response = requests.get(url=url, json=inp_details.model_dump())
+
+print(response.json()['content'])
