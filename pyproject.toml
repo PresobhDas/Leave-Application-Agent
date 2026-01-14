@@ -8,6 +8,8 @@ dependencies = [
   "azure-functions>=1.24.0",
   "fastapi[standard]>=0.128.0",
   "fastmcp>=2.14.2",
+  "langchain-openai>=1.1.7",
   "langgraph>=1.0.5",
+  "pydantic>=2.12.5",
   "requests>=2.32.5",
 ]
