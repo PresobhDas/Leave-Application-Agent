@@ -1,7 +1,17 @@
 from mcp.server.fastmcp import FastMCP
 import requests
+from mcp.server.transport_security import TransportSecuritySettings
 
-mcp_api_app = FastMCP()
+mcp_api_app = FastMCP(
+    transport_security=TransportSecuritySettings(
+        # allow just your app host (tightest)
+        allowed_hosts=[
+            "leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net",
+            "*.azurewebsites.net",  # optional wildcard
+        ],
+    )
+)
+
 
 @mcp_api_app.tool()
 async def get_weather(city:str):
