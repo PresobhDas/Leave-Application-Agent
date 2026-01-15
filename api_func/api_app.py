@@ -27,6 +27,8 @@ async def call_agent(inp_details : InputDetails) -> AIMessage:
                 arguments={'city':'Dallas'}
             )
 
+    return result
+
 
 
 
