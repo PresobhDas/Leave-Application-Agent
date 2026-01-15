@@ -26,14 +26,11 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
         async with streamable_http_client('https://leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net/mcp') as (read, write):
             async with ClientSession(read, write) as session:
                 await session.initialize()
-                result = await session.call_tool(
-                    name='get_weather',
-                    arguments={'city':'Dallas'}
-                )
+                log.info(f'Data from MCP is {await session.call_tool(name='get_weather',arguments={'city':'Dallas'})}')
     except* Exception as e:
         log.exception(f'Failed with Exception: {e.exceptions}')
 
-    return result
+    return 'Ran Successful : OK'
 
 
 
