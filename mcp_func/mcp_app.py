@@ -2,12 +2,14 @@ from mcp.server.fastmcp import FastMCP
 import requests
 from mcp.server.transport_security import TransportSecuritySettings
 
+HOST = 'leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net'
+
 mcp_api_app = FastMCP(
     transport_security=TransportSecuritySettings(
         # allow just your app host (tightest)
         allowed_hosts=[
-            "leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net",
-            "*.azurewebsites.net",  # optional wildcard
+                HOST,
+                f'{HOST}:443' # optional wildcard
         ],
     )
 )
