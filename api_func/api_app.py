@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Body
 from pydantic import BaseModel
 from typing import Annotated
 from langgraph.graph import START, END, StateGraph
@@ -16,8 +16,8 @@ class InputDetails(BaseModel):
 async def ping():
     return {'response':'pong'}
 
-@api_server.get('/agent')
-async def call_agent(inp_details : Annotated[InputDetails, Query()]) -> AIMessage:
+@api_server.post('/agent')
+async def call_agent(inp_details : Annotated[InputDetails, Body()]) -> AIMessage:
     chat_model = get_chat_model()
 
     async with streamable_http_client('https://leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net/mcp') as (read, write):
