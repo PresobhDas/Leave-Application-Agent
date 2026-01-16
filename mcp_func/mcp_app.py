@@ -1,12 +1,19 @@
 from mcp.server.fastmcp import FastMCP
 import requests
 from mcp.server.transport_security import TransportSecuritySettings
-import logging
+import logging, sys
 
 log = logging.getLogger("api")
 log.setLevel(logging.INFO)
 logging.getLogger().setLevel(logging.INFO) 
-log.info('MCP Module loaded')
+log.propagate = True
+if not log.handlers:
+    h = logging.StreamHandler(sys.stdout)
+    h.setLevel(logging.INFO)
+    log.addHandler(h)
+
+log.info("mcp_app.py logging is ON")
+print("mcp_app.py PRINT sanity check")
 
 HOST = 'leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net'
 
@@ -23,6 +30,7 @@ mcp_api_app = FastMCP(
 @mcp_api_app.tool()
 async def get_weather(city:str):
     log.info('Successfully got into the MCP for get_weather')
+    print('Printing from the print function')
     return {'Weather of Dallas' : 'Sunny'}
     # def get_lat_long(city:str):
     #     url = "https://geocoding-api.open-meteo.com/v1/search"
