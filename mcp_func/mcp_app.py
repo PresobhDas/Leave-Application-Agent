@@ -3,10 +3,10 @@ import requests
 from mcp.server.transport_security import TransportSecuritySettings
 import logging, sys
 
-log = logging.getLogger()
+log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
 logging.getLogger().setLevel(logging.INFO) 
-log.propagate = True
+# log.propagate = True
 if not log.handlers:
     h = logging.StreamHandler(sys.stdout)
     h.setLevel(logging.INFO)
