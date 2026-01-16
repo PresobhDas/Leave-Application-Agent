@@ -49,6 +49,7 @@ async def get_weather(city:str):
         }
 
         resp = requests.get(url=url, params=params)
+        log.info('get_weather API successfully called.')
         return resp.json()
     
 mcp_server = mcp_api_app.streamable_http_app()
