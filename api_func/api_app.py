@@ -9,8 +9,9 @@ from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 import logging
 
-logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("api")
+log.setLevel(logging.INFO)
+logging.getLogger().setLevel(logging.INFO) 
 
 api_server = FastAPI()
 MCP_SERVER = 'https://leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net/mcp'
