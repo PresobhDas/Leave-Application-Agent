@@ -6,10 +6,10 @@ import logging, sys
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 
-# if not log.handlers:
-#     h = logging.StreamHandler(sys.stdout)
-#     h.setLevel(logging.INFO)
-#     log.addHandler(h)
+if not log.handlers:
+    h = logging.StreamHandler(sys.stdout)
+    h.setLevel(logging.INFO)
+    log.addHandler(h)
 
 HOST = 'leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net'
 
