@@ -24,8 +24,10 @@ async def ping():
 async def call_agent(inp_details : Annotated[InputDetails, Body()]):
     log.info('Calling the call_agent function for processing the request')
     chat_model = get_chat_model()
+    log.info('Retrieved the chat model')
     try:
         async with streamable_http_client('https://leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net/mcp') as (read, write):
+            log.info('Successfully called streamable_http_client')
             async with ClientSession(read, write) as session:
                 await session.initialize()
                 log.info('MCP session initialized')
