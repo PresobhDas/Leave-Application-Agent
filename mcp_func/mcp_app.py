@@ -7,13 +7,10 @@ log = logging.getLogger("api")
 log.setLevel(logging.INFO)
 logging.getLogger().setLevel(logging.INFO) 
 log.propagate = True
-if not log.handlers:
-    h = logging.StreamHandler(sys.stdout)
-    h.setLevel(logging.INFO)
-    log.addHandler(h)
-
-log.info("mcp_app.py logging is ON")
-print("mcp_app.py PRINT sanity check")
+# if not log.handlers:
+#     h = logging.StreamHandler(sys.stdout)
+#     h.setLevel(logging.INFO)
+#     log.addHandler(h)
 
 HOST = 'leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net'
 
