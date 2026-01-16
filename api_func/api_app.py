@@ -21,6 +21,7 @@ async def ping():
 
 @api_server.post('/agent')
 async def call_agent(inp_details : Annotated[InputDetails, Body()]):
+    log.info('Calling the call_agent function for processing the request')
     chat_model = get_chat_model()
     try:
         async with streamable_http_client('https://leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net/mcp') as (read, write):
