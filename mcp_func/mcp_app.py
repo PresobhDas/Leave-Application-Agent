@@ -5,6 +5,7 @@ import logging, sys
 
 log = logging.getLogger()
 log.setLevel(logging.INFO)
+log.propagate = True
 
 if not log.handlers:
     h = logging.StreamHandler(sys.stdout)
