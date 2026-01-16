@@ -27,7 +27,7 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
     chat_model = get_chat_model()
     log.info('Retrieved the chat model')
     try:
-        async with streamable_http_client(MCP_SERVER) as (read, write):
+        async with streamable_http_client(MCP_SERVER) as (read, write, session_id):
             log.info('Successfully called streamable_http_client')
             async with ClientSession(read, write) as session:
                 await session.initialize()
