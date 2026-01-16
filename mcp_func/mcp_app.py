@@ -7,10 +7,10 @@ log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
 # logging.getLogger().setLevel(logging.INFO) 
 
-if not log.handlers:
-    h = logging.StreamHandler(sys.stdout)
-    h.setLevel(logging.INFO)
-    log.addHandler(h)
+# if not log.handlers:
+#     h = logging.StreamHandler(sys.stdout)
+#     h.setLevel(logging.INFO)
+#     log.addHandler(h)
 
 log.info("mcp_app.py logging is ON")
 print("mcp_app.py PRINT sanity check")
