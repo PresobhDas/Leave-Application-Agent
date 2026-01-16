@@ -5,8 +5,8 @@ import logging, sys
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
-logging.getLogger().setLevel(logging.INFO) 
-# log.propagate = True
+# logging.getLogger().setLevel(logging.INFO) 
+
 if not log.handlers:
     h = logging.StreamHandler(sys.stdout)
     h.setLevel(logging.INFO)
