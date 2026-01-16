@@ -9,4 +9,4 @@ inp_details = InputDetails(inp_query='Hello How are you')
 response = requests.post(url=url, json=inp_details.model_dump())
 
 print(type(response))
-print(response.content)
+print(response.json())

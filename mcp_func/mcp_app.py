@@ -4,7 +4,7 @@ from mcp.server.transport_security import TransportSecuritySettings
 import logging
 
 logging.basicConfig(level=logging.INFO)
-log = logging.getLogger("api")
+log = logging.getLogger("mcp")
 
 HOST = 'leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net'
 
@@ -17,6 +17,7 @@ mcp_api_app = FastMCP(
         ],
     )
 )
+log.info('MCP Module loaded')
 
 @mcp_api_app.tool()
 async def get_weather(city:str):
