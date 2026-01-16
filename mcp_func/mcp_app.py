@@ -3,7 +3,7 @@ import requests
 from mcp.server.transport_security import TransportSecuritySettings
 import logging, sys
 
-log = logging.getLogger("api")
+log = logging.getLogger()
 log.setLevel(logging.INFO)
 logging.getLogger().setLevel(logging.INFO) 
 log.propagate = True
