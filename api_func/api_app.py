@@ -37,7 +37,7 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
     except* Exception as e:
         log.exception(f'Failed with Exception: {e.exceptions}')
 
-    return 'Ran Successful : OK'
+    return result
 
 
 
