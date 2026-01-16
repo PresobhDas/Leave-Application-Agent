@@ -9,6 +9,7 @@ from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 import logging
 
+logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("api")
 
 api_server = FastAPI()
