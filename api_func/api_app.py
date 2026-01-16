@@ -13,6 +13,7 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("api")
 
 api_server = FastAPI()
+MCP_SERVER = 'https://leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net/mcp'
 class InputDetails(BaseModel):
     inp_query:str
 
@@ -26,7 +27,7 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
     chat_model = get_chat_model()
     log.info('Retrieved the chat model')
     try:
-        async with streamable_http_client('https://leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net/mcp') as (read, write):
+        async with streamable_http_client(MCP_SERVER) as (read, write):
             log.info('Successfully called streamable_http_client')
             async with ClientSession(read, write) as session:
                 await session.initialize()

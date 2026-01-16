@@ -18,7 +18,6 @@ mcp_api_app = FastMCP(
     )
 )
 
-
 @mcp_api_app.tool()
 async def get_weather(city:str):
     log.info('Successfully got into the MCP for get_weather')
