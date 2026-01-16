@@ -5,12 +5,11 @@ import logging, sys
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
-# logging.getLogger().setLevel(logging.INFO) 
 
-# if not log.handlers:
-#     h = logging.StreamHandler(sys.stdout)
-#     h.setLevel(logging.INFO)
-#     log.addHandler(h)
+if not log.handlers:
+    h = logging.StreamHandler(sys.stdout) 
+    h.setLevel(logging.INFO)
+    log.addHandler(h)
 
 log.info("mcp_app.py logging is ON")
 print("mcp_app.py PRINT sanity check")
@@ -31,35 +30,34 @@ mcp_api_app = FastMCP(
 async def get_weather(city:str):
     log.info('Successfully got into the MCP for get_weather')
     print('Printing from the print')
-    return {'Weather of Dallas' : 'Sunny'}
-    # def get_lat_long(city:str):
-    #     url = "https://geocoding-api.open-meteo.com/v1/search"
-    #     params = {
-    #         'name':city,
-    #         'count':1,
-    #         'language':'en',
-    #         'format':'json'
-    #     }
+    def get_lat_long(city:str):
+        url = "https://geocoding-api.open-meteo.com/v1/search"
+        params = {
+            'name':city,
+            'count':1,
+            'language':'en',
+            'format':'json'
+        }
 
-    #     resp = requests.get(url=url, params=params)
-    #     data = resp.json()
-    #     if 'results' not in data:
-    #         raise ValueError(f'City:{city} not found')
+        resp = requests.get(url=url, params=params)
+        data = resp.json()
+        if 'results' not in data:
+            raise ValueError(f'City:{city} not found')
         
-    #     result = data['results'][0]
-    #     return result['latitude'], result['longitude']
+        result = data['results'][0]
+        return result['latitude'], result['longitude']
     
-    # lat, long = get_lat_long(city)
-    # if lat and long:
-    #     url = "https://api.open-meteo.com/v1/forecast"
-    #     params = {
-    #         'latitude':lat,
-    #         'longitude':long,
-    #         'current_weather':True
-    #     }
+    lat, long = get_lat_long(city)
+    if lat and long:
+        url = "https://api.open-meteo.com/v1/forecast"
+        params = {
+            'latitude':lat,
+            'longitude':long,
+            'current_weather':True
+        }
 
-    #     resp = requests.get(url=url, params=params)
-    #     log.info('get_weather API successfully called.')
-    #     return resp.json()
+        resp = requests.get(url=url, params=params)
+        log.info('get_weather API successfully called.')
+        return resp.json()
     
 mcp_server = mcp_api_app.streamable_http_app()
