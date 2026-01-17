@@ -7,14 +7,10 @@ from utils import get_chat_model, get_weather_tool
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from mcp.client.streamable_http import streamable_http_client
 from mcp import ClientSession
-import logging, sys
+import logging, sys, inspect
 
 log = logging.getLogger('api')
 log.setLevel(logging.INFO)
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s.%(funcName)s: %(message)s"
-)
 
 if not log.handlers:
     h = logging.StreamHandler(sys.stdout) 
@@ -32,26 +28,14 @@ async def ping():
 
 @api_server.post('/agent')
 async def call_agent(inp_details : Annotated[InputDetails, Body()]):
-    log.info('Function Invoked')
-
-    chat_model = get_chat_model()
-    MCP_SERVER = 'https://leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net/mcp'
-    try:
-        async with streamable_http_client(MCP_SERVER) as (read, write, session_id):
-            async with ClientSession(read, write) as MCP_SESSION:
-                MCP_SESSION.initialize()
-                log.info('Created MCP_SESSION')
-                result = process_ai_agent()
-                return result
-    except* Exception as e:
-        log.exception(f'Failed with Exception: {e.exceptions}')
-
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     async def process_ai_agent():
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
         class RagState(StateGraph):
             question:str
             tool_execution_count: int
         async def check_tool_condition(state: RagState):
-            log.info('Function Invoked')
+            log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
             if state.get('tool_execution_count',0) >= 5:
                 return 'end'
             last_AIMessage = state['messages'][-1]
@@ -62,7 +46,7 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
                 return 'end'
 
         async def generate_answer_from_llm(state:RagState):
-            log.info('Function Invoked')
+            log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
             inp_system_message = await MCP_SESSION.get_prompt(
                 name = 'get_input_prompt_system'
             )
@@ -111,5 +95,21 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
         )
 
         return result
+
+    log.info('Function Invoked')
+
+    chat_model = get_chat_model()
+    MCP_SERVER = 'https://leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net/mcp'
+    try:
+        async with streamable_http_client(MCP_SERVER) as (read, write, session_id):
+            async with ClientSession(read, write) as MCP_SESSION:
+                MCP_SESSION.initialize()
+                log.info('Created MCP_SESSION')
+                result = process_ai_agent()
+                return result
+    except* Exception as e:
+        log.exception(f'Failed with Exception: {e.exceptions}')
+
+
 
 

@@ -1,15 +1,10 @@
 import os
 from langchain_openai import ChatOpenAI
 from langchain.tools import tool
-
-import logging, sys
+import logging, sys, inspect
 
 log = logging.getLogger('utils')
 log.setLevel(logging.INFO)
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s.%(funcName)s: %(message)s"
-)
 
 if not log.handlers:
     h = logging.StreamHandler(sys.stdout) 
@@ -17,7 +12,7 @@ if not log.handlers:
     log.addHandler(h)
 
 def get_chat_model() -> ChatOpenAI:
-    log.info('Function Invoked')
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     chat_model = ChatOpenAI(
         model= 'gpt-4o-mini',
         temperature=0.3,
@@ -35,7 +30,7 @@ async def get_weather_tool(city: str, mcp_session):
 
     This function tool get the city name as the input and returns the current weather information for that city
     '''
-    log.info('Function Invoked')
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     resp = await mcp_session.call_tool(
                                         name = 'get_weather',
                                         arguments = {'city':city} 

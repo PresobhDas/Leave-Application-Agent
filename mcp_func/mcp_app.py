@@ -1,14 +1,10 @@
 from mcp.server.fastmcp import FastMCP
 import requests
 from mcp.server.transport_security import TransportSecuritySettings
-import logging, sys
+import logging, sys, inspect
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s.%(funcName)s: %(message)s"
-)
 
 if not log.handlers:
     h = logging.StreamHandler(sys.stdout) 
@@ -29,7 +25,7 @@ mcp_api_app = FastMCP(
 
 @mcp_api_app.prompt()
 async def get_input_prompt_human(question:str, context:str):
-    log.info('Function Invoked')
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     human_message=f"""This is the question : {question}."""
     # Also look at the previous ToolMessage object for any context that would have been retrieved from the RAG pipeline"""
     # if context != '':
@@ -39,7 +35,7 @@ async def get_input_prompt_human(question:str, context:str):
 
 @mcp_api_app.prompt()
 async def get_input_prompt_system():
-    log.info('Function Invoked')
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     system_message = '''
     You are a helpful AI bot that does the following.
     1. Understand the question given to you by the user.
@@ -60,9 +56,9 @@ async def get_input_prompt_system():
 
 @mcp_api_app.tool()
 async def get_weather(city:str):
-    log.info('Function Invoked')
-    log.info('Successfully got into the MCP for get_weather')
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     def get_lat_long(city:str):
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
         url = "https://geocoding-api.open-meteo.com/v1/search"
         params = {
             'name':city,
