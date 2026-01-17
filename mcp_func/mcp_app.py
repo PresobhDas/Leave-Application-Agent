@@ -6,6 +6,7 @@ import logging, sys
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
 logging.basicConfig(
+    level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s.%(funcName)s: %(message)s"
 )
 
@@ -62,8 +63,8 @@ def get_input_prompt_system():
 
 @mcp_api_app.tool()
 async def get_weather(city:str):
+    log.info('Function Invoked')
     log.info('Successfully got into the MCP for get_weather')
-    print('Printing from the print')
     def get_lat_long(city:str):
         url = "https://geocoding-api.open-meteo.com/v1/search"
         params = {

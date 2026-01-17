@@ -10,6 +10,7 @@ import logging, sys
 log = logging.getLogger('api')
 log.setLevel(logging.INFO)
 logging.basicConfig(
+    level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s.%(funcName)s: %(message)s"
 )
 
