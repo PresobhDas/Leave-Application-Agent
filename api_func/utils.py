@@ -17,7 +17,7 @@ if not log.handlers:
     h.setLevel(logging.INFO)
     log.addHandler(h)
 
-async def get_chat_model() -> ChatOpenAI:
+def get_chat_model() -> ChatOpenAI:
     log.info('Function Invoked')
     chat_model = ChatOpenAI(
         name='gpt-4o-mini',
@@ -26,7 +26,7 @@ async def get_chat_model() -> ChatOpenAI:
     log.info('Retrieved the chat model')
     return chat_model
 
-async def get_mcp_session():
+def get_mcp_session():
     log.info('Function Invoked')
     MCP_SERVER = 'https://leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net/mcp'
     try:

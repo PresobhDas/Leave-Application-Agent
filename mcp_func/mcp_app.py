@@ -15,9 +15,6 @@ if not log.handlers:
     h.setLevel(logging.INFO)
     log.addHandler(h)
 
-log.info("mcp_app.py logging is ON")
-print("mcp_app.py PRINT sanity check")
-
 HOST = 'leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net'
 
 mcp_api_app = FastMCP(
@@ -31,7 +28,7 @@ mcp_api_app = FastMCP(
 )
 
 @mcp_api_app.prompt()
-def get_input_prompt_human(question:str, context:str):
+async def get_input_prompt_human(question:str, context:str):
     log.info('Function Invoked')
     human_message=f"""This is the question : {question}."""
     # Also look at the previous ToolMessage object for any context that would have been retrieved from the RAG pipeline"""
@@ -41,7 +38,7 @@ def get_input_prompt_human(question:str, context:str):
     return human_message  
 
 @mcp_api_app.prompt()
-def get_input_prompt_system():
+async def get_input_prompt_system():
     log.info('Function Invoked')
     system_message = '''
     You are a helpful AI bot that does the following.
