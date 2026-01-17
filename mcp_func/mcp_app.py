@@ -5,6 +5,9 @@ import logging, sys
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
+logging.basicConfig(
+    format="%(asctime)s [%(levelname)s] %(name)s.%(funcName)s: %(message)s"
+)
 
 if not log.handlers:
     h = logging.StreamHandler(sys.stdout) 
@@ -25,6 +28,37 @@ mcp_api_app = FastMCP(
         ],
     )
 )
+
+@mcp_api_app.prompt()
+def get_input_prompt_human(question:str, context:str):
+    log.info('Function Invoked')
+    human_message=f"""This is the question : {question}."""
+    # Also look at the previous ToolMessage object for any context that would have been retrieved from the RAG pipeline"""
+    # if context != '':
+    #     human_message += """This is the context being provided to you from the RAG pipeline : {context}"""
+
+    return human_message  
+
+@mcp_api_app.prompt()
+def get_input_prompt_system():
+    log.info('Function Invoked')
+    system_message = '''
+    You are a helpful AI bot that does the following.
+    1. Understand the question given to you by the user.
+    2. Take the following actions ONLY with priority in the given order:
+        a) If the question is regular conversaion, respond naturally and conversationally as no information retrieval is needed.
+        b) Try to answer based on your internal knowledge.
+        c) Call external tools provided to you. Details of the different tools ar as follows. There is NO particular order in which the below tools need to be invoked. Directly call the right tool as needed. No need to follow the below precedence.
+            1) Tool Name : load_RAG_context_tool.
+                Description: RAG tool to see if the question has potential answers from RAG output. If the RAG output has the necessary information, then provide the citation as well. For eg: PageNo from the given context.
+            2) Tool Name: weather_tool
+                Description: weather_tool to retrieve the weather information for any given location. 
+            3) Tool Name: load_data_from_db
+                Description: load_data_from_db to load Customer information from the Postgres SQL Database. If the question involves querying data from the Database based on the CUSTOMER ID, call this tool to pass the CUSTOMER ID as a parameter to read and pass back the information read from the databse to the LLM
+        d) If NONE of the THE ABOVE works, say 'I Don't know the answer'.      
+    '''
+
+    return system_message
 
 @mcp_api_app.tool()
 async def get_weather(city:str):
