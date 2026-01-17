@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Body
 from pydantic import BaseModel
 from typing import Annotated
-from langgraph.graph import START, END, StateGraph
+from langgraph.graph import START, END, StateGraph, MessagesState
 from langgraph.prebuilt import ToolNode
 from utils import get_chat_model, get_weather_tool
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
@@ -31,7 +31,7 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     async def process_ai_agent():
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-        class RagState(StateGraph):
+        class RagState(MessagesState):
             question:str
             tool_execution_count: int
         async def check_tool_condition(state: RagState):
