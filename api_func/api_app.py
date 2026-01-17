@@ -52,7 +52,7 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
             )
             inp_human_message = await MCP_SESSION.get_prompt(name='get_input_prompt_human',
                             arguments={
-                                            'question' : state.question,
+                                            'question' : state.get('question', ''),
                                             'context' : ''
                                         } 
                     )
