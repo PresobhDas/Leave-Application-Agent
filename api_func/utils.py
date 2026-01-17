@@ -1,8 +1,7 @@
 import os
 from langchain_openai import ChatOpenAI
 from langchain.tools import tool
-from mcp.client.streamable_http import streamable_http_client
-from mcp import ClientSession
+
 import logging, sys
 
 log = logging.getLogger('utils')
@@ -20,28 +19,15 @@ if not log.handlers:
 def get_chat_model() -> ChatOpenAI:
     log.info('Function Invoked')
     chat_model = ChatOpenAI(
-        name='gpt-4o-mini',
+        model= 'gpt-4o-mini',
+        temperature=0.3,
         api_key=os.environ['OPENAI_API_KEY']
     )
     log.info('Retrieved the chat model')
     return chat_model
 
-def get_mcp_session():
-    log.info('Function Invoked')
-    MCP_SERVER = 'https://leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net/mcp'
-    try:
-        with streamable_http_client(MCP_SERVER) as (read, write, session_id):
-            with ClientSession(read, write) as MCP_SESSION:
-                MCP_SESSION.initialize()
-    except* Exception as e:
-        log.exception(f'Failed with Exception: {e.exceptions}')
-
-    log.info('Created MCP_SESSION')
-    return MCP_SESSION
-
 @tool
 async def get_weather_tool(city: str, mcp_session):
-    log.info('Function Invoked')
     '''
     Docstring for weather_tool
     :param city: Input city whose weather is being requested for.
@@ -49,6 +35,7 @@ async def get_weather_tool(city: str, mcp_session):
 
     This function tool get the city name as the input and returns the current weather information for that city
     '''
+    log.info('Function Invoked')
     resp = await mcp_session.call_tool(
                                         name = 'get_weather',
                                         arguments = {'city':city} 
