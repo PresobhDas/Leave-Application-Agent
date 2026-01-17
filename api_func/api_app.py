@@ -103,9 +103,9 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
     try:
         async with streamable_http_client(MCP_SERVER) as (read, write, session_id):
             async with ClientSession(read, write) as MCP_SESSION:
-                MCP_SESSION.initialize()
-                log.info('Created MCP_SESSION')
-                result = process_ai_agent()
+                await MCP_SESSION.initialize()
+                log.info('CUSTOM LOG - Created MCP_SESSION')
+                result = await process_ai_agent()
                 return result
     except* Exception as e:
         log.exception(f'Failed with Exception: {e.exceptions}')
