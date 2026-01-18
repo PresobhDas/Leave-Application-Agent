@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import Annotated
 from langgraph.graph import START, END, StateGraph, MessagesState
 from langgraph.prebuilt import ToolNode
-from utils import get_chat_model, get_weather_tool
+from llm_utils import get_chat_model, build_nodes, build_tools, check_tool_condition, RagState
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from mcp.client.streamable_http import streamable_http_client
 from mcp import ClientSession
@@ -18,7 +18,6 @@ if not log.handlers:
     log.addHandler(h)
 
 api_server = FastAPI()
-
 class InputDetails(BaseModel):
     inp_query:str
 
@@ -31,51 +30,15 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     async def process_ai_agent():
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-        class RagState(MessagesState):
-            question:str
-            tool_execution_count: int
-        async def check_tool_condition(state: RagState):
-            log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-            if state.get('tool_execution_count',0) >= 5:
-                return 'end'
-            last_AIMessage = state['messages'][-1]
-            tool_calls = getattr(last_AIMessage, 'tool_calls', None)
-            if tool_calls:
-                return 'tool_execution_node'
-            else:
-                return 'end'
 
-        async def node_generate_answer_from_llm(state:RagState):
-            log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-            inp_system_message = await MCP_SESSION.get_prompt(
-                name = 'get_input_prompt_system'
-            )
-            inp_human_message = await MCP_SESSION.get_prompt(name='get_input_prompt_human',
-                            arguments={
-                                            'question' : state.get('question', ''),
-                                            'context' : ''
-                                        } 
-                    )
-            SYSTEM_MESSAGE = SystemMessage(content=inp_system_message.messages[0].content.text)
-            HUMAN_MESSAGE = HumanMessage(content=inp_human_message.messages[0].content.text)
-            response = await answer_llm_with_tools.ainvoke(state['messages'] + [SYSTEM_MESSAGE, HUMAN_MESSAGE])
-            count = state.get('tool_execution_count',0)
-            if getattr(response, 'tool_calls', None):
-                count += 1
+        tools = build_tools(MCP_SESSION)
+        llm_with_tools = chat_model.bind_tools(tools)
+        nodes = build_nodes(MCP_SESSION, llm_with_tools)
 
-            return {
-            'messages':[HUMAN_MESSAGE, response],
-            'tool_execution_count' : count
-            }
-
-        tools = [get_weather_tool]
-        answer_llm_with_tools = chat_model.bind_tools(tools)
         graph = StateGraph(RagState)
-
-        graph.add_node('node_generate_answer_from_llm', node_generate_answer_from_llm)
+        graph.add_node('node_generate_answer_from_llm', nodes['node_generate_answer_from_llm'])
         node_tool_execution = ToolNode(tools=tools)
         graph.add_node('node_tool_execution', node_tool_execution)
-
         graph.add_edge(START, 'node_generate_answer_from_llm')
         graph.add_conditional_edges(
             'node_generate_answer_from_llm',
