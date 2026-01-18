@@ -36,7 +36,7 @@ async def check_tool_condition(state: RagState):
     log.info(last_AIMessage)
     tool_calls = getattr(last_AIMessage, 'tool_calls', None)
     if tool_calls:
-        return 'tool_execution_node'
+        return 'node_tool_execution'
     else:
         return 'end'
 
