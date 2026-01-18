@@ -45,7 +45,7 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
             else:
                 return 'end'
 
-        async def generate_answer_from_llm(state:RagState):
+        async def node_generate_answer_from_llm(state:RagState):
             log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
             inp_system_message = await MCP_SESSION.get_prompt(
                 name = 'get_input_prompt_system'
@@ -72,16 +72,16 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
         answer_llm_with_tools = chat_model.bind_tools(tools)
         graph = StateGraph(RagState)
 
-        graph.add_node('generate_answer_from_llm', generate_answer_from_llm)
-        tool_execution_node = ToolNode(tools=tools)
-        graph.add_node('tool_execution_node', tool_execution_node)
+        graph.add_node('node_generate_answer_from_llm', node_generate_answer_from_llm)
+        node_tool_execution = ToolNode(tools=tools)
+        graph.add_node('node_tool_execution', node_tool_execution)
 
-        graph.add_edge(START, 'generate_answer_from_llm')
+        graph.add_edge(START, 'node_generate_answer_from_llm')
         graph.add_conditional_edges(
-            'generate_answer_from_llm',
+            'node_generate_answer_from_llm',
             check_tool_condition,
             {
-                'tool_execution_node': 'tool_execution_node',
+                'node_tool_execution': 'node_tool_execution',
                 'end': END
             }
         )

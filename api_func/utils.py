@@ -2,6 +2,7 @@ import os
 from langchain_openai import ChatOpenAI
 from langchain.tools import tool
 import logging, sys, inspect
+from mcp import ClientSession
 
 log = logging.getLogger('utils')
 log.setLevel(logging.INFO)
@@ -22,11 +23,13 @@ def get_chat_model() -> ChatOpenAI:
     return chat_model
 
 @tool
-async def get_weather_tool(city: str, mcp_session):
+async def get_weather_tool(city: str, mcp_session:ClientSession):
     '''
     Docstring for weather_tool
     :param city: Input city whose weather is being requested for.
     :type city: str
+    :param mcp_session: The MCP session that needs to be passed to call the tools from the MCP Server
+    :type city: ClientSession
 
     This function tool get the city name as the input and returns the current weather information for that city
     '''
