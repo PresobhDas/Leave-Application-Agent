@@ -33,6 +33,7 @@ async def check_tool_condition(state: RagState):
     if state.get('tool_execution_count',0) >= 5:
         return 'end'
     last_AIMessage = state['messages'][-1]
+    log.info(last_AIMessage)
     tool_calls = getattr(last_AIMessage, 'tool_calls', None)
     if tool_calls:
         return 'tool_execution_node'
