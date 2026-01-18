@@ -52,14 +52,14 @@ jobs:
           python -m pip install -r requirements.txt --target=".python_packages/lib/site-packages"
           zip -r ../release_mcp.zip . -x "__pycache__/*"
 
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-app
-          path: |
-            release_api.zip
-            release_mcp.zip
-          retention-days: 1
+      # - name: Upload artifact for deployment job
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: python-app
+      #     path: |
+      #       release_api.zip
+      #       release_mcp.zip
+      #     retention-days: 1
 
   deploy:
     runs-on: ubuntu-latest

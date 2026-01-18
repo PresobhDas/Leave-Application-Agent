@@ -29,7 +29,7 @@ async def get_weather_tool(city: str, mcp_session:ClientSession):
     :param city: Input city whose weather is being requested for.
     :type city: str
     :param mcp_session: The MCP session that needs to be passed to call the tools from the MCP Server
-    :type city: ClientSession
+    :type mcp_session: ClientSession
 
     This function tool get the city name as the input and returns the current weather information for that city
     '''
