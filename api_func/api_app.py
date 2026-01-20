@@ -46,6 +46,7 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
                 'end': END
             }
         )
+        graph.add_edge('node_tool_execution', 'node_generate_answer_from_llm')
         graph_app = graph.compile()
         log.info('Graph created and compiled')
         result = await graph_app.ainvoke(
