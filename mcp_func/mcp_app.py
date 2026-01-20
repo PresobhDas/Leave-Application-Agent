@@ -2,8 +2,7 @@ from mcp.server.fastmcp import FastMCP
 import requests
 from mcp.server.transport_security import TransportSecuritySettings
 import logging, sys, inspect
-from pydantic import BaseModel
-from api_func.llm_utils import WeatherData
+from llm_utils import WeatherData
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)

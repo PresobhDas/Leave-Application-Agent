@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import Annotated
 from langgraph.graph import START, END, StateGraph, MessagesState
 from langgraph.prebuilt import ToolNode
-from llm_utils import get_chat_model, build_nodes, build_tools, check_tool_condition, RagState
+from llm_utils import get_chat_model, build_nodes, build_tools, check_tool_condition, RagState, InputDetails
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from mcp.client.streamable_http import streamable_http_client
 from mcp import ClientSession
@@ -18,8 +18,6 @@ if not log.handlers:
     log.addHandler(h)
 
 api_server = FastAPI()
-class InputDetails(BaseModel):
-    inp_query:str
 
 @api_server.get('/ping')
 async def ping():

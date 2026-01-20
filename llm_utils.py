@@ -26,6 +26,9 @@ class WeatherData(BaseModel):
     windspeed: float
     winddirection: float
 
+class InputDetails(BaseModel):
+    inp_query:str
+
 def get_chat_model() -> ChatOpenAI:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     chat_model = ChatOpenAI(
