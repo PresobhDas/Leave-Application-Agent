@@ -94,12 +94,13 @@ async def get_weather(city:str):
 
         resp = requests.get(url=url, params=params).json()
         log.info('get_weather API successfully called.')
-        current_weather = WeatherData()
-        current_weather.latitude = resp['latitude']
-        current_weather.longitude = resp['longitude']
-        current_weather.temperature = resp['current_weather']['temperature']
-        current_weather.windspeed = resp['current_weather']['windspeed']
-        current_weather.winddirection = resp['current_weather']['winddirection']
+        current_weather = WeatherData(
+            latitude=resp['latitude'],
+            longitude=resp['longitude'],
+            temperature=resp['current_weather']['temperature'],
+            windspeed=resp['current_weather']['windspeed'],
+            winddirection=resp['current_weather']['winddirection']
+        )
 
         return current_weather
     
