@@ -67,8 +67,9 @@ def build_tools(mcp_session:ClientSession):
                                             name = 'get_weather',
                                             arguments = {'city':city} 
                         )   
-        log.info(f'weather response from the LLM is : {resp}')
-        return resp
+        resp_content = WeatherData.model_validate_json(resp.content[0].text())
+        log.info(f'Formatted resp_content is {resp_content}')
+        return resp_content
     
     return [get_weather_tool]
 
