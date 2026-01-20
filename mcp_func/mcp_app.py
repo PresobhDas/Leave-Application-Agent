@@ -2,6 +2,7 @@ from mcp.server.fastmcp import FastMCP
 import requests
 from mcp.server.transport_security import TransportSecuritySettings
 import logging, sys, inspect
+from pydantic import BaseModel
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
@@ -57,6 +58,13 @@ async def get_input_prompt_system():
 @mcp_api_app.tool()
 async def get_weather(city:str):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    class WeatherData(BaseModel):
+        latitude: float
+        longitude: float
+        temperature: float
+        windspeed: float
+        winddirection: float
+
     def get_lat_long(city:str):
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
         url = "https://geocoding-api.open-meteo.com/v1/search"
@@ -84,8 +92,15 @@ async def get_weather(city:str):
             'current_weather':True
         }
 
-        resp = requests.get(url=url, params=params)
+        resp = requests.get(url=url, params=params).json()
         log.info('get_weather API successfully called.')
-        return resp.json()
+        current_weather = WeatherData()
+        current_weather.latitude = resp['latitude']
+        current_weather.longitude = resp['longitude']
+        current_weather.temperature = resp['current_weather']['temperature']
+        current_weather.windspeed = resp['current_weather']['windspeed']
+        current_weather.winddirection = resp['current_weather']['winddirection']
+
+        return current_weather
     
 mcp_server = mcp_api_app.streamable_http_app()
