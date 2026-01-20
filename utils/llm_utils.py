@@ -1,7 +1,6 @@
-import os
+import os, logging, sys, inspect
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
-import logging, sys, inspect
 from mcp import ClientSession
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langgraph.graph import MessagesState
@@ -67,7 +66,6 @@ def build_tools(mcp_session:ClientSession):
                                             arguments = {'city':city} 
                         )   
         resp_content = WeatherData.model_validate_json(resp.content[0].text)
-        log.info(f'Formatted resp_content is {resp_content}')
         return resp_content
     
     return [get_weather_tool]

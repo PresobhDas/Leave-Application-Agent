@@ -1,7 +1,6 @@
+import logging, sys, inspect, requests
 from mcp.server.fastmcp import FastMCP
-import requests
 from mcp.server.transport_security import TransportSecuritySettings
-import logging, sys, inspect
 from utils.llm_utils import WeatherData
 
 log = logging.getLogger('mcp')
@@ -28,9 +27,6 @@ mcp_api_app = FastMCP(
 async def get_input_prompt_human(question:str, context:str):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     human_message=f"""This is the question : {question}."""
-    # Also look at the previous ToolMessage object for any context that would have been retrieved from the RAG pipeline"""
-    # if context != '':
-    #     human_message += """This is the context being provided to you from the RAG pipeline : {context}"""
 
     return human_message  
 
