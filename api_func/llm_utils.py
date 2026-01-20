@@ -5,6 +5,7 @@ import logging, sys, inspect
 from mcp import ClientSession
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langgraph.graph import MessagesState
+from pydantic import BaseModel
 
 log = logging.getLogger('utils')
 log.setLevel(logging.INFO)
@@ -17,6 +18,13 @@ if not log.handlers:
 class RagState(MessagesState):
     question:str
     tool_execution_count: int
+
+class WeatherData(BaseModel):
+    latitude: float
+    longitude: float
+    temperature: float
+    windspeed: float
+    winddirection: float
 
 def get_chat_model() -> ChatOpenAI:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')

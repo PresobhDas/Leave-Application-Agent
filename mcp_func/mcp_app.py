@@ -3,6 +3,7 @@ import requests
 from mcp.server.transport_security import TransportSecuritySettings
 import logging, sys, inspect
 from pydantic import BaseModel
+from api_func.llm_utils import WeatherData
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
@@ -58,12 +59,6 @@ async def get_input_prompt_system():
 @mcp_api_app.tool()
 async def get_weather(city:str):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    class WeatherData(BaseModel):
-        latitude: float
-        longitude: float
-        temperature: float
-        windspeed: float
-        winddirection: float
 
     def get_lat_long(city:str):
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
@@ -102,6 +97,6 @@ async def get_weather(city:str):
             winddirection=resp['current_weather']['winddirection']
         )
 
-        return current_weather
+        return current_weather.model_dump_json()
     
 mcp_server = mcp_api_app.streamable_http_app()
