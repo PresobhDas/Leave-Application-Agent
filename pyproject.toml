@@ -9,6 +9,7 @@ dependencies = [
   "fastapi[standard]>=0.128.0",
   "fastmcp>=2.14.2",
   "langchain>=1.2.4",
+  "langchain-core>=1.2.7",
   "langchain-openai>=1.1.7",
   "langgraph>=1.0.5",
   "pydantic>=2.12.5",

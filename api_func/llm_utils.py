@@ -1,10 +1,11 @@
 import os
 from langchain_openai import ChatOpenAI
-from langchain.tools import tool
+from langchain_core.tools import tool
 import logging, sys, inspect
 from mcp import ClientSession
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langgraph.graph import MessagesState
+from pydantic import BaseModel
 
 log = logging.getLogger('utils')
 log.setLevel(logging.INFO)
@@ -50,12 +51,19 @@ def build_tools(mcp_session:ClientSession):
 
         This function tool get the city name as the input and returns the current weather information for that city
         '''
+        class WeatherData(BaseModel):
+            latitude: float
+            longitude: float
+            temperature: float
+            windspeed: float
+            winddirection: float
+
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
         resp = await mcp_session.call_tool(
                                             name = 'get_weather',
                                             arguments = {'city':city} 
                         )   
-
+        log.info(f'weather response from the LLM is : {resp}')
         return resp
     
     return [get_weather_tool]
