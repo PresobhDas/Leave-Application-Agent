@@ -42,6 +42,7 @@ jobs:
       - name: Build package - api_func
         run: |
           cp requirements.txt api_func/
+          cp -r utils api_func/
           cd api_func
           python -m pip install -r requirements.txt --target=".python_packages/lib/site-packages"
           zip -r ../release_api.zip . -x "__pycache__/*"
@@ -49,6 +50,7 @@ jobs:
       - name: Build package - mcp_func
         run: |
           cp requirements.txt mcp_func/
+          cp -r utils api_func/
           cd mcp_func
           python -m pip install -r requirements.txt --target=".python_packages/lib/site-packages"
           zip -r ../release_mcp.zip . -x "__pycache__/*"

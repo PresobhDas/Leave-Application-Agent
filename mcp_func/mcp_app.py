@@ -2,7 +2,7 @@ from mcp.server.fastmcp import FastMCP
 import requests
 from mcp.server.transport_security import TransportSecuritySettings
 import logging, sys, inspect
-from llm_utils import WeatherData
+from utils.llm_utils import WeatherData
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)

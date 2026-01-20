@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import Annotated
 from langgraph.graph import START, END, StateGraph, MessagesState
 from langgraph.prebuilt import ToolNode
-from llm_utils import get_chat_model, build_nodes, build_tools, check_tool_condition, RagState, InputDetails
+from utils.llm_utils import get_chat_model, build_nodes, build_tools, check_tool_condition, RagState, InputDetails
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from mcp.client.streamable_http import streamable_http_client
 from mcp import ClientSession
