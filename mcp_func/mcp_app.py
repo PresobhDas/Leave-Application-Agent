@@ -52,6 +52,21 @@ async def get_input_prompt_system():
     return system_message
 
 @mcp_api_app.tool()
+async def test_cosmos():
+    from azure.identity import DefaultAzureCredential
+    from azure.cosmos import CosmosClient
+
+    client = CosmosClient(
+        "https://azure-data-storage.documents.azure.com:443/",
+        credential=DefaultAzureCredential()
+    )
+
+    db = client.get_database_client("leave-db")
+    container = db.get_container_client("employee-master")
+
+    return list(container.read_all_items(max_item_count=1))
+
+@mcp_api_app.tool()
 async def get_weather(city:str):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
 
