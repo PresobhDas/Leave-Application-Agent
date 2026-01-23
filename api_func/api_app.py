@@ -21,6 +21,21 @@ api_server = FastAPI()
 async def ping():
     return {'response':'pong'}
 
+@api_server.post('/test_cosmos')
+async def test_cosmos():
+    from azure.identity import DefaultAzureCredential
+    from azure.cosmos import CosmosClient
+
+    client = CosmosClient(
+        "https://azure-data-storage.documents.azure.com:443/",
+        credential=DefaultAzureCredential()
+    )
+
+    db = client.get_database_client("leave-db")
+    container = db.get_container_client("employee-master")
+
+    return list(container.read_all_items(max_item_count=1))
+
 @api_server.post('/agent')
 async def call_agent(inp_details : Annotated[InputDetails, Body()]):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
