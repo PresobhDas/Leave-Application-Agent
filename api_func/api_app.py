@@ -65,8 +65,7 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
             async with ClientSession(read, write) as MCP_SESSION:
                 await MCP_SESSION.initialize()
                 log.info('CUSTOM LOG - Created MCP_SESSION')
-                # result = await process_ai_agent()
-                result = await MCP_SESSION.call_tool(name='test_cosmos')
+                result = await process_ai_agent()
                 return result
     except* Exception as e:
         log.exception(f'Failed with Exception: {e.exceptions}')

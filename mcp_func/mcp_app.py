@@ -57,6 +57,7 @@ async def get_employee_record(employee_id:str):
     from azure.cosmos import CosmosClient
     import os
 
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     COSMOS_URL = os.environ['COSMOS_DB_CONNECTION_STRING']
 
     client = CosmosClient(
