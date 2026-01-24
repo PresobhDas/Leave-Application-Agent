@@ -97,13 +97,15 @@ async def get_weather(city:str):
         resp = requests.get(url=url, params=params)
         data = resp.json()
         if 'results' not in data:
-            raise ValueError(f'City:{city} not found')
+            log.info(f'CUSTOM LOG - {city} not a valid geographical location')
+            return None
         
         result = data['results'][0]
-        return result['latitude'], result['longitude']
+        return (result['latitude'], result['longitude'])
     
-    lat, long = get_lat_long(city)
-    if lat and long:
+    location = get_lat_long(city)
+    if location:
+        lat, long = location[0], location[1]
         url = "https://api.open-meteo.com/v1/forecast"
         params = {
             'latitude':lat,
@@ -122,5 +124,6 @@ async def get_weather(city:str):
         )
 
         return current_weather.model_dump_json()
+    return None
     
 mcp_server = mcp_api_app.streamable_http_app()
