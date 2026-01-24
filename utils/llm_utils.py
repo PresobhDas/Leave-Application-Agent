@@ -32,6 +32,7 @@ class EmployeeData(BaseModel):
     department:str
     managerId:str
     hireDate:str
+    workLocation:str
     isActive:bool
 
 class InputDetails(BaseModel):
