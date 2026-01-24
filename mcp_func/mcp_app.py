@@ -73,10 +73,10 @@ async def get_employee_record(employee_id:str):
         emp_data = EmployeeData.model_validate(resp)
     except CosmosResourceNotFoundError:
         log.info(f'No records found for Employee : {employee_id}')
-        return None
+        return {'error':f'No records found for Employee : {employee_id}'}
     except CosmosHttpResponseError as err:
         log.error(f'Communication to Azure Cosmos failed with error {err}')
-        return None
+        return {'error':f'Communication to Azure Cosmos failed with error {err}'}
     
     return emp_data.model_dump_json()
 
@@ -124,6 +124,6 @@ async def get_weather(city:str):
         )
 
         return current_weather.model_dump_json()
-    return None
+    return {'error':f'{city} is not a valid location'}
     
 mcp_server = mcp_api_app.streamable_http_app()
