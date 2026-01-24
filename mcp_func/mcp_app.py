@@ -2,6 +2,7 @@ import logging, sys, inspect, requests
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
 from utils.llm_utils import WeatherData, EmployeeData
+from azure.cosmos.exceptions import CosmosResourceNotFoundError, CosmosHttpResponseError 
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
@@ -67,9 +68,16 @@ async def get_employee_record(employee_id:str):
 
     db = client.get_database_client("leave-db")
     container = db.get_container_client("employee-master")
-
-    resp = container.read_item(item=employee_id, partition_key=employee_id)
-    emp_data = EmployeeData.model_validate(resp)
+    try:
+        resp = container.read_item(item=employee_id, partition_key=employee_id)
+        emp_data = EmployeeData.model_validate(resp)
+    except CosmosResourceNotFoundError:
+        log.info(f'No records found for Employee : {employee_id}')
+        return None
+    except CosmosHttpResponseError as err:
+        log.error(f'Communication to Azure Cosmos failed with error {err}')
+        return None
+    
     return emp_data.model_dump_json()
 
 @mcp_api_app.tool()

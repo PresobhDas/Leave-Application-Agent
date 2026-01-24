@@ -30,6 +30,7 @@ class EmployeeData(BaseModel):
     employeeId:str
     name:str
     department:str
+    managerId:str
     hireDate:str
     isActive:bool
 
@@ -89,8 +90,11 @@ def build_tools(mcp_session:ClientSession):
                                             name = 'get_employee_record',
                                             arguments = {'employee_id':employee_id}
         )
-
-        resp_content = EmployeeData.model_validate_json(resp.content[0].text)
+        try:
+            resp_content = EmployeeData.model_validate_json(resp.content[0].text)
+        except:
+            return None
+        
         return resp_content
 
     return [get_weather_tool, get_employee_record]
