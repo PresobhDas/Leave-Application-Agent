@@ -9,7 +9,7 @@ inp_details = InputDetails(inp_query='What is the current weather in Greensboro?
 response = requests.post(url=url, json=inp_details.model_dump())
 
 # data = response.json()
-print(response)
+print(response.json())
 # for contents in data['messages']:
 #     print(contents['type'])
 #     print('-'*5)

@@ -1,7 +1,7 @@
 import logging, sys, inspect, requests
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
-from utils.llm_utils import WeatherData
+from utils.llm_utils import WeatherData, EmployeeData
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
@@ -52,19 +52,24 @@ async def get_input_prompt_system():
     return system_message
 
 @mcp_api_app.tool()
-async def test_cosmos():
+async def get_employee_record(employee_id:str):
     from azure.identity import DefaultAzureCredential
     from azure.cosmos import CosmosClient
+    import os
+
+    COSMOS_URL = os.environ['COSMOS_DB_CONNECTION_STRING']
 
     client = CosmosClient(
-        "https://azure-data-storage.documents.azure.com:443/",
+        url=COSMOS_URL,
         credential=DefaultAzureCredential()
     )
 
     db = client.get_database_client("leave-db")
     container = db.get_container_client("employee-master")
 
-    return list(container.read_all_items(max_item_count=1))
+    resp = container.read_item(item=employee_id, partition_key=employee_id)
+    emp_data = EmployeeData.model_validate(resp)
+    return emp_data.model_dump_json()
 
 @mcp_api_app.tool()
 async def get_weather(city:str):

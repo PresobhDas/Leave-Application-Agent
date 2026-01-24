@@ -25,6 +25,14 @@ class WeatherData(BaseModel):
     windspeed: float
     winddirection: float
 
+class EmployeeData(BaseModel):
+    id:str
+    employeeId:str
+    name:str
+    department:str
+    hireDate:str
+    isActive:bool
+
 class InputDetails(BaseModel):
     inp_query:str
 
@@ -68,7 +76,24 @@ def build_tools(mcp_session:ClientSession):
         resp_content = WeatherData.model_validate_json(resp.content[0].text)
         return resp_content
     
-    return [get_weather_tool]
+    @tool
+    async def get_employee_record(employee_id:str):
+        '''
+        Docstring for get_employee_record
+        
+        :param employee_id: This function takes the Employee ID as a parameter and returns the employee details from the Cosmos DB Database.
+        :type employee_id: str
+        '''
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+        resp = await mcp_session.call_tool(
+                                            name = 'get_employee_record',
+                                            arguments = {'employee_id':employee_id}
+        )
+
+        resp_content = EmployeeData.model_validate_json(resp.content[0].text)
+        return resp_content
+
+    return [get_weather_tool, get_employee_record]
 
 def build_nodes(mcp_session:ClientSession, llm_with_tools):
 
