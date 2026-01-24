@@ -75,7 +75,11 @@ def build_tools(mcp_session:ClientSession):
                                             name = 'get_weather',
                                             arguments = {'city':city} 
                         )   
-        resp_content = WeatherData.model_validate_json(resp.content[0].text)
+        try:
+            resp_content = WeatherData.model_validate_json(resp.content[0].text)
+        except:
+            return None
+        
         return resp_content
     
     @tool
