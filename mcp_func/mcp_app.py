@@ -1,7 +1,7 @@
 import logging, sys, inspect, requests
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
-from utils.llm_utils import WeatherData, EmployeeData
+from utils.llm_utils import WeatherData, EmployeeData, EmployeeLeaveData
 from azure.cosmos.exceptions import CosmosResourceNotFoundError, CosmosHttpResponseError 
 
 log = logging.getLogger('mcp')
@@ -53,7 +53,7 @@ async def get_input_prompt_system():
     return system_message
 
 @mcp_api_app.tool()
-async def get_employee_record(employee_id:str):
+async def get_employee_master_record(employee_id:str):
     from azure.identity import DefaultAzureCredential
     from azure.cosmos import CosmosClient
     import os
@@ -74,6 +74,34 @@ async def get_employee_record(employee_id:str):
     except CosmosResourceNotFoundError:
         log.info(f'No records found for Employee : {employee_id}')
         return {'error':f'No records found for Employee : {employee_id}'}
+    except CosmosHttpResponseError as err:
+        log.error(f'Communication to Azure Cosmos failed with error {err}')
+        return {'error':f'Communication to Azure Cosmos failed with error {err}'}
+    
+    return emp_data.model_dump_json()
+
+@mcp_api_app.tool()
+async def get_employee_leave_record(employee_id:str):
+    from azure.identity import DefaultAzureCredential
+    from azure.cosmos import CosmosClient
+    import os
+
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    COSMOS_URL = os.environ['COSMOS_DB_CONNECTION_STRING']
+
+    client = CosmosClient(
+        url=COSMOS_URL,
+        credential=DefaultAzureCredential()
+    )
+
+    db = client.get_database_client("leave-db")
+    container = db.get_container_client("employee-leaves")
+    try:
+        resp = container.read_item(item=employee_id, partition_key=employee_id)
+        emp_data = EmployeeLeaveData.model_validate(resp)
+    except CosmosResourceNotFoundError:
+        log.info(f'No leave records found for Employee : {employee_id}')
+        return {'error':f'No leave records found for Employee : {employee_id}'}
     except CosmosHttpResponseError as err:
         log.error(f'Communication to Azure Cosmos failed with error {err}')
         return {'error':f'Communication to Azure Cosmos failed with error {err}'}

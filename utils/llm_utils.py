@@ -35,6 +35,15 @@ class EmployeeData(BaseModel):
     workLocation:str
     isActive:bool
 
+class EmployeeLeaveData(BaseModel):
+    id:str
+    employeeId:str
+    name:str
+    leaveType:str
+    startDate:str
+    endDate:str
+    numberOfDays:int
+
 class InputDetails(BaseModel):
     inp_query:str
 
@@ -83,16 +92,16 @@ def build_tools(mcp_session:ClientSession):
         return resp_content
     
     @tool
-    async def get_employee_record(employee_id:str):
+    async def get_employee_master_record(employee_id:str):
         '''
-        Docstring for get_employee_record
+        Docstring for get_employee_master_record
         
         :param employee_id: This function takes the Employee ID as a parameter and returns the employee details from the Cosmos DB Database.
         :type employee_id: str
         '''
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
         resp = await mcp_session.call_tool(
-                                            name = 'get_employee_record',
+                                            name = 'get_employee_master_record',
                                             arguments = {'employee_id':employee_id}
         )
         try:
@@ -101,8 +110,30 @@ def build_tools(mcp_session:ClientSession):
             return None
         
         return resp_content
+    
+    @tool
+    async def get_employee_leave_record(employee_id:str):
+        '''
+        Docstring for get_employee_leave_record
+        
+        :param employee_id: This function takes the employee ID as a parameter and returns that employees leave information from Cosmos DB Database.
+        :type employee_id: str
+        '''
 
-    return [get_weather_tool, get_employee_record]
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+        resp = await mcp_session.call_tool(
+                                            name='get_employee_leave_record',
+                                            arguments={'employee_id':employee_id}
+        )
+
+        try:
+            resp_content = EmployeeLeaveData.model_validate_json(resp.content[0].text)
+        except:
+            return None
+        
+        return resp_content
+
+    return [get_weather_tool, get_employee_master_record, get_employee_leave_record]
 
 def build_nodes(mcp_session:ClientSession, llm_with_tools):
 
