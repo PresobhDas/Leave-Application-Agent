@@ -53,12 +53,12 @@ jobs:
           cd mcp_func
           zip -r ../release_mcp.zip . -x "__pycache__/*"
 
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_7063C4A9ACB847E2A7B9204778560AD1 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D3364DE3020246508A5A1A7C627C4BFC }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DC49250B7A774CF9A6BBD0D8662C8A14 }}
+      # - name: Login to Azure
+      #   uses: azure/login@v2
+      #   with:
+      #     client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_7063C4A9ACB847E2A7B9204778560AD1 }}
+      #     tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D3364DE3020246508A5A1A7C627C4BFC }}
+      #     subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DC49250B7A774CF9A6BBD0D8662C8A14 }}
 
       - name: Verify zip contents
         run: |
@@ -74,6 +74,7 @@ jobs:
           app-name: "leave-policy-agent"
           slot-name: "Production"
           package: release_api.zip
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_API_PUBLISH_PROFILE }}
           remote-build: true
           scm-do-build-during-deployment: true
           enable-oryx-build: true
@@ -85,6 +86,7 @@ jobs:
           app-name: "leave-policy-agent-mcp"
           slot-name: "Production"
           package: release_mcp.zip
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_MCP_PUBLISH_PROFILE }}
           remote-build: true
           scm-do-build-during-deployment: true
           enable-oryx-build: true
