@@ -74,6 +74,7 @@ jobs:
           app-name: "leave-policy-agent"
           slot-name: "Production"
           package: release_api.zip
+          remote-build: true
           scm-do-build-during-deployment: true
           enable-oryx-build: true
 
@@ -84,5 +85,6 @@ jobs:
           app-name: "leave-policy-agent-mcp"
           slot-name: "Production"
           package: release_mcp.zip
+          remote-build: true
           scm-do-build-during-deployment: true
           enable-oryx-build: true
