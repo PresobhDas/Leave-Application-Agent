@@ -44,7 +44,6 @@ jobs:
           cp requirements.txt api_func/
           cp -r utils api_func/
           cd api_func
-          python -m pip install -r requirements.txt --target=".python_packages/lib/site-packages"
           zip -r ../release_api.zip . -x "__pycache__/*"
 
       - name: Build package - mcp_func
@@ -52,7 +51,6 @@ jobs:
           cp requirements.txt mcp_func/
           cp -r utils mcp_func/
           cd mcp_func
-          python -m pip install -r requirements.txt --target=".python_packages/lib/site-packages"
           zip -r ../release_mcp.zip . -x "__pycache__/*"
 
       - name: Login to Azure
