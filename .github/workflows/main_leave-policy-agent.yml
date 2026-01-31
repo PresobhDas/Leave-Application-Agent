@@ -54,12 +54,12 @@ jobs:
           python -m pip install -r requirements.txt --target=".python_packages/lib/site-packages"
           zip -r ../release_mcp.zip . -x "__pycache__/*"
 
-      # - name: Login to Azure
-      #   uses: azure/login@v2
-      #   with:
-      #     client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_7063C4A9ACB847E2A7B9204778560AD1 }}
-      #     tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D3364DE3020246508A5A1A7C627C4BFC }}
-      #     subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DC49250B7A774CF9A6BBD0D8662C8A14 }}
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_87735683EF9C4445BB29876EADDD5A93 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_7FF7B2E8CDAE4DDA9648D1D6C05CF5AD }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_91D9D55183AB440E911110457D6041C3 }}
 
       - name: "Deploy MCP function"
         uses: Azure/functions-action@v1
@@ -68,4 +68,4 @@ jobs:
           app-name: "leave-policy-agent-mcp-1"
           # slot-name: "Production"
           package: release_mcp.zip
-          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_MCP_PUBLISH_PROFILE }}
+          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}+
