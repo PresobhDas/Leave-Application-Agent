@@ -4,11 +4,11 @@ from langchain_text_splitters import TokenTextSplitter
 from azure.identity import DefaultAzureCredential
 from azure.cosmos import CosmosClient
 
-SENTENCE_TRANSFORMER_TOKEN = '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'
-client = InferenceClient(model='BAAI/bge-base-en-v1.5', token=SENTENCE_TRANSFORMER_TOKEN)
-embedding = client.feature_extraction(text='Azure Functions are great for serverless APIs')
+# SENTENCE_TRANSFORMER_TOKEN = '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'
+# client = InferenceClient(model='BAAI/bge-base-en-v1.5', token=SENTENCE_TRANSFORMER_TOKEN)
+# embedding = client.feature_extraction(text='Azure Functions are great for serverless APIs')
 
-print(embedding.shape)
+# print(embedding.shape)
 
 # token_splitter = TokenTextSplitter(chunk_size=512, chunk_overlap=64)
 
@@ -28,13 +28,13 @@ print(embedding.shape)
 # model = SentenceTransformer('BAAI/bge-base-en-v1.5')
 # embeddings = model.encode(doc_chunks, normalize_embeddings=False)
 
-# COSMOS_URL = 'https://azure-data-storage.documents.azure.com:443/'
+COSMOS_URL = 'https://azure-data-storage.documents.azure.com:443/'
 
-# client = CosmosClient(
-#     url=COSMOS_URL,
-#     credential=DefaultAzureCredential()
-# )
+client = CosmosClient(
+    url=COSMOS_URL,
+    credential=DefaultAzureCredential()
+)
 
-# db = client.get_database_client("leave-db")
-# container = db.get_container_client("employee-leaves")
+db = client.get_database_client("leave-db")
+container = db.get_container_client("employee-leaves")
 

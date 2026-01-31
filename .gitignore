@@ -11,3 +11,4 @@ wheels/
 uv.lock
 test.py
 main_agent.py
+text_embedder.py
