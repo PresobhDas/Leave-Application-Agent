@@ -72,10 +72,10 @@ jobs:
         id: deploy-api-function
         with:
           app-name: "leave-policy-agent"
-          slot-name: "Production"
+          # slot-name: "Production"
           package: release_api.zip
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_API_PUBLISH_PROFILE }}
-          remote-build: true
+          # remote-build: true
           scm-do-build-during-deployment: true
           enable-oryx-build: true
 
@@ -84,9 +84,9 @@ jobs:
         id: deploy-mcp-function
         with:
           app-name: "leave-policy-agent-mcp"
-          slot-name: "Production"
+          # slot-name: "Production"
           package: release_mcp.zip
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_MCP_PUBLISH_PROFILE }}
-          remote-build: true
+          # remote-build: true
           scm-do-build-during-deployment: true
           enable-oryx-build: true
