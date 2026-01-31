@@ -1,8 +1,14 @@
-from sentence_transformers import SentenceTransformer
+from huggingface_hub import InferenceClient
 from docx import Document
 from langchain_text_splitters import TokenTextSplitter
 from azure.identity import DefaultAzureCredential
 from azure.cosmos import CosmosClient
+
+SENTENCE_TRANSFORMER_TOKEN = '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'
+client = InferenceClient(model='BAAI/bge-base-en-v1.5', token=SENTENCE_TRANSFORMER_TOKEN)
+embedding = client.feature_extraction(text='Azure Functions are great for serverless APIs')
+
+print(embedding.shape)
 
 # token_splitter = TokenTextSplitter(chunk_size=512, chunk_overlap=64)
 
@@ -32,8 +38,3 @@ from azure.cosmos import CosmosClient
 # db = client.get_database_client("leave-db")
 # container = db.get_container_client("employee-leaves")
 
-from azure.identity import DefaultAzureCredential
-
-cred = DefaultAzureCredential()
-token = cred.get_token("https://management.azure.com/.default")
-print("Token acquired!")
