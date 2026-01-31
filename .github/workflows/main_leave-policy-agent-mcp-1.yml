@@ -68,4 +68,3 @@ jobs:
           app-name: "leave-policy-agent-mcp-1"
           # slot-name: "Production"
           package: release_mcp.zip
-          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}+
