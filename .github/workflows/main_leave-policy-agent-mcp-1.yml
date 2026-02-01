@@ -44,6 +44,7 @@ jobs:
           cp requirements.txt api_func/
           cp -r utils api_func/
           cd api_func
+          python -m pip install -r requirements.txt --target=".python_packages/lib/site-packages"
           zip -r ../release_api.zip . -x "__pycache__/*"
 
       - name: Build package - mcp_func
@@ -60,6 +61,14 @@ jobs:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_87735683EF9C4445BB29876EADDD5A93 }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_7FF7B2E8CDAE4DDA9648D1D6C05CF5AD }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_91D9D55183AB440E911110457D6041C3 }}
+
+      - name: Verify apps exist
+        uses: azure/cli@v2
+        with:
+        inlineScript: |
+          az account show --query "{name:name,id:id}" -o json
+          az functionapp show -g presobh-group -n leave-policy-agent --query "{name:name,state:state}" -o json
+          az functionapp show -g presobh-group -n leave-policy-agent-mcp-1 --query "{name:name,state:state}" -o json
 
       - name: "Deploy API function"
         uses: Azure/functions-action@v1
