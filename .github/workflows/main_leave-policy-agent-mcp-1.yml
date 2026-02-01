@@ -65,10 +65,10 @@ jobs:
       - name: Verify apps exist
         uses: azure/cli@v2
         with:
-        inlineScript: |
-          az account show --query "{name:name,id:id}" -o json
-          az functionapp show -g presobh-group -n leave-policy-agent --query "{name:name,state:state}" -o json
-          az functionapp show -g presobh-group -n leave-policy-agent-mcp-1 --query "{name:name,state:state}" -o json
+          inlineScript: |
+            az account show --query "{name:name,id:id}" -o json
+            az functionapp show -g presobh-group -n leave-policy-agent --query "{name:name,state:state}" -o json
+            az functionapp show -g presobh-group -n leave-policy-agent-mcp-1 --query "{name:name,state:state}" -o json
 
       - name: "Deploy API function"
         uses: Azure/functions-action@v1
