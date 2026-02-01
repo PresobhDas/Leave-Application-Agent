@@ -61,10 +61,16 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_7FF7B2E8CDAE4DDA9648D1D6C05CF5AD }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_91D9D55183AB440E911110457D6041C3 }}
 
+      - name: "Deploy API function"
+        uses: Azure/functions-action@v1
+        id: deploy-api-function
+        with:
+          app-name: "leave-policy-agent"
+          package: release_api.zip
+
       - name: "Deploy MCP function"
         uses: Azure/functions-action@v1
         id: deploy-mcp-function
         with:
           app-name: "leave-policy-agent-mcp-1"
-          # slot-name: "Production"
           package: release_mcp.zip
