@@ -5,6 +5,7 @@ from mcp import ClientSession
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langgraph.graph import MessagesState
 from pydantic import BaseModel
+from huggingface_hub import InferenceClient
 
 log = logging.getLogger('utils')
 log.setLevel(logging.INFO)
@@ -163,3 +164,10 @@ def build_nodes(mcp_session:ClientSession, llm_with_tools):
     return {
         'node_generate_answer_from_llm' : node_generate_answer_from_llm
     }
+
+def generate_embeddings(text_chunk:str):
+    SENTENCE_TRANSFORMER_TOKEN = os.environ['SENTENCE_TRANSFORMER_TOKEN']
+    client = InferenceClient(model='BAAI/bge-base-en-v1.5', token=SENTENCE_TRANSFORMER_TOKEN)
+    embeddings = client.feature_extraction(text=text_chunk)
+
+    return embeddings

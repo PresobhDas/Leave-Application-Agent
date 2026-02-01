@@ -11,7 +11,6 @@ on:
   workflow_dispatch:
 
 env:
-  # AZURE_FUNCTIONAPP_PACKAGE_PATH: './api_func' # set this to the path to your web app project, defaults to the repository root
   PYTHON_VERSION: "3.13" # set this to the python version to use (supports 3.6, 3.7, 3.8)_
 
 jobs:
@@ -61,14 +60,6 @@ jobs:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_87735683EF9C4445BB29876EADDD5A93 }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_7FF7B2E8CDAE4DDA9648D1D6C05CF5AD }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_91D9D55183AB440E911110457D6041C3 }}
-
-      - name: Verify apps exist
-        uses: azure/cli@v2
-        with:
-          inlineScript: |
-            az account show --query "{name:name,id:id}" -o json
-            az functionapp show -g presobh-group -n leave-policy-agent --query "{name:name,state:state}" -o json
-            az functionapp show -g presobh-group -n leave-policy-agent-mcp-1 --query "{name:name,state:state}" -o json
 
       - name: "Deploy API function"
         uses: Azure/functions-action@v1

@@ -1,40 +1,70 @@
 from huggingface_hub import InferenceClient
 from docx import Document
 from langchain_text_splitters import TokenTextSplitter
+from llm_utils import generate_embeddings
+from pydantic import BaseModel
 from azure.identity import DefaultAzureCredential
 from azure.cosmos import CosmosClient
+import os
 
-# SENTENCE_TRANSFORMER_TOKEN = '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'
-# client = InferenceClient(model='BAAI/bge-base-en-v1.5', token=SENTENCE_TRANSFORMER_TOKEN)
-# embedding = client.feature_extraction(text='Azure Functions are great for serverless APIs')
+class MetaData(BaseModel):
+    chunk_index:int
+    heading:str
+class DocChunk(BaseModel):
+    id:str
+    document_id:str
+    chunk_text:str
+    embedding:list[float]
+    metadata:MetaData
 
-# print(embedding.shape)
+token_splitter = TokenTextSplitter(chunk_size=512, chunk_overlap=64)
+DOC_NAME = 'Leave_Policy'
 
-# token_splitter = TokenTextSplitter(chunk_size=512, chunk_overlap=64)
+def create_embeddings(token_split_chunk:str, chunk_index:int)-> DocChunk:
+    embedding = generate_embeddings(token_split_chunk)
+    metadata = MetaData(chunk_index=chunk_index,
+                        heading=cur_heading
+                        )
+    doc_chunk=DocChunk(id=f'{DOC_NAME}-{chunk_index}',
+                    document_id=DOC_NAME,
+                    chunk_text=token_split_chunk,
+                    embedding=embedding,
+                    metadata=metadata
+                    )
+    return doc_chunk.model_dump()
 
-# docs = Document('Leave_Policy.docx')
-# doc_chunks = []
-# cur_chunk_text = ''
-# for doc in docs.paragraphs:
-#     if doc.style.name == 'Heading 1':
-#         token_split_chunks = token_splitter.split_text(cur_chunk_text)
-#         doc_chunks.extend(token_split_chunks)
-#         cur_chunk_text = ''
-#     cur_chunk_text += doc.text
+docs = Document('Leave_Policy.docx')
+cur_chunk_text = ''
+chunk_index=0
+list_of_embedding_data = []
+for doc in docs.paragraphs:
+    if doc.style.name == 'Heading 1' and cur_chunk_text != '':
+        token_split_chunks = token_splitter.split_text(cur_chunk_text)
+        for token_split_chunk in token_split_chunks:
+            chunk_index += 1
+            doc_chunk = create_embeddings(token_split_chunk, chunk_index)
+            cur_chunk_text = ''
+            list_of_embedding_data.append(doc_chunk)
 
-# token_split_chunks = token_splitter.split_text(cur_chunk_text)
-# doc_chunks.extend(token_split_chunks)
+    if doc.style.name == 'Heading 1':
+        cur_heading = doc.text
+    cur_chunk_text += doc.text
 
-# model = SentenceTransformer('BAAI/bge-base-en-v1.5')
-# embeddings = model.encode(doc_chunks, normalize_embeddings=False)
+token_split_chunks = token_splitter.split_text(cur_chunk_text)
+for token_split_chunk in token_split_chunks:
+    chunk_index += 1
+    doc_chunk = create_embeddings(token_split_chunk, chunk_index)
+    list_of_embedding_data.append(doc_chunk)
 
-COSMOS_URL = 'https://azure-data-storage.documents.azure.com:443/'
-
+COSMOS_URL = os.environ['COSMOS_DB_CONNECTION_STRING']
 client = CosmosClient(
     url=COSMOS_URL,
     credential=DefaultAzureCredential()
 )
+db = client.get_database_client("policy-embeddings")
+container = db.get_container_client("embedding-data")
+for embedding in list_of_embedding_data:
+    container.create_item(body=embedding)
 
-db = client.get_database_client("leave-db")
-container = db.get_container_client("employee-leaves")
+
 
