@@ -1,8 +1,15 @@
 import logging, sys, inspect, requests
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
-from utils.llm_utils import WeatherData, EmployeeData, EmployeeLeaveData
+from utils.llm_utils import getAzureSecrets, WeatherData, EmployeeData, EmployeeLeaveData, RagData
 from azure.cosmos.exceptions import CosmosResourceNotFoundError, CosmosHttpResponseError 
+from azure.search.documents import SearchClient
+from azure.search.documents.models import VectorizedQuery
+from azure.core.credentials import AzureKeyCredential
+from utils.llm_utils import getAzureSecrets
+from sentence_transformers import SentenceTransformer
+from azure.identity import DefaultAzureCredential
+from azure.cosmos import CosmosClient
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
@@ -23,6 +30,12 @@ mcp_api_app = FastMCP(
         ],
     )
 )
+
+INDEX_SEARCH_ENDPOINT = getAzureSecrets('AZURE-AI-SEARCH-CONNECTION-STRING')
+INDEX_SEARCH_API_KEY = getAzureSecrets('AZURE-AI-SEARCH-API-KEY')
+INDEX_NAME = 'embedding-index'
+model = SentenceTransformer("BAAI/bge-base-en-v1.5")
+COSMOS_URL = getAzureSecrets('COSMOS-DB-CONNECTION-STRING')
 
 @mcp_api_app.prompt()
 async def get_input_prompt_human(question:str, context:str):
@@ -54,12 +67,7 @@ async def get_input_prompt_system():
 
 @mcp_api_app.tool()
 async def get_employee_master_record(employee_id:str):
-    from azure.identity import DefaultAzureCredential
-    from azure.cosmos import CosmosClient
-    import os
-
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    COSMOS_URL = os.environ['COSMOS_DB_CONNECTION_STRING']
 
     client = CosmosClient(
         url=COSMOS_URL,
@@ -82,12 +90,7 @@ async def get_employee_master_record(employee_id:str):
 
 @mcp_api_app.tool()
 async def get_employee_leave_record(employee_id:str):
-    from azure.identity import DefaultAzureCredential
-    from azure.cosmos import CosmosClient
-    import os
-
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    COSMOS_URL = os.environ['COSMOS_DB_CONNECTION_STRING']
 
     client = CosmosClient(
         url=COSMOS_URL,
@@ -114,6 +117,51 @@ async def get_employee_leave_record(employee_id:str):
         return {'error':f'Communication to Azure Cosmos failed with error {err}'}
     
     return emp_data.model_dump_json()
+
+@mcp_api_app.tool()
+async def get_leave_policy_document(inp_question:str, model):
+    embeddings = model.encode(inp_question, normalize_embeddings=True)[0]
+    search_client = SearchClient(
+        endpoint=INDEX_SEARCH_ENDPOINT,
+        index_name=INDEX_NAME,
+        credential=AzureKeyCredential(INDEX_SEARCH_API_KEY)
+        )
+
+    vector_query = VectorizedQuery(
+        vector=embeddings,
+        k_nearest_neighbors=5,
+        fields="embedding"
+    )
+
+    results = search_client.search(
+        search_text=None,      # IMPORTANT for pure vector search
+        vector_queries=[vector_query]
+    )
+
+    for doc in results:
+        score = doc['@search.score']
+        doc_id = doc['id']
+        break
+
+    client = CosmosClient(
+        url=COSMOS_URL,
+        credential=DefaultAzureCredential()
+        )
+
+    db = client.get_database_client("policy-embeddings")
+    container = db.get_container_client("embedding-data")
+    try:
+        resp = container.read_item(item=doc_id, partition_key=doc_id)
+        rag_data = RagData.model_validate(resp)
+    except CosmosResourceNotFoundError:
+        log.info('No matching text found')
+        return {'No matching text found'}
+    except CosmosHttpResponseError as err:
+        log.error(f'Communication to Azure Cosmos failed with error {err}')
+        return {'error':f'Communication to Azure Cosmos failed with error {err}'}
+    
+    rag_data.matchPercent = score
+    return rag_data.model_dump_json()
 
 @mcp_api_app.tool()
 async def get_weather(city:str):

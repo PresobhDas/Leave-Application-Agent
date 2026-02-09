@@ -6,6 +6,11 @@ from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langgraph.graph import MessagesState
 from pydantic import BaseModel
 from huggingface_hub import InferenceClient
+from azure.identity import DefaultAzureCredential
+from azure.keyvault.secrets import SecretClient
+from sentence_transformers import SentenceTransformer
+
+VAULT_URL = "https://leave-policy-keyvault.vault.azure.net/"
 
 log = logging.getLogger('utils')
 log.setLevel(logging.INFO)
@@ -45,15 +50,21 @@ class EmployeeLeaveData(BaseModel):
     endDate:str
     numberOfDays:int
 
+class RagData(BaseModel):
+    id:str
+    partiion_key_id:str
+    test:str
+    matchPercent:int
 class InputDetails(BaseModel):
     inp_query:str
 
 def get_chat_model() -> ChatOpenAI:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    openai_api_key = getAzureSecrets('OPENAI-API-KEY')
     chat_model = ChatOpenAI(
         model= 'gpt-4o-mini',
         temperature=0.3,
-        api_key=os.environ['OPENAI_API_KEY']
+        api_key=openai_api_key
     )
     log.info('Retrieved the chat model')
     return chat_model
@@ -133,8 +144,29 @@ def build_tools(mcp_session:ClientSession):
             return None
         
         return resp_content
+    
+    @tool
+    async def get_leave_policy_document(inp_question:str):
+        '''
+        Docstring for get_leave_policy_document
+        
+        :param inp_question: This function gets the input question and then checks whether the information is present in the Leave_Policy document and return the best possible result back. This does an vector embedding similarity 
+        search.
+        :type inp_question: str
+        '''
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+        resp = await mcp_session.call_tool(
+                                    name='get_employee_leave_get_leave_policy_documentrecord',
+                                    arguments={'inp_question':inp_question}
+        )
+        try:
+            resp_content = RagData.model_validate_json(resp.content[0].text)
+        except:
+            return None
+        
+        return resp_content
 
-    return [get_weather_tool, get_employee_master_record, get_employee_leave_record]
+    return [get_weather_tool, get_employee_master_record, get_employee_leave_record, get_leave_policy_document]
 
 def build_nodes(mcp_session:ClientSession, llm_with_tools):
 
@@ -165,9 +197,16 @@ def build_nodes(mcp_session:ClientSession, llm_with_tools):
         'node_generate_answer_from_llm' : node_generate_answer_from_llm
     }
 
-def generate_embeddings(text_chunk:str):
-    SENTENCE_TRANSFORMER_TOKEN = os.environ['SENTENCE_TRANSFORMER_TOKEN']
-    client = InferenceClient(model='BAAI/bge-base-en-v1.5', token=SENTENCE_TRANSFORMER_TOKEN)
-    embeddings = client.feature_extraction(text=text_chunk)
-
+def generate_embeddings(text_chunk:str, model):
+    # SENTENCE_TRANSFORMER_TOKEN = getAzureSecrets('SENTENCE-TRANSFORMER-TOKEN')
+    # client = InferenceClient(model='BAAI/bge-base-en-v1.5', token=SENTENCE_TRANSFORMER_TOKEN)
+    # embeddings = client.feature_extraction(text=text_chunk)
+    embeddings = model.encode([text_chunk], normalize_embeddings=True)[0]
     return embeddings
+
+def getAzureSecrets(key:str) -> str:
+    credential = DefaultAzureCredential()
+    client = SecretClient(vault_url=VAULT_URL, credential=credential)
+    client_secret = client.get_secret(key).value
+
+    return client_secret
