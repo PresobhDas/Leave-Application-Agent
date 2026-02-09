@@ -5,10 +5,8 @@ from mcp import ClientSession
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langgraph.graph import MessagesState
 from pydantic import BaseModel
-from huggingface_hub import InferenceClient
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
-from sentence_transformers import SentenceTransformer
 
 VAULT_URL = "https://leave-policy-keyvault.vault.azure.net/"
 
