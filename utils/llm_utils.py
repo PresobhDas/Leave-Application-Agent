@@ -58,7 +58,7 @@ class InputDetails(BaseModel):
 
 def get_chat_model() -> ChatOpenAI:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    openai_api_key = getAzureSecrets('OPENAI-API-KEY')
+    openai_api_key = os.environ['OPENAI_API_KEY']
     chat_model = ChatOpenAI(
         model= 'gpt-4o-mini',
         temperature=0.3,
