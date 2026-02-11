@@ -52,12 +52,14 @@ async def get_input_prompt_system():
         a) If the question is regular conversaion, respond naturally and conversationally as no information retrieval is needed.
         b) Try to answer based on your internal knowledge.
         c) Call external tools provided to you. Details of the different tools ar as follows. There is NO particular order in which the below tools need to be invoked. Directly call the right tool as needed. No need to follow the below precedence.
-            1) Tool Name : load_RAG_context_tool.
-                Description: RAG tool to see if the question has potential answers from RAG output. If the RAG output has the necessary information, then provide the citation as well. For eg: PageNo from the given context.
-            2) Tool Name: weather_tool
-                Description: weather_tool to retrieve the weather information for any given location. 
-            3) Tool Name: load_data_from_db
-                Description: load_data_from_db to load Customer information from the Postgres SQL Database. If the question involves querying data from the Database based on the CUSTOMER ID, call this tool to pass the CUSTOMER ID as a parameter to read and pass back the information read from the databse to the LLM
+            1) Tool Name : get_employee_master_record.
+                Description: Retrieve the employee master information from the Azure Cosmos DB. This queries the NO SQL database based on the given Employee ID.
+            2) Tool Name : get_employee_leave_record.
+                Description: Retrieve the employee leave information from the Azure Cosmos DB. This queries the NO SQL database based on the given Employee ID.
+            3) Tool Name : get_leave_policy_document.
+                Description: This is the RAG retrieval tool and queries the Azure AI Search using the vector embeddings of the given input text based on similarity.
+            4) Tool Name: get_weather_tool
+                Description: get_weather_tool to retrieve the weather information for any given location. 
         d) If NONE of the THE ABOVE works, say 'I Don't know the answer'.      
     '''
 
