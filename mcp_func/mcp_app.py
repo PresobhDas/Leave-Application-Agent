@@ -208,5 +208,6 @@ async def get_weather(city:str):
 
         return current_weather.model_dump_json()
     return {'error':f'{city} is not a valid location'}
-    
+
+mcp_api_app.settings.streamable_http_path = "/mcp"  
 mcp_server = mcp_api_app.streamable_http_app()
