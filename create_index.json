@@ -25,7 +25,7 @@
       "sortable": false,
       "facetable": false,
       "key": false,
-      "dimensions": 768,
+      "dimensions": 1536,
       "vectorSearchProfile": "vector-profile",
       "synonymMaps": []
     }

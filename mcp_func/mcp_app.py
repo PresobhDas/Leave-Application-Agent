@@ -1,15 +1,15 @@
 import logging, sys, inspect, requests
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
-from utils.llm_utils import getAzureSecrets, WeatherData, EmployeeData, EmployeeLeaveData, RagData
+from utils.llm_utils import getAzureSecrets, WeatherData, EmployeeData, EmployeeLeaveData, RagData, generate_embeddings
 from azure.cosmos.exceptions import CosmosResourceNotFoundError, CosmosHttpResponseError 
 from azure.search.documents import SearchClient
 from azure.search.documents.models import VectorizedQuery
 from azure.core.credentials import AzureKeyCredential
-from utils.llm_utils import getAzureSecrets
 from sentence_transformers import SentenceTransformer
 from azure.identity import DefaultAzureCredential
 from azure.cosmos import CosmosClient
+import os
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
@@ -31,11 +31,11 @@ mcp_api_app = FastMCP(
     )
 )
 
-INDEX_SEARCH_ENDPOINT = getAzureSecrets('AZURE-AI-SEARCH-CONNECTION-STRING')
-INDEX_SEARCH_API_KEY = getAzureSecrets('AZURE-AI-SEARCH-API-KEY')
+INDEX_SEARCH_API_ENDPOINT = os.environ['AZURE_AI_SEARCH_API_ENDPOINT']
+INDEX_SEARCH_API_KEY = os.environ['AZURE_AI_SEARCH_API_KEY']
 INDEX_NAME = 'embedding-index'
 model = SentenceTransformer("BAAI/bge-base-en-v1.5")
-COSMOS_URL = getAzureSecrets('COSMOS-DB-CONNECTION-STRING')
+COSMOS_URL = os.environ['COSMOS_DB_CONNECTION_STRING']
 
 @mcp_api_app.prompt()
 async def get_input_prompt_human(question:str, context:str):
@@ -119,17 +119,17 @@ async def get_employee_leave_record(employee_id:str):
     return emp_data.model_dump_json()
 
 @mcp_api_app.tool()
-async def get_leave_policy_document(inp_question:str, model):
-    embeddings = model.encode(inp_question, normalize_embeddings=True)[0]
+async def get_leave_policy_document(inp_question:str):
+    embeddings = generate_embeddings(inp_question)
     search_client = SearchClient(
-        endpoint=INDEX_SEARCH_ENDPOINT,
+        endpoint=INDEX_SEARCH_API_ENDPOINT,
         index_name=INDEX_NAME,
         credential=AzureKeyCredential(INDEX_SEARCH_API_KEY)
         )
 
     vector_query = VectorizedQuery(
         vector=embeddings,
-        k_nearest_neighbors=5,
+        k_nearest_neighbors=3,
         fields="embedding"
     )
 

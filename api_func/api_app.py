@@ -5,7 +5,7 @@ from langgraph.prebuilt import ToolNode
 from utils.llm_utils import get_chat_model, build_nodes, build_tools, check_tool_condition, RagState, InputDetails
 from mcp.client.streamable_http import streamable_http_client
 from mcp import ClientSession
-import logging, sys, inspect
+import logging, sys, inspect, os
 
 log = logging.getLogger('api')
 log.setLevel(logging.INFO)
@@ -59,7 +59,7 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
     log.info('Function Invoked')
 
     chat_model = get_chat_model()
-    MCP_SERVER = 'https://leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net/mcp'
+    MCP_SERVER = os.environ['MCP_SERVER_ENDPOINT']
     try:
         async with streamable_http_client(MCP_SERVER) as (read, write, session_id):
             async with ClientSession(read, write) as MCP_SESSION:

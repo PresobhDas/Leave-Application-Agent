@@ -154,7 +154,7 @@ def build_tools(mcp_session:ClientSession):
         '''
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
         resp = await mcp_session.call_tool(
-                                    name='get_employee_leave_get_leave_policy_documentrecord',
+                                    name='get_leave_policy_document',
                                     arguments={'inp_question':inp_question}
         )
         try:
@@ -195,12 +195,19 @@ def build_nodes(mcp_session:ClientSession, llm_with_tools):
         'node_generate_answer_from_llm' : node_generate_answer_from_llm
     }
 
-def generate_embeddings(text_chunk:str, model):
-    # SENTENCE_TRANSFORMER_TOKEN = getAzureSecrets('SENTENCE-TRANSFORMER-TOKEN')
-    # client = InferenceClient(model='BAAI/bge-base-en-v1.5', token=SENTENCE_TRANSFORMER_TOKEN)
-    # embeddings = client.feature_extraction(text=text_chunk)
-    embeddings = model.encode([text_chunk], normalize_embeddings=True)[0]
-    return embeddings
+def generate_embeddings(text_chunk:str):
+    from openai import AzureOpenAI
+
+    credential = DefaultAzureCredential()
+    endpoint = os.environ['AZURE_OPENAI_API_ENDPOINT']
+    client = AzureOpenAI(api_version="2024-12-01-preview",azure_endpoint=endpoint, azure_ad_token_provider=credential)
+
+    embedding = client.embeddings.create(
+        model='text-embedding-3-small',
+        input=text_chunk
+    )
+
+    return embedding.data[0].embedding
 
 def getAzureSecrets(key:str) -> str:
     credential = DefaultAzureCredential()
