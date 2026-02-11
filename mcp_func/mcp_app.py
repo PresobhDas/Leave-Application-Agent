@@ -6,7 +6,6 @@ from azure.cosmos.exceptions import CosmosResourceNotFoundError, CosmosHttpRespo
 from azure.search.documents import SearchClient
 from azure.search.documents.models import VectorizedQuery
 from azure.core.credentials import AzureKeyCredential
-from sentence_transformers import SentenceTransformer
 from azure.identity import DefaultAzureCredential
 from azure.cosmos import CosmosClient
 import os
