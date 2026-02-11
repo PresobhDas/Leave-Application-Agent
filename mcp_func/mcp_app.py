@@ -34,7 +34,6 @@ mcp_api_app = FastMCP(
 INDEX_SEARCH_API_ENDPOINT = os.environ['AZURE_AI_SEARCH_API_ENDPOINT']
 INDEX_SEARCH_API_KEY = os.environ['AZURE_AI_SEARCH_API_KEY']
 INDEX_NAME = 'embedding-index'
-model = SentenceTransformer("BAAI/bge-base-en-v1.5")
 COSMOS_URL = os.environ['COSMOS_DB_CONNECTION_STRING']
 
 @mcp_api_app.prompt()
