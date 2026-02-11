@@ -18,7 +18,7 @@ if not log.handlers:
     h.setLevel(logging.INFO)
     log.addHandler(h)
 
-HOST = 'leave-policy-agent-mcp-aseufdafbndad6a8.westus2-01.azurewebsites.net'
+HOST = 'leave-policy-agent-mcp-1-auczcxdxa7dwftd9.westus2-01.azurewebsites.net'
 
 mcp_api_app = FastMCP(
     transport_security=TransportSecuritySettings(
