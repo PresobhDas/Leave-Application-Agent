@@ -9,6 +9,7 @@ from azure.core.credentials import AzureKeyCredential
 from azure.identity import DefaultAzureCredential
 from azure.cosmos import CosmosClient
 import os
+from fastapi import FastAPI
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
@@ -210,4 +211,9 @@ async def get_weather(city:str):
     return {'error':f'{city} is not a valid location'}
 
 mcp_api_app.settings.streamable_http_path = "/mcp"  
-mcp_server = mcp_api_app.streamable_http_app()
+mcp_asgi  = mcp_api_app.streamable_http_app()
+
+app = FastAPI(lifespan=lambda _app: mcp_api_app.session_manager.run())  # <- key fix
+app.mount("/", mcp_asgi )
+
+mcp_server = app
