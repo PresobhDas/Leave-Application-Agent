@@ -62,13 +62,13 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
     chat_model = get_chat_model()
     MCP_SERVER = os.environ['MCP_SERVER_ENDPOINT']
     async def probe():
-        async with httpx.AsyncClient(follow_redirects=False, timeout=20.0) as client:
-            r = await client.get(MCP_SERVER, headers={"Accept": "text/event-stream"})
-            log.info(f'status:, {r.status_code}')
-            log.info(f'location:, {r.headers.get("location")}')
-            log.info(f'content-type:, {r.headers.get("content-type")}')
-            log.info(f'mcp-session-id:, {r.headers.get("mcp-session-id")}')
-            log.info(f'first100:, {r.text[:100]}')
+        async with streamable_http_client(MCP_SERVER) as (read, write, session_id):
+            logging.info("MCP session_id=%s", session_id)
+            async with ClientSession(read, write) as s:
+                await s.initialize()
+                # If this works, your transport is good:
+                p = await s.get_prompt(name="get_input_prompt_system", arguments={})
+                logging.info("get_prompt OK len=%s", len(str(p)))
 
     await probe()
     try:
