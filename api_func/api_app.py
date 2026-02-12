@@ -70,7 +70,7 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
             log.info("mcp-session-id:", r.headers.get("mcp-session-id"))
             log.info("first100:", r.text[:100])
 
-    asyncio.run(probe())
+    await probe()
     try:
         async with streamable_http_client(MCP_SERVER) as (read, write, session_id):
             async with ClientSession(read, write) as MCP_SESSION:
