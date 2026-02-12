@@ -6,6 +6,7 @@ from utils.llm_utils import get_chat_model, build_nodes, build_tools, check_tool
 from mcp.client.streamable_http import streamable_http_client
 from mcp import ClientSession
 import logging, sys, inspect, os
+import httpx, asyncio
 
 log = logging.getLogger('api')
 log.setLevel(logging.INFO)
@@ -60,6 +61,16 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
 
     chat_model = get_chat_model()
     MCP_SERVER = os.environ['MCP_SERVER_ENDPOINT']
+    async def probe():
+        async with httpx.AsyncClient(follow_redirects=False, timeout=20.0) as client:
+            r = await client.get(MCP_SERVER, headers={"Accept": "text/event-stream"})
+            log.info("status:", r.status_code)
+            log.info("location:", r.headers.get("location"))
+            log.info("content-type:", r.headers.get("content-type"))
+            log.info("mcp-session-id:", r.headers.get("mcp-session-id"))
+            log.info("first100:", r.text[:100])
+
+    asyncio.run(probe())
     try:
         async with streamable_http_client(MCP_SERVER) as (read, write, session_id):
             async with ClientSession(read, write) as MCP_SESSION:
