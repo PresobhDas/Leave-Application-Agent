@@ -7,6 +7,7 @@ from langgraph.graph import MessagesState
 from pydantic import BaseModel
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
+import json
 
 VAULT_URL = "https://leave-policy-keyvault.vault.azure.net/"
 
@@ -55,6 +56,36 @@ class RagData(BaseModel):
     matchPercent:int
 class InputDetails(BaseModel):
     inp_query:str
+
+tool_properties = dict()
+tool_properties['get_employee_master_record'] = json.dumps([
+  {"propertyName":"employee_id","propertyType":"string","description":"Employee ID","isRequired":True}
+])
+
+def get_prompts(prompt_name:str, question:str):
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    prompt_dict = dict()
+
+    prompt_dict['input_prompt_human'] = f"""This is the question : {question}."""
+    prompt_dict['input_prompt_system'] = '''
+    You are a helpful AI bot that does the following.
+    1. Understand the question given to you by the user.
+    2. Take the following actions ONLY with priority in the given order:
+        a) If the question is regular conversaion, respond naturally and conversationally as no information retrieval is needed.
+        b) Try to answer based on your internal knowledge.
+        c) Call external tools provided to you. Details of the different tools ar as follows. There is NO particular order in which the below tools need to be invoked. Directly call the right tool as needed. No need to follow the below precedence.
+            1) Tool Name : get_employee_master_record.
+                Description: Retrieve the employee master information from the Azure Cosmos DB. This queries the NO SQL database based on the given Employee ID.
+            2) Tool Name : get_employee_leave_record.
+                Description: Retrieve the employee leave information from the Azure Cosmos DB. This queries the NO SQL database based on the given Employee ID.
+            3) Tool Name : get_leave_policy_document.
+                Description: This is the RAG retrieval tool and queries the Azure AI Search using the vector embeddings of the given input text based on similarity.
+            4) Tool Name: get_weather_tool
+                Description: get_weather_tool to retrieve the weather information for any given location. 
+        d) If NONE of the THE ABOVE works, say 'I Don't know the answer'.      
+    '''
+
+    return prompt_dict.get(prompt_name, 'Invalid prompt passed')
 
 def get_chat_model() -> ChatOpenAI:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
