@@ -61,6 +61,9 @@ tool_properties = dict()
 tool_properties['get_employee_master_record'] = json.dumps([
   {"propertyName":"employee_id","propertyType":"string","description":"Employee ID","isRequired":True}
 ])
+tool_properties['get_employee_leave_record'] = json.dumps([
+  {"propertyName":"employee_id","propertyType":"string","description":"Employee ID","isRequired":True}
+])
 
 def get_prompts(prompt_name:str, question:str|None=None):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
@@ -168,8 +171,7 @@ def build_tools(mcp_session:ClientSession):
         )
 
         try:
-            # resp_content = EmployeeLeaveData.model_validate_json(resp.content[0].text)
-            resp_content = EmployeeData.model_validate_json(resp.content[0].text)
+            resp_content = EmployeeLeaveData.model_validate_json(resp.content[0].text)
         except:
             return None
         
