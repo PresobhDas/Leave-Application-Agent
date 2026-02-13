@@ -21,42 +21,41 @@ if not log.handlers:
     h.setLevel(logging.INFO)
     log.addHandler(h)
 
-mcp_api_app = func.FunctionApp()
-
 INDEX_SEARCH_API_ENDPOINT = os.environ['AZURE_AI_SEARCH_API_ENDPOINT']
 INDEX_SEARCH_API_KEY = os.environ['AZURE_AI_SEARCH_API_KEY']
 INDEX_NAME = 'embedding-index'
 COSMOS_URL = os.environ['COSMOS_DB_CONNECTION_STRING']
 
-@mcp_api_app.mcp_tool_trigger(
-    arg_name='context',
-    tool_name='get_employee_master_record',
-    description='Retrieve employee master information from Cosmos DB',
-    tool_properties=tool_properties['get_employee_master_record']
-)
-
-def get_employee_master_record(context:str):
-    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    content = json.loads(context)
-    employee_id = content['arguments']['employee_id']
-    client = CosmosClient(
-        url=COSMOS_URL,
-        credential=DefaultAzureCredential()
+def register_tools(mcp_api_app):
+    @mcp_api_app.mcp_tool_trigger(
+        arg_name='context',
+        tool_name='get_employee_master_record',
+        description='Retrieve employee master information from Cosmos DB',
+        tool_properties=tool_properties['get_employee_master_record']
     )
 
-    db = client.get_database_client("leave-db")
-    container = db.get_container_client("employee-master")
-    try:
-        resp = container.read_item(item=employee_id, partition_key=employee_id)
-        emp_data = EmployeeData.model_validate(resp)
-    except CosmosResourceNotFoundError:
-        log.info(f'No records found for Employee : {employee_id}')
-        return {'error':f'No records found for Employee : {employee_id}'}
-    except CosmosHttpResponseError as err:
-        log.error(f'Communication to Azure Cosmos failed with error {err}')
-        return {'error':f'Communication to Azure Cosmos failed with error {err}'}
-    
-    return emp_data.model_dump_json()
+    def get_employee_master_record(context:str):
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+        content = json.loads(context)
+        employee_id = content['arguments']['employee_id']
+        client = CosmosClient(
+            url=COSMOS_URL,
+            credential=DefaultAzureCredential()
+        )
+
+        db = client.get_database_client("leave-db")
+        container = db.get_container_client("employee-master")
+        try:
+            resp = container.read_item(item=employee_id, partition_key=employee_id)
+            emp_data = EmployeeData.model_validate(resp)
+        except CosmosResourceNotFoundError:
+            log.info(f'No records found for Employee : {employee_id}')
+            return {'error':f'No records found for Employee : {employee_id}'}
+        except CosmosHttpResponseError as err:
+            log.error(f'Communication to Azure Cosmos failed with error {err}')
+            return {'error':f'Communication to Azure Cosmos failed with error {err}'}
+        
+        return emp_data.model_dump_json()
 
 # @mcp_api_app.prompt()
 # async def get_input_prompt_human(question:str, context:str):
