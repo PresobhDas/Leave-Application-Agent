@@ -1,6 +1,4 @@
 import logging, sys, inspect, requests
-from mcp.server.fastmcp import FastMCP
-from mcp.server.transport_security import TransportSecuritySettings
 from utils.llm_utils import tool_properties, getAzureSecrets, WeatherData, EmployeeData, EmployeeLeaveData, RagData, generate_embeddings
 from azure.cosmos.exceptions import CosmosResourceNotFoundError, CosmosHttpResponseError 
 from azure.search.documents import SearchClient
@@ -76,16 +74,17 @@ def register_tools(mcp_api_app):
 
             db = client.get_database_client("leave-db")
             container = db.get_container_client("employee-leaves")
-
-            query = 'select * from c where c.employeeId = @employee_id'
-            params = [{'name':'@employee_id', 'value':employee_id}]
-            items = container.query_items(
-                query=query,
-                parameters=params,
-                partition_key=employee_id
-            )
-            for item in items:
-                emp_data = EmployeeLeaveData.model_validate(item)
+            resp = container.read_item(item=employee_id, partition_key=employee_id)
+            emp_data = EmployeeData.model_validate(resp)
+            # query = 'select * from c where c.employeeId = @employee_id'
+            # params = [{'name':'@employee_id', 'value':employee_id}]
+            # items = container.query_items(
+            #     query=query,
+            #     parameters=params,
+            #     partition_key=employee_id
+            # )
+            # for item in items:
+            #     emp_data = EmployeeLeaveData.model_validate(item)
         except CosmosResourceNotFoundError:
             log.info(f'No leave records found for Employee : {employee_id}')
             return {'error':f'No leave records found for Employee : {employee_id}'}

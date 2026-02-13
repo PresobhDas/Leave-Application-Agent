@@ -168,7 +168,8 @@ def build_tools(mcp_session:ClientSession):
         )
 
         try:
-            resp_content = EmployeeLeaveData.model_validate_json(resp.content[0].text)
+            # resp_content = EmployeeLeaveData.model_validate_json(resp.content[0].text)
+            resp_content = EmployeeData.model_validate_json(resp.content[0].text)
         except:
             return None
         
