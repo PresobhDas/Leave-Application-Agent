@@ -60,17 +60,8 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
     log.info('Function Invoked')
 
     chat_model = get_chat_model()
-    MCP_SERVER = os.environ['MCP_SERVER_ENDPOINT']
-    async def probe():
-        async with streamable_http_client(MCP_SERVER) as (read, write, session_id):
-            logging.info("MCP session_id=%s", session_id)
-            async with ClientSession(read, write) as s:
-                await s.initialize()
-                # If this works, your transport is good:
-                p = await s.get_prompt(name="get_input_prompt_system", arguments={})
-                logging.info("get_prompt OK len=%s", len(str(p)))
-
-    await probe()
+    MCP_SERVER = f'{os.environ['MCP_SERVER_ENDPOINT']}/runtime/webhooks/mcp?code={os.environ['MCP_EXTENSION_KEY']}'
+    log.info(f'MCP_SERVER is at {MCP_SERVER}')
     try:
         async with streamable_http_client(MCP_SERVER) as (read, write, session_id):
             async with ClientSession(read, write) as MCP_SESSION:
