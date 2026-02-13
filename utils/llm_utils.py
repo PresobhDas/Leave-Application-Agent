@@ -152,27 +152,27 @@ def build_tools(mcp_session:ClientSession):
         
         return resp_content
     
-    # @tool
-    # async def get_employee_leave_record(employee_id:str):
-    #     '''
-    #     Docstring for get_employee_leave_record
+    @tool
+    async def get_employee_leave_record(employee_id:str):
+        '''
+        Docstring for get_employee_leave_record
         
-    #     :param employee_id: This function takes the employee ID as a parameter and returns that employees leave information from Cosmos DB Database.
-    #     :type employee_id: str
-    #     '''
+        :param employee_id: This function takes the employee ID as a parameter and returns that employees leave information from Cosmos DB Database.
+        :type employee_id: str
+        '''
 
-    #     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    #     resp = await mcp_session.call_tool(
-    #                                         name='get_employee_leave_record',
-    #                                         arguments={'employee_id':employee_id}
-    #     )
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+        resp = await mcp_session.call_tool(
+                                            name='get_employee_leave_record',
+                                            arguments={'employee_id':employee_id}
+        )
 
-    #     try:
-    #         resp_content = EmployeeLeaveData.model_validate_json(resp.content[0].text)
-    #     except:
-    #         return None
+        try:
+            resp_content = EmployeeLeaveData.model_validate_json(resp.content[0].text)
+        except:
+            return None
         
-    #     return resp_content
+        return resp_content
     
     # @tool
     # async def get_leave_policy_document(inp_question:str):
@@ -195,7 +195,7 @@ def build_tools(mcp_session:ClientSession):
         
     #     return resp_content
 
-    return [get_employee_master_record]
+    return [get_employee_master_record, get_employee_leave_record]
 
 def build_nodes(mcp_session:ClientSession, llm_with_tools):
 
