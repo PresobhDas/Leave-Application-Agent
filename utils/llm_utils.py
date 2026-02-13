@@ -201,17 +201,11 @@ def build_nodes(mcp_session:ClientSession, llm_with_tools):
 
     async def node_generate_answer_from_llm(state:RagState):
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-        inp_system_message = await mcp_session.get_prompt(
-            name = 'get_input_prompt_system'
-        )
-        inp_human_message = await mcp_session.get_prompt(name='get_input_prompt_human',
-                        arguments={
-                                        'question' : state.get('question', ''),
-                                        'context' : ''
-                                    } 
-                )
-        SYSTEM_MESSAGE = SystemMessage(content=inp_system_message.messages[0].content.text)
-        HUMAN_MESSAGE = HumanMessage(content=inp_human_message.messages[0].content.text)
+
+        inp_system_message = get_prompts('input_prompt_system')
+        inp_human_message = get_prompts('input_prompt_human', question=state.get('question', ''))
+        SYSTEM_MESSAGE = SystemMessage(content=inp_system_message)
+        HUMAN_MESSAGE = HumanMessage(content=inp_human_message)
         response = await llm_with_tools.ainvoke(state['messages'] + [SYSTEM_MESSAGE, HUMAN_MESSAGE])
         count = state.get('tool_execution_count',0)
         if getattr(response, 'tool_calls', None):
