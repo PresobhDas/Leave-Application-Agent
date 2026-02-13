@@ -198,7 +198,7 @@ def build_tools(mcp_session:ClientSession):
         
     #     return resp_content
 
-    return [get_employee_master_record]
+    return [get_employee_master_record, get_employee_leave_record]
 
 def build_nodes(mcp_session:ClientSession, llm_with_tools):
 
