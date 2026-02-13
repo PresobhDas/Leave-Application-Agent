@@ -9,8 +9,6 @@ from azure.core.credentials import AzureKeyCredential
 from azure.identity import DefaultAzureCredential
 from azure.cosmos import CosmosClient
 import os
-from fastapi import FastAPI
-import azure.functions as func
 import json
 
 log = logging.getLogger('mcp')
@@ -33,14 +31,6 @@ def register_tools(mcp_api_app):
         description='Retrieve employee master information from Cosmos DB',
         tool_properties=tool_properties['get_employee_master_record']
     )
-
-    @mcp_api_app.mcp_tool_trigger(
-        arg_name='context',
-        tool_name='get_employee_leave_record',
-        description='Retrieve employees leave information from Cosmos DB',
-        tool_properties=tool_properties['get_employee_leave_record']
-    )
-
     def get_employee_master_record(context:str):
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
         try:
@@ -62,11 +52,17 @@ def register_tools(mcp_api_app):
         except CosmosHttpResponseError as err:
             log.error(f'Communication to Azure Cosmos failed with error {err}')
             return {'error':f'Communication to Azure Cosmos failed with error {err}'}
-        except err as e:
+        except Exception as e:
             log .error(f'Failed with error {e}')
 
         return emp_data.model_dump_json()
-
+    
+    @mcp_api_app.mcp_tool_trigger(
+        arg_name='context',
+        tool_name='get_employee_leave_record',
+        description='Retrieve employees leave information from Cosmos DB',
+        tool_properties=tool_properties['get_employee_leave_record']
+    )
     def get_employee_leave_record(context:str):
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
         try: 
@@ -96,9 +92,9 @@ def register_tools(mcp_api_app):
         except CosmosHttpResponseError as err:
             log.error(f'Communication to Azure Cosmos failed with error {err}')
             return {'error':f'Communication to Azure Cosmos failed with error {err}'}
-        except err as e:
+        except Exception as e:
             log .error(f'Failed with error {e}')
-            
+
         return emp_data.model_dump_json()
 
 # @mcp_api_app.tool()
