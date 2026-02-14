@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 import json
+from model_contracts import EmployeeMasterResponseModel, EmployeeLeaveData, WeatherData, RagData, InputDetails
 
 VAULT_URL = "https://leave-policy-keyvault.vault.azure.net/"
 
@@ -22,40 +23,6 @@ if not log.handlers:
 class RagState(MessagesState):
     question:str
     tool_execution_count: int
-
-class WeatherData(BaseModel):
-    latitude: float
-    longitude: float
-    temperature: float
-    windspeed: float
-    winddirection: float
-
-class EmployeeData(BaseModel):
-    id:str
-    employeeId:str
-    name:str
-    department:str
-    managerId:str
-    hireDate:str
-    workLocation:str
-    isActive:bool
-
-class EmployeeLeaveData(BaseModel):
-    id:str
-    employeeId:str
-    name:str
-    leaveType:str
-    startDate:str
-    endDate:str
-    numberOfDays:int
-
-class RagData(BaseModel):
-    id:str
-    partiion_key_id:str
-    test:str
-    matchPercent:int
-class InputDetails(BaseModel):
-    inp_query:str
 
 tool_properties = dict()
 tool_properties['get_employee_master_record'] = json.dumps([
@@ -152,7 +119,7 @@ def build_tools(mcp_session:ClientSession):
                                             arguments = {'employee_id':employee_id}
         )
         try:
-            resp_content = EmployeeData.model_validate_json(resp.content[0].text)
+            resp_content = EmployeeMasterResponseModel.model_validate_json(resp.content[0].text)
         except:
             return None
         

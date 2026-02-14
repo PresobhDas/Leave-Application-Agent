@@ -6,8 +6,8 @@ from azure.search.documents.models import VectorizedQuery
 from azure.core.credentials import AzureKeyCredential
 from azure.identity import DefaultAzureCredential
 from azure.cosmos import CosmosClient
-import os
-import json
+import os, json
+from utils.model_contracts import EmployeeMasterResponseModel, EmployeeLeaveData, WeatherData
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
@@ -44,16 +44,20 @@ def register_tools(mcp_api_app):
             container = db.get_container_client("employee-master")
             resp = container.read_item(item=employee_id, partition_key=employee_id)
             emp_data = EmployeeData.model_validate(resp)
+            emp_response = EmployeeMasterResponseModel()
+            emp_response.dataFound = 'FOUND'
+            emp_response.employee = emp_data
         except CosmosResourceNotFoundError:
             log.info(f'No records found for Employee : {employee_id}')
-            return {'error':f'No records found for Employee : {employee_id}'}
+            emp_response.dataFound = 'NOT FOUND'
         except CosmosHttpResponseError as err:
             log.error(f'Communication to Azure Cosmos failed with error {err}')
-            return {'error':f'Communication to Azure Cosmos failed with error {err}'}
+            emp_response.dataFound = 'ERROR'
         except Exception as e:
             log.error(f'Failed with error {e}')
+            emp_response.dataFound = 'ERROR'
 
-        return emp_data.model_dump_json()
+        return emp_response.model_dump_json()
     
     @mcp_api_app.mcp_tool_trigger(
         arg_name='context',
