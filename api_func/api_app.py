@@ -2,11 +2,11 @@ from fastapi import FastAPI, Body
 from typing import Annotated
 from langgraph.graph import START, END, StateGraph
 from langgraph.prebuilt import ToolNode
-from utils.llm_utils import get_chat_model, build_nodes, build_tools, check_tool_condition, RagState, InputDetails
+from utils.llm_utils import get_chat_model, build_nodes, build_tools, check_tool_condition, RagState
+from utils.model_contracts import InputDetails
 from mcp.client.streamable_http import streamable_http_client
 from mcp import ClientSession
 import logging, sys, inspect, os
-import httpx, asyncio
 
 log = logging.getLogger('api')
 log.setLevel(logging.INFO)

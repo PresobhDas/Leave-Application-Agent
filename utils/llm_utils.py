@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 import json
-from model_contracts import EmployeeMasterResponseModel, EmployeeLeaveData, WeatherData, RagData, InputDetails
+from utils.model_contracts import EmployeeMasterResponseModel, EmployeeLeaveData, WeatherData, RagData
 
 VAULT_URL = "https://leave-policy-keyvault.vault.azure.net/"
 
