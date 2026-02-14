@@ -140,48 +140,55 @@ def register_tools(mcp_api_app):
 #     rag_data.matchPercent = score
 #     return rag_data.model_dump_json()
 
-# @mcp_api_app.tool()
-# async def get_weather(city:str):
-#     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    @mcp_api_app.mcp_tool_trigger(
+        arg_name='context',
+        tool_name='get_weather',
+        description='Retrieve employees leave information from Cosmos DB',
+        tool_properties=tool_properties['get_weather']
+    )
+    async def get_weather(context:str):
+        def get_lat_long(city:str):
+            log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+            url = "https://geocoding-api.open-meteo.com/v1/search"
+            params = {
+                'name':city,
+                'count':1,
+                'language':'en',
+                'format':'json'
+            }
 
-#     def get_lat_long(city:str):
-#         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-#         url = "https://geocoding-api.open-meteo.com/v1/search"
-#         params = {
-#             'name':city,
-#             'count':1,
-#             'language':'en',
-#             'format':'json'
-#         }
-
-#         resp = requests.get(url=url, params=params)
-#         data = resp.json()
-#         if 'results' not in data:
-#             log.info(f'CUSTOM LOG - {city} not a valid geographical location')
-#             return None
+            resp = requests.get(url=url, params=params)
+            data = resp.json()
+            if 'results' not in data:
+                log.info(f'CUSTOM LOG - {city} not a valid geographical location')
+                return None
+            
+            result = data['results'][0]
+            return (result['latitude'], result['longitude'])
         
-#         result = data['results'][0]
-#         return (result['latitude'], result['longitude'])
-    
-#     location = get_lat_long(city)
-#     if location:
-#         lat, long = location[0], location[1]
-#         url = "https://api.open-meteo.com/v1/forecast"
-#         params = {
-#             'latitude':lat,
-#             'longitude':long,
-#             'current_weather':True
-#         }
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+        content = json.loads(context)
+        log.info(f'Passed parameter for {inspect.currentframe().f_code.co_name} is {content}')
+        city = content['arguments']['city']
+        location = get_lat_long(city)
+        if location:
+            lat, long = location[0], location[1]
+            url = "https://api.open-meteo.com/v1/forecast"
+            params = {
+                'latitude':lat,
+                'longitude':long,
+                'current_weather':True
+            }
 
-#         resp = requests.get(url=url, params=params).json()
-#         log.info('get_weather API successfully called.')
-#         current_weather = WeatherData(
-#             latitude=resp['latitude'],
-#             longitude=resp['longitude'],
-#             temperature=resp['current_weather']['temperature'],
-#             windspeed=resp['current_weather']['windspeed'],
-#             winddirection=resp['current_weather']['winddirection']
-#         )
+            resp = requests.get(url=url, params=params).json()
+            log.info('get_weather API successfully called.')
+            current_weather = WeatherData(
+                latitude=resp['latitude'],
+                longitude=resp['longitude'],
+                temperature=resp['current_weather']['temperature'],
+                windspeed=resp['current_weather']['windspeed'],
+                winddirection=resp['current_weather']['winddirection']
+            )
 
-#         return current_weather.model_dump_json()
-#     return {'error':f'{city} is not a valid location'}
+            return current_weather.model_dump_json()
+        return {'error':f'{city} is not a valid location'}

@@ -64,6 +64,9 @@ tool_properties['get_employee_master_record'] = json.dumps([
 tool_properties['get_employee_leave_record'] = json.dumps([
   {"propertyName":"employee_id","propertyType":"string","description":"Employee ID","isRequired":True}
 ])
+tool_properties['get_weather'] = json.dumps([
+  {"propertyName":"city","propertyType":"string","description":"Name of the city","isRequired":True}
+])
 
 def get_prompts(prompt_name:str, question:str|None=None):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
@@ -113,27 +116,27 @@ async def check_tool_condition(state: RagState):
         return 'end'
 
 def build_tools(mcp_session:ClientSession):
-    # @tool
-    # async def get_weather_tool(city: str):
-    #     '''
-    #     Docstring for weather_tool
-    #     :param city: Input city whose weather is being requested for.
-    #     :type city: str
+    @tool
+    async def get_weather_tool(city: str):
+        '''
+        Docstring for weather_tool
+        :param city: Input city whose weather is being requested for.
+        :type city: str
 
-    #     This function tool get the city name as the input and returns the current weather information for that city
-    #     '''
+        This function tool get the city name as the input and returns the current weather information for that city
+        '''
 
-    #     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    #     resp = await mcp_session.call_tool(
-    #                                         name = 'get_weather',
-    #                                         arguments = {'city':city} 
-    #                     )   
-    #     try:
-    #         resp_content = WeatherData.model_validate_json(resp.content[0].text)
-    #     except:
-    #         return None
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+        resp = await mcp_session.call_tool(
+                                            name = 'get_weather',
+                                            arguments = {'city':city} 
+                        )   
+        try:
+            resp_content = WeatherData.model_validate_json(resp.content[0].text)
+        except:
+            return None
         
-    #     return resp_content
+        return resp_content
     
     @tool
     async def get_employee_master_record(employee_id:str):
@@ -198,7 +201,7 @@ def build_tools(mcp_session:ClientSession):
         
     #     return resp_content
 
-    return [get_employee_master_record, get_employee_leave_record]
+    return [get_employee_master_record, get_employee_leave_record, get_weather_tool]
 
 def build_nodes(mcp_session:ClientSession, llm_with_tools):
 
