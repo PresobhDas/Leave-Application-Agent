@@ -1,5 +1,5 @@
 import logging, sys, inspect, requests
-from utils.llm_utils import tool_properties, getAzureSecrets, WeatherData, EmployeeData, EmployeeLeaveData, RagData, generate_embeddings
+from utils.llm_utils import tool_properties, getAzureSecrets, generate_embeddings
 from azure.cosmos.exceptions import CosmosResourceNotFoundError, CosmosHttpResponseError 
 from azure.search.documents import SearchClient
 from azure.search.documents.models import VectorizedQuery
@@ -7,7 +7,7 @@ from azure.core.credentials import AzureKeyCredential
 from azure.identity import DefaultAzureCredential
 from azure.cosmos import CosmosClient
 import os, json
-from utils.model_contracts import EmployeeMasterResponseModel, EmployeeLeaveData, WeatherData
+from utils.model_contracts import EmployeeData, EmployeeMasterResponseModel, EmployeeLeaveData, WeatherData
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
