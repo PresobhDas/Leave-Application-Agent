@@ -8,6 +8,7 @@ from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 import json
 from utils.model_contracts import EmployeeMasterResponseModel, EmployeeLeaveData, WeatherData, RagData
+from mcp.client.streamable_http import streamable_http_client
 
 VAULT_URL = "https://leave-policy-keyvault.vault.azure.net/"
 
@@ -81,28 +82,28 @@ async def check_tool_condition(state: RagState):
     else:
         return 'end'
 
-def build_tools(mcp_session:ClientSession):
-    @tool
-    async def get_weather_tool(city: str):
-        '''
-        Docstring for weather_tool
-        :param city: Input city whose weather is being requested for.
-        :type city: str
+def build_tools(mcp_server:str):
+    # @tool
+    # async def get_weather_tool(city: str):
+    #     '''
+    #     Docstring for weather_tool
+    #     :param city: Input city whose weather is being requested for.
+    #     :type city: str
 
-        This function tool get the city name as the input and returns the current weather information for that city
-        '''
+    #     This function tool get the city name as the input and returns the current weather information for that city
+    #     '''
 
-        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-        resp = await mcp_session.call_tool(
-                                            name = 'get_weather',
-                                            arguments = {'city':city} 
-                        )   
-        try:
-            resp_content = WeatherData.model_validate_json(resp.content[0].text)
-        except:
-            return None
+    #     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    #     resp = await mcp_session.call_tool(
+    #                                         name = 'get_weather',
+    #                                         arguments = {'city':city} 
+    #                     )   
+    #     try:
+    #         resp_content = WeatherData.model_validate_json(resp.content[0].text)
+    #     except:
+    #         return None
         
-        return resp_content
+    #     return resp_content
     
     @tool
     async def get_employee_master_record(employee_id:str):
@@ -113,10 +114,13 @@ def build_tools(mcp_session:ClientSession):
         :type employee_id: str
         '''
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-        resp = await mcp_session.call_tool(
-                                            name = 'get_employee_master_record',
-                                            arguments = {'employee_id':employee_id}
-        )
+        async with streamable_http_client(mcp_server) as (read, write, session_id):
+            async with ClientSession(read, write) as MCP_SESSION:
+                await MCP_SESSION.initialize()
+                resp = await MCP_SESSION.call_tool(
+                                                    name = 'get_employee_master_record',
+                                                    arguments = {'employee_id':employee_id}
+                        )
         try:
             resp_content = EmployeeMasterResponseModel.model_validate_json(resp.content[0].text)
         except:
@@ -124,27 +128,27 @@ def build_tools(mcp_session:ClientSession):
         
         return resp_content
     
-    @tool
-    async def get_employee_leave_record(employee_id:str):
-        '''
-        Docstring for get_employee_leave_record
+    # @tool
+    # async def get_employee_leave_record(employee_id:str):
+    #     '''
+    #     Docstring for get_employee_leave_record
         
-        :param employee_id: This function takes the employee ID as a parameter and returns that employees leave information from Cosmos DB Database.
-        :type employee_id: str
-        '''
+    #     :param employee_id: This function takes the employee ID as a parameter and returns that employees leave information from Cosmos DB Database.
+    #     :type employee_id: str
+    #     '''
 
-        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-        resp = await mcp_session.call_tool(
-                                            name='get_employee_leave_record',
-                                            arguments={'employee_id':employee_id}
-        )
+    #     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    #     resp = await mcp_session.call_tool(
+    #                                         name='get_employee_leave_record',
+    #                                         arguments={'employee_id':employee_id}
+    #     )
 
-        try:
-            resp_content = EmployeeLeaveData.model_validate_json(resp.content[0].text)
-        except:
-            return None
+    #     try:
+    #         resp_content = EmployeeLeaveData.model_validate_json(resp.content[0].text)
+    #     except:
+    #         return None
         
-        return resp_content
+    #     return resp_content
     
     # @tool
     # async def get_leave_policy_document(inp_question:str):
@@ -167,9 +171,9 @@ def build_tools(mcp_session:ClientSession):
         
     #     return resp_content
 
-    return [get_employee_master_record, get_employee_leave_record, get_weather_tool]
+    return [get_employee_master_record]
 
-def build_nodes(mcp_session:ClientSession, llm_with_tools):
+def build_nodes(llm_with_tools):
 
     async def node_generate_answer_from_llm(state:RagState):
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')

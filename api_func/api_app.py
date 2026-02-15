@@ -28,9 +28,9 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
     async def process_ai_agent():
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
 
-        tools = build_tools(MCP_SESSION)
+        tools = build_tools(MCP_SERVER)
         llm_with_tools = chat_model.bind_tools(tools)
-        nodes = build_nodes(MCP_SESSION, llm_with_tools)
+        nodes = build_nodes(llm_with_tools)
 
         graph = StateGraph(RagState)
         graph.add_node('node_generate_answer_from_llm', nodes['node_generate_answer_from_llm'])
@@ -63,12 +63,12 @@ async def call_agent(inp_details : Annotated[InputDetails, Body()]):
     MCP_SERVER = f'{os.environ['MCP_SERVER_ENDPOINT']}/runtime/webhooks/mcp?code={os.environ['MCP_EXTENSION_KEY']}'
     log.info(f'MCP_SERVER is at {MCP_SERVER}')
     try:
-        async with streamable_http_client(MCP_SERVER) as (read, write, session_id):
-            async with ClientSession(read, write) as MCP_SESSION:
-                await MCP_SESSION.initialize()
-                log.info('CUSTOM LOG - Created MCP_SESSION')
-                result = await process_ai_agent()
-                return result
+        # async with streamable_http_client(MCP_SERVER) as (read, write, session_id):
+        #     async with ClientSession(read, write) as MCP_SESSION:
+        #         await MCP_SESSION.initialize()
+        #         log.info('CUSTOM LOG - Created MCP_SESSION')
+        result = await process_ai_agent()
+        return result
     except* Exception as e:
         log.exception(f'Failed with Exception: {e.exceptions}')
 
