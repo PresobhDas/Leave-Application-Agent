@@ -30,6 +30,7 @@ def register_tools(mcp_api_app):
         tool_properties=tool_properties['get_employee_master_record']
     )
     def get_employee_master_record(context:str):
+        emp_response = EmployeeMasterResponseModel()
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
         try:
             content = json.loads(context)
@@ -43,8 +44,7 @@ def register_tools(mcp_api_app):
             db = client.get_database_client("leave-db")
             container = db.get_container_client("employee-master")
             resp = container.read_item(item=employee_id, partition_key=employee_id)
-            emp_data = EmployeeData.model_validate(resp)
-            emp_response = EmployeeMasterResponseModel()
+            emp_data = EmployeeData.model_validate(resp)    
             emp_response.dataFound = 'FOUND'
             emp_response.employee = emp_data
         except CosmosResourceNotFoundError:

@@ -4,7 +4,6 @@ from langchain_core.tools import tool
 from mcp import ClientSession
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langgraph.graph import MessagesState
-from pydantic import BaseModel
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 import json
