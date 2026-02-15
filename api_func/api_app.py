@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, Request
 from typing import Annotated
 from langgraph.graph import START, END, StateGraph
 from langgraph.prebuilt import ToolNode
@@ -7,6 +7,7 @@ from utils.model_contracts import InputDetails
 from mcp.client.streamable_http import streamable_http_client
 from mcp import ClientSession
 import logging, sys, inspect, os
+import uuid
 
 log = logging.getLogger('api')
 log.setLevel(logging.INFO)
@@ -26,8 +27,10 @@ async def ping():
     return {'response':'pong'}
 
 @api_server.post('/agent')
-async def call_agent(inp_details : Annotated[InputDetails, Body()]):
+async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body()]):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    rid = str(uuid.uuid4())
+    log.info(f"RID={rid} Entered call_agent client={request.client} ua={request.headers.get('user-agent')} xff={request.headers.get('x-forwarded-for')}")
     async def process_ai_agent():
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
 
