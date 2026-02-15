@@ -16,6 +16,9 @@ if not log.handlers:
     h.setLevel(logging.INFO)
     log.addHandler(h)
 
+log.propagate = False
+log.info(f"LOGGER_DIAG handlers={len(log.handlers)} handler_ids={[id(h) for h in log.handlers]}")
+
 api_server = FastAPI()
 
 @api_server.get('/ping')
