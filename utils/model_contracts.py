@@ -19,7 +19,7 @@ class EmployeeData(BaseModel):
     isActive:bool
 
 class EmployeeMasterResponseModel(BaseModel):
-    dataFound: Literal['FOUND', 'NOT FOUND', 'ERROR']
+    dataFound: Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'ERROR'
     employee: EmployeeData | None = None
 
 class EmployeeLeaveData(BaseModel):
@@ -36,6 +36,6 @@ class RagData(BaseModel):
     partiion_key_id:str
     test:str
     matchPercent:int
-    
+
 class InputDetails(BaseModel):
     inp_query:str
