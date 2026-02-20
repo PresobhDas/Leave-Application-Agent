@@ -19,7 +19,7 @@ class EmployeeData(BaseModel):
     isActive:bool
 
 class EmployeeMasterResponseModel(BaseModel):
-    dataFound: Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'ERROR'
+    dataFound: Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'NOT FOUND'
     employee: EmployeeData | None = None
 
 class EmployeeLeaveData(BaseModel):
@@ -32,7 +32,7 @@ class EmployeeLeaveData(BaseModel):
     numberOfDays:int
 
 class EmployeeLeaveResponseModel(BaseModel):
-    dataFound : Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'ERROR'
+    dataFound : Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'NOT FOUND'
     employeeLeave : EmployeeLeaveData | None = None
 
 class RagData(BaseModel):

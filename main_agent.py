@@ -27,7 +27,7 @@ headers = {
 url = 'https://leave-policy-agent-aaavdzbuf3bcexej.westus2-01.azurewebsites.net/agent'
 # leave-policy-agent-mcp-1-auczcxdxa7dwftd9.westus2-01.azurewebsites.net
 
-inp_details = InputDetails(inp_query='Get me the details of employee E1002')
+inp_details = InputDetails(inp_query='Get me the leave details of employee E1002')
 response = requests.post(url=url, headers=headers, json=inp_details.model_dump())
 print(response.status_code, response.url)
 print(response.headers.get("location"))
