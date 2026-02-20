@@ -46,7 +46,7 @@ def get_prompts(prompt_name:str, question:str|None=None):
     2. Take the following actions ONLY with priority in the given order:
         a) If the question is regular conversaion, respond naturally and conversationally as no information retrieval is needed.
         b) Try to answer based on your internal knowledge.
-        c) Call external tools provided to you. Details of the different tools ar as follows. There is NO particular order in which the below tools need to be invoked. Directly call the right tool as needed. No need to follow the below precedence.
+        c) Call external tools provided to you. Details of the different tools ar as follows. There is NO particular order in which the below tools need to be invoked. Directly call the right tool as needed. No need to follow the below precedence. If tools returns 'NOT FOUND', quit retrying and exit with the proper response of not getting data from that particular tool.
             1) Tool Name : get_employee_master_record.
                 Description: Retrieve the employee master information from the Azure Cosmos DB. This queries the NO SQL database based on the given Employee ID.
             2) Tool Name : get_employee_leave_record.
