@@ -31,6 +31,10 @@ class EmployeeLeaveData(BaseModel):
     endDate:str
     numberOfDays:int
 
+class EmployeeLeaveResponseModel(BaseModel):
+    dataFound : Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'ERROR'
+    employeeLeave : EmployeeLeaveData | None = None
+
 class RagData(BaseModel):
     id:str
     partiion_key_id:str

@@ -7,7 +7,7 @@ from azure.core.credentials import AzureKeyCredential
 from azure.identity import DefaultAzureCredential
 from azure.cosmos import CosmosClient
 import os, json
-from utils.model_contracts import EmployeeData, EmployeeMasterResponseModel, EmployeeLeaveData, WeatherData
+from utils.model_contracts import EmployeeData, EmployeeMasterResponseModel, EmployeeLeaveData, EmployeeLeaveResponseModel, WeatherData
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
@@ -59,45 +59,49 @@ def register_tools(mcp_api_app):
 
         return emp_response.model_dump_json()
     
-    # @mcp_api_app.mcp_tool_trigger(
-    #     arg_name='context',
-    #     tool_name='get_employee_leave_record',
-    #     description='Retrieve employees leave information from Cosmos DB',
-    #     tool_properties=tool_properties['get_employee_leave_record']
-    # )
-    # def get_employee_leave_record(context:str):
-    #     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    #     try: 
-    #         content = json.loads(context)
-    #         log.info(f'Passed parameter for {inspect.currentframe().f_code.co_name} is {content}')
-    #         employee_id = content['arguments']['employee_id']
-    #         client = CosmosClient(
-    #             url=COSMOS_URL,
-    #             credential=DefaultAzureCredential()
-    #         )
+    @mcp_api_app.mcp_tool_trigger(
+        arg_name='context',
+        tool_name='get_employee_leave_record',
+        description='Retrieve employees leave information from Cosmos DB',
+        tool_properties=tool_properties['get_employee_leave_record']
+    )
+    def get_employee_leave_record(context:str):
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+        emp_leave_response = EmployeeLeaveResponseModel()
+        try: 
+            content = json.loads(context)
+            log.info(f'Passed parameter for {inspect.currentframe().f_code.co_name} is {content}')
+            employee_id = content['arguments']['employee_id']
+            client = CosmosClient(
+                url=COSMOS_URL,
+                credential=DefaultAzureCredential()
+            )
 
-    #         db = client.get_database_client("leave-db")
-    #         container = db.get_container_client("employee-leaves")
+            db = client.get_database_client("leave-db")
+            container = db.get_container_client("employee-leaves")
 
-    #         query = 'select * from c where c.employeeId = @employee_id'
-    #         params = [{'name':'@employee_id', 'value':employee_id}]
-    #         items = container.query_items(
-    #             query=query,
-    #             parameters=params,
-    #             partition_key=employee_id
-    #         )
-    #         for item in items:
-    #             emp_data = EmployeeLeaveData.model_validate(item)
-    #     except CosmosResourceNotFoundError:
-    #         log.info(f'No leave records found for Employee : {employee_id}')
-    #         return {'error':f'No leave records found for Employee : {employee_id}'}
-    #     except CosmosHttpResponseError as err:
-    #         log.error(f'Communication to Azure Cosmos failed with error {err}')
-    #         return {'error':f'Communication to Azure Cosmos failed with error {err}'}
-    #     except Exception as e:
-    #         log.error(f'Failed with error {e}')
+            query = 'select * from c where c.employeeId = @employee_id'
+            params = [{'name':'@employee_id', 'value':employee_id}]
+            items = container.query_items(
+                query=query,
+                parameters=params,
+                partition_key=employee_id
+            )
+            for item in items:
+                leave_data = EmployeeLeaveData.model_validate(item)
+                emp_leave_response.dataFound = 'FOUND'
+                emp_leave_response.employeeLeave = leave_data
+        except CosmosResourceNotFoundError:
+            log.info(f'No leave records found for Employee : {employee_id}')
+            emp_leave_response.dataFound = 'NOT FOUND'
+        except CosmosHttpResponseError as err:
+            log.error(f'Communication to Azure Cosmos failed with error {err}')
+            emp_leave_response.dataFound = 'ERROR'
+        except Exception as e:
+            log.error(f'Failed with error {e}')
+            emp_leave_response.dataFound = 'ERROR'
 
-    #     return emp_data.model_dump_json()
+        return emp_leave_response.model_dump_json()
 
 # @mcp_api_app.tool()
 # async def get_leave_policy_document(inp_question:str):
