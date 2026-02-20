@@ -8,6 +8,10 @@ class WeatherData(BaseModel):
     windspeed: float
     winddirection: float
 
+class WeatherDataResponse(BaseModel):
+    dataFound : Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'NOT FOUND'
+    weatherData : WeatherData | None = None
+
 class EmployeeData(BaseModel):
     id:str
     employeeId:str
