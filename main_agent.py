@@ -27,11 +27,8 @@ headers = {
 url = 'https://leave-policy-agent-aaavdzbuf3bcexej.westus2-01.azurewebsites.net/agent'
 # leave-policy-agent-mcp-1-auczcxdxa7dwftd9.westus2-01.azurewebsites.net
 
-inp_details = InputDetails(inp_query='Get me employee E1002 leave information, if the current temperature of that employees location is above freezing')
+inp_details = InputDetails(inp_query='what is the current temperature in the location of employee E1001?')
 response = requests.post(url=url, headers=headers, json=inp_details.model_dump())
-print(response.status_code, response.url)
-print(response.headers.get("location"))
-print(response.history)
 
 data = response.json()
 

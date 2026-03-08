@@ -34,7 +34,7 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
     async def process_ai_agent():
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
 
-        tools = build_tools(MCP_SERVER)
+        tools = build_tools(MCP_SESSION)
         llm_with_tools = chat_model.bind_tools(tools)
         nodes = build_nodes(llm_with_tools)
 
@@ -66,13 +66,13 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
     log.info('Function Invoked')
 
     chat_model = get_chat_model()
-    MCP_SERVER = f'{os.environ['MCP_SERVER_ENDPOINT']}/runtime/webhooks/mcp?code={os.environ['MCP_EXTENSION_KEY']}'
+    MCP_SERVER = os.environ['MCP_SERVER_ENDPOINT']
     log.info(f'MCP_SERVER is at {MCP_SERVER}')
     try:
-        # async with streamable_http_client(MCP_SERVER) as (read, write, session_id):
-        #     async with ClientSession(read, write) as MCP_SESSION:
-        #         await MCP_SESSION.initialize()
-        #         log.info('CUSTOM LOG - Created MCP_SESSION')
+        async with streamable_http_client(MCP_SERVER) as (read, write, _):
+            async with ClientSession(read, write) as MCP_SESSION:
+                await MCP_SESSION.initialize()
+                log.info('CUSTOM LOG - Created MCP_SESSION')
         result = await process_ai_agent()
         return result
     except* Exception as e:

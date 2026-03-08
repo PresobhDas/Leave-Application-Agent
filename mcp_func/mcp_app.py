@@ -1,5 +1,5 @@
 import logging, sys, inspect, requests
-from utils.llm_utils import tool_properties, getAzureSecrets, generate_embeddings
+from utils.llm_utils import getAzureSecrets, generate_embeddings
 from azure.cosmos.exceptions import CosmosResourceNotFoundError, CosmosHttpResponseError 
 from azure.search.documents import SearchClient
 from azure.search.documents.models import VectorizedQuery
@@ -8,6 +8,7 @@ from azure.identity import DefaultAzureCredential
 from azure.cosmos import CosmosClient
 import os, json
 from utils.model_contracts import EmployeeData, EmployeeMasterResponseModel, EmployeeLeaveData, EmployeeLeaveResponseModel, WeatherData, WeatherDataResponse
+from mcp.server.fastmcp import FastMCP
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
@@ -22,20 +23,13 @@ INDEX_SEARCH_API_KEY = os.environ['AZURE_AI_SEARCH_API_KEY']
 INDEX_NAME = 'embedding-index'
 COSMOS_URL = os.environ['COSMOS_DB_CONNECTION_STRING']
 
-def register_tools(mcp_api_app):
-    @mcp_api_app.mcp_tool_trigger(
-        arg_name='context',
-        tool_name='get_employee_master_record',
-        description='Retrieve employee master information from Cosmos DB',
-        tool_properties=tool_properties['get_employee_master_record']
-    )
-    def get_employee_master_record(context:str):
+def register_tools(mcp_server:FastMCP):
+    @mcp_server.tool()
+    async def get_employee_master_record(employee_id:str):
         emp_response = EmployeeMasterResponseModel()
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
         try:
-            content = json.loads(context)
-            log.info(f'Passed parameter for {inspect.currentframe().f_code.co_name} is {content}')
-            employee_id = content['arguments']['employee_id']
+            log.info(f'Passed parameter for {inspect.currentframe().f_code.co_name} is {employee_id}')
             client = CosmosClient(
                 url=COSMOS_URL,
                 credential=DefaultAzureCredential()
@@ -59,19 +53,12 @@ def register_tools(mcp_api_app):
 
         return emp_response.model_dump_json()
     
-    @mcp_api_app.mcp_tool_trigger(
-        arg_name='context',
-        tool_name='get_employee_leave_record',
-        description='Retrieve employees leave information from Cosmos DB',
-        tool_properties=tool_properties['get_employee_leave_record']
-    )
-    def get_employee_leave_record(context:str):
+    @mcp_server.tool()
+    async def get_employee_leave_record(employee_id:str):
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
         emp_leave_response = EmployeeLeaveResponseModel()
         try: 
-            content = json.loads(context)
-            log.info(f'Passed parameter for {inspect.currentframe().f_code.co_name} is {content}')
-            employee_id = content['arguments']['employee_id']
+            log.info(f'Passed parameter for {inspect.currentframe().f_code.co_name} is {employee_id}')
             client = CosmosClient(
                 url=COSMOS_URL,
                 credential=DefaultAzureCredential()
@@ -148,13 +135,8 @@ def register_tools(mcp_api_app):
 #     rag_data.matchPercent = score
 #     return rag_data.model_dump_json()
 
-    @mcp_api_app.mcp_tool_trigger(
-        arg_name='context',
-        tool_name='get_weather',
-        description='Retrieve weather information from External API',
-        tool_properties=tool_properties['get_weather']
-    )
-    async def get_weather(context:str):
+    @mcp_server.tool()
+    async def get_weather(city:str):
         def get_lat_long(city:str):
             log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
             url = "https://geocoding-api.open-meteo.com/v1/search"
@@ -176,9 +158,7 @@ def register_tools(mcp_api_app):
         
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
         weather_response = WeatherDataResponse()
-        content = json.loads(context)
-        log.info(f'Passed parameter for {inspect.currentframe().f_code.co_name} is {content}')
-        city = content['arguments']['city']
+        log.info(f'Passed parameter for {inspect.currentframe().f_code.co_name} is {city}')
         location = get_lat_long(city)
         if location:
             lat, long = location[0], location[1]

@@ -24,17 +24,6 @@ class RagState(MessagesState):
     question:str
     tool_execution_count: int
 
-tool_properties = dict()
-tool_properties['get_employee_master_record'] = json.dumps([
-  {"propertyName":"employee_id","propertyType":"string","description":"Employee ID","isRequired":True}
-])
-tool_properties['get_employee_leave_record'] = json.dumps([
-  {"propertyName":"employee_id","propertyType":"string","description":"Employee ID","isRequired":True}
-])
-tool_properties['get_weather'] = json.dumps([
-  {"propertyName":"city","propertyType":"string","description":"Name of the city","isRequired":True}
-])
-
 def get_prompts(prompt_name:str, question:str|None=None):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     prompt_dict = dict()
@@ -82,7 +71,7 @@ async def check_tool_condition(state: RagState):
     else:
         return 'end'
 
-def build_tools(mcp_server:str):
+def build_tools(MCP_SESSION):
     @tool
     async def get_weather_tool(city: str):
         '''
@@ -94,13 +83,10 @@ def build_tools(mcp_server:str):
         '''
 
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-        async with streamable_http_client(mcp_server) as (read, write, session_id):
-            async with ClientSession(read, write) as MCP_SESSION:
-                await MCP_SESSION.initialize()
-                resp = await MCP_SESSION.call_tool(
-                                                    name = 'get_weather',
-                                                    arguments = {'city':city}
-                        )
+        resp = await MCP_SESSION.call_tool(
+                                            name = 'get_weather',
+                                            arguments = {'city':city}
+                )
         try:
             resp_content = WeatherDataResponse.model_validate_json(resp.content[0].text)
         except:
@@ -117,13 +103,10 @@ def build_tools(mcp_server:str):
         :type employee_id: str
         '''
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-        async with streamable_http_client(mcp_server) as (read, write, session_id):
-            async with ClientSession(read, write) as MCP_SESSION:
-                await MCP_SESSION.initialize()
-                resp = await MCP_SESSION.call_tool(
-                                                    name = 'get_employee_master_record',
-                                                    arguments = {'employee_id':employee_id}
-                        )
+        resp = await MCP_SESSION.call_tool(
+                                            name = 'get_employee_master_record',
+                                            arguments = {'employee_id':employee_id}
+                )
         try:
             resp_content = EmployeeMasterResponseModel.model_validate_json(resp.content[0].text)
         except:
@@ -141,13 +124,10 @@ def build_tools(mcp_server:str):
         '''
 
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-        async with streamable_http_client(mcp_server) as (read, write, session_id):
-            async with ClientSession(read, write) as MCP_SESSION:
-                await MCP_SESSION.initialize()
-                resp = await MCP_SESSION.call_tool(
-                                                    name = 'get_employee_leave_record',
-                                                    arguments = {'employee_id':employee_id}
-                        )
+        resp = await MCP_SESSION.call_tool(
+                                            name = 'get_employee_leave_record',
+                                            arguments = {'employee_id':employee_id}
+                )
 
         try:
             resp_content = EmployeeLeaveResponseModel.model_validate_json(resp.content[0].text)
