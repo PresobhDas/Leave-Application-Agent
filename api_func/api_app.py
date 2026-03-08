@@ -5,7 +5,7 @@ from langgraph.graph import START, END, StateGraph
 from langgraph.prebuilt import ToolNode
 from utils.llm_utils import get_chat_model, build_nodes, build_tools, check_tool_condition, RagState
 from utils.model_contracts import InputDetails
-from mcp.client.streamable_http import StreamableHTTPTransport
+from mcp.client.streamable_http import streamable_http_client
 from mcp import ClientSession
 import logging, sys, inspect, os
 import uuid
@@ -71,17 +71,10 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
     headers = {"x-functions-key": os.environ['MCP_FUNCTION_KEY']}
     log.info(f'MCP_SERVER is at {MCP_SERVER}')
     try:
-        transport = StreamableHTTPTransport(
-            url=MCP_SERVER,
-            headers=headers,
-            timeout=30.0,
-            sse_read_timeout=300.0        # ← pass the configured client here
-        )
-        async with ClientSession(transport) as MCP_SESSION:
-            await MCP_SESSION.initialize()
-            log.info('CUSTOM LOG - Created MCP_SESSION')
-
-        result = await process_ai_agent()
+        async with streamable_http_client(url=MCP_SERVER) as (read_stream, write_stream, _):
+            async with ClientSession(read_stream=read_stream, write_stream=write_stream) as session:
+                MCP_SESSION = await session.initialize()
+                result = await process_ai_agent()
         return result
     except* Exception as e:
         log.exception(f'Failed with Exception: {e.exceptions}')
