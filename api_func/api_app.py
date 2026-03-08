@@ -72,8 +72,8 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
     log.info(f'MCP_SERVER is at {MCP_SERVER}')
     try:
         async with streamable_http_client(url=MCP_SERVER) as (read_stream, write_stream, _):
-            async with ClientSession(read_stream=read_stream, write_stream=write_stream) as session:
-                MCP_SESSION = await session.initialize()
+            async with ClientSession(read_stream=read_stream, write_stream=write_stream) as MCP_SESSION:
+                await MCP_SESSION.initialize()
                 result = await process_ai_agent()
         return result
     except* Exception as e:
