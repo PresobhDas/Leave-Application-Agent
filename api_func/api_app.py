@@ -71,14 +71,11 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
     headers = {"x-functions-key": os.environ['MCP_FUNCTION_KEY']}
     log.info(f'MCP_SERVER is at {MCP_SERVER}')
     try:
-        http_client = httpx.AsyncClient(
-        headers=headers,
-        timeout=httpx.Timeout(30.0, read=300.0)  # read timeout for long tools
-        )
-
         transport = StreamableHTTPTransport(
             url=MCP_SERVER,
-            httpx_client=http_client          # ← pass the configured client here
+            headers=headers,
+            timeout=30.0,
+            sse_read_timeout=300.0        # ← pass the configured client here
         )
         async with ClientSession(transport) as MCP_SESSION:
             await MCP_SESSION.initialize()
