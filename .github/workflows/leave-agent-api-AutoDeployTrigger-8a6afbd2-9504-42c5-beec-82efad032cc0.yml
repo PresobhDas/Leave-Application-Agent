@@ -7,7 +7,8 @@ on:
     branches: 
       [ main ]
     paths:
-    - '**'
+    - 'api_func/**'
+    - 'utils/**'
     - '.github/workflows/leave-agent-api-AutoDeployTrigger-8a6afbd2-9504-42c5-beec-82efad032cc0.yml'
 
   # Allow manual trigger 

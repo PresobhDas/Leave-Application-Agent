@@ -7,7 +7,8 @@ on:
     branches: 
       [ main ]
     paths:
-    - '**'
+    - 'mcp_func/**'
+    - 'utils/**'
     - '.github/workflows/leave-mcp-api-AutoDeployTrigger-ef216533-6c53-417d-b122-03763d2732f4.yml'
 
   # Allow manual trigger 
