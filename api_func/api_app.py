@@ -67,9 +67,10 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
 
     chat_model = get_chat_model()
     MCP_SERVER = os.environ['MCP_SERVER_ENDPOINT']
+    headers = {"x-functions-key": os.environ['MCP_FUNCTION_KEY']}
     log.info(f'MCP_SERVER is at {MCP_SERVER}')
     try:
-        async with streamable_http_client(MCP_SERVER) as (read, write, _):
+        async with streamable_http_client(MCP_SERVER, headers=headers) as (read, write, _):
             async with ClientSession(read, write) as MCP_SESSION:
                 await MCP_SESSION.initialize()
                 log.info('CUSTOM LOG - Created MCP_SESSION')
