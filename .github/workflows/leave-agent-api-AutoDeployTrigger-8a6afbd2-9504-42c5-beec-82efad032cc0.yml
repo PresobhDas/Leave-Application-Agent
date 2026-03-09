@@ -9,6 +9,8 @@ on:
     paths:
     - 'api_func/**'
     - 'utils/**'
+    - 'pyproject.toml'
+    - 'uv.lock'
     - '.github/workflows/leave-agent-api-AutoDeployTrigger-8a6afbd2-9504-42c5-beec-82efad032cc0.yml'
 
   # Allow manual trigger 
@@ -36,15 +38,12 @@ jobs:
         uses: azure/container-apps-deploy-action@v2
         with:
           appSourcePath: ${{ github.workspace }}
-          _dockerfilePathKey_: _dockerfilePath_
-          _targetLabelKey_: _targetLabel_
-          registryUrl: 
+          dockerfilePath: api_func/Dockerfile
+          registryUrl: ${{ secrets.LEAVEAGENTAPI_REGISTRY_URL }} 
           registryUsername: ${{ secrets.LEAVEAGENTAPI_REGISTRY_USERNAME }}
           registryPassword: ${{ secrets.LEAVEAGENTAPI_REGISTRY_PASSWORD }}
           containerAppName: leave-agent-api
           resourceGroup: presobh-group
-          imageToBuild: default/[parameters('containerAppName')]:${{ github.sha }}
-          _buildArgumentsKey_: |
-            _buildArgumentsValues_
+          imageToBuild: ${{ secrets.LEAVEAGENTAPI_REGISTRY_URL }}/leave-agent-api:${{ github.sha }}
 
 
