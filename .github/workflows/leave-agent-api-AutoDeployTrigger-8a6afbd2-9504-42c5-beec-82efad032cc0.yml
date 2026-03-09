@@ -39,7 +39,7 @@ jobs:
         with:
           appSourcePath: ${{ github.workspace }}
           dockerfilePath: api_func/Dockerfile
-          registryUrl: ${{ secrets.LEAVEAGENTAPI_REGISTRY_URL }} 
+          acrName: ${{ secrets.LEAVEAGENTAPI_ACR_NAME }}
           registryUsername: ${{ secrets.LEAVEAGENTAPI_REGISTRY_USERNAME }}
           registryPassword: ${{ secrets.LEAVEAGENTAPI_REGISTRY_PASSWORD }}
           containerAppName: leave-agent-api

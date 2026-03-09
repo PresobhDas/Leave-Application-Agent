@@ -38,7 +38,8 @@ jobs:
         uses: azure/container-apps-deploy-action@v2
         with:
           appSourcePath: ${{ github.workspace }}
-          registryUrl: ${{ secrets.LEAVEAGENTAPI_REGISTRY_URL }} 
+          dockerfilePath: mcp_func/Dockerfile
+          acrName: ${{ secrets.LEAVEAGENTAPI_ACR_NAME }}
           registryUsername: ${{ secrets.LEAVEMCPAPI_REGISTRY_USERNAME }}
           registryPassword: ${{ secrets.LEAVEMCPAPI_REGISTRY_PASSWORD }}
           containerAppName: leave-mcp-api
