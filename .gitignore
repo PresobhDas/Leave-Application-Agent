@@ -8,7 +8,6 @@ wheels/
 
 # Virtual environments
 .venv
-uv.lock
 test.py
 text_embedder.py
 Leave_Policy.docx
