@@ -16,6 +16,12 @@ on:
   # Allow manual trigger 
   workflow_dispatch:      
 
+- name: Docker login to ACR
+  run: |
+    echo "${{ secrets.LEAVEAGENTAPI_REGISTRY_PASSWORD }}" | docker login ${{ secrets.LEAVEAGENTAPI_REGISTRY_URL }} \
+      --username "${{ secrets.LEAVEAGENTAPI_REGISTRY_USERNAME }}" \
+      --password-stdin
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
