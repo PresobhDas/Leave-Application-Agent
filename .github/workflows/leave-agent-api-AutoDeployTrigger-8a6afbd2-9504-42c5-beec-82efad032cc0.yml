@@ -40,8 +40,8 @@ jobs:
           appSourcePath: ${{ github.workspace }}
           dockerfilePath: api_func/Dockerfile
           acrName: ${{ secrets.LEAVEAGENTAPI_ACR_NAME }}
-          registryUsername: ${{ secrets.LEAVEAGENTAPI_REGISTRY_USERNAME }}
-          registryPassword: ${{ secrets.LEAVEAGENTAPI_REGISTRY_PASSWORD }}
+          acrUsername: ${{ secrets.LEAVEAGENTAPI_REGISTRY_USERNAME }}
+          acrPassword: ${{ secrets.LEAVEAGENTAPI_REGISTRY_PASSWORD }}
           containerAppName: leave-agent-api
           resourceGroup: presobh-group
           imageToBuild: ${{ secrets.LEAVEAGENTAPI_REGISTRY_URL }}/leave-agent-api:${{ github.sha }}

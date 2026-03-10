@@ -40,8 +40,8 @@ jobs:
           appSourcePath: ${{ github.workspace }}
           dockerfilePath: mcp_func/Dockerfile
           acrName: ${{ secrets.LEAVEAGENTAPI_ACR_NAME }}
-          registryUsername: ${{ secrets.LEAVEMCPAPI_REGISTRY_USERNAME }}
-          registryPassword: ${{ secrets.LEAVEMCPAPI_REGISTRY_PASSWORD }}
+          acrUsername: ${{ secrets.LEAVEMCPAPI_REGISTRY_USERNAME }}
+          acrPassword: ${{ secrets.LEAVEMCPAPI_REGISTRY_PASSWORD }}
           containerAppName: leave-mcp-api
           resourceGroup: presobh-group
           imageToBuild: ${{ secrets.LEAVEAGENTAPI_REGISTRY_URL }}/leave-mcp-api:${{ github.sha }}
