@@ -24,6 +24,12 @@ jobs:
       contents: read #Required when GH token is used to authenticate with private repo
 
     steps:
+      - name: Docker login to ACR
+        run: |
+          echo "${{ secrets.LEAVEAGENTAPI_REGISTRY_PASSWORD }}" | docker login ${{ secrets.LEAVEAGENTAPI_REGISTRY_URL }} \
+            --username "${{ secrets.LEAVEAGENTAPI_REGISTRY_USERNAME }}" \
+            --password-stdin
+            
       - name: Checkout to the branch
         uses: actions/checkout@v2
 
@@ -40,8 +46,8 @@ jobs:
           appSourcePath: ${{ github.workspace }}
           dockerfilePath: mcp_func/Dockerfile
           acrName: ${{ secrets.LEAVEAGENTAPI_ACR_NAME }}
-          acrUsername: ${{ secrets.LEAVEMCPAPI_REGISTRY_USERNAME }}
-          acrPassword: ${{ secrets.LEAVEMCPAPI_REGISTRY_PASSWORD }}
+          acrUsername: ${{ secrets.LEAVEAGENTAPI_REGISTRY_USERNAME }}
+          acrPassword: ${{ secrets.LEAVEAGENTAPI_REGISTRY_PASSWORD }}
           containerAppName: leave-mcp-api
           resourceGroup: presobh-group
           imageToBuild: ${{ secrets.LEAVEAGENTAPI_REGISTRY_URL }}/leave-mcp-api:${{ github.sha }}
