@@ -9,6 +9,7 @@ from azure.cosmos import CosmosClient
 import os, json
 from utils.model_contracts import EmployeeData, EmployeeMasterResponseModel, EmployeeLeaveData, EmployeeLeaveResponseModel, WeatherData, WeatherDataResponse
 from mcp.server.fastmcp import FastMCP
+from mcp.server.transport_security import TransportSecuritySettings
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
@@ -183,7 +184,14 @@ def register_tools(mcp_server:FastMCP):
 
         return weather_response.model_dump_json()
 
-mcp = FastMCP("Leave-application-mcp-server")
+mcp = FastMCP(name="Leave-application-mcp-server",
+                transport_security=TransportSecuritySettings(
+                enable_dns_rebinding_protection=True,
+                allowed_hosts=[
+                    "leave-mcp-api.internal.ashyglacier-369787e5.westus2.azurecontainerapps.io"
+                    ]
+                )
+        )
 register_tools(mcp)
 
 mcp_server = mcp.streamable_http_app()
