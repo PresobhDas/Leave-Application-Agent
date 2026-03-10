@@ -183,5 +183,7 @@ def register_tools(mcp_server:FastMCP):
 
         return weather_response.model_dump_json()
 
-mcp_server = FastMCP("Leave-application-mcp-server")
-register_tools(mcp_server)
+mcp = FastMCP("Leave-application-mcp-server")
+register_tools(mcp)
+
+mcp_server = mcp.streamable_http_app()
