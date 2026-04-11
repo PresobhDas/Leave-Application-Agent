@@ -10,6 +10,7 @@ import os, json
 from utils.model_contracts import EmployeeData, EmployeeMasterResponseModel, EmployeeLeaveData, EmployeeLeaveResponseModel, WeatherData, WeatherDataResponse
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
+from fastapi import FastAPI
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
@@ -23,6 +24,16 @@ INDEX_SEARCH_API_ENDPOINT = os.environ['AZURE_AI_SEARCH_API_ENDPOINT']
 INDEX_SEARCH_API_KEY = os.environ['AZURE_AI_SEARCH_API_KEY']
 INDEX_NAME = 'embedding-index'
 COSMOS_URL = os.environ['COSMOS_DB_CONNECTION_STRING']
+
+app = FastAPI()
+
+@app.get("/")
+async def root():
+    return {"status": "ok"}
+
+@app.get("/health")
+async def health():
+    return {"status": "healthy"}
 
 def register_tools(mcp_server:FastMCP):
     @mcp_server.tool()

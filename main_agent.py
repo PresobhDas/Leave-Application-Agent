@@ -9,6 +9,8 @@ url = 'https://leave-agent-api.ashyglacier-369787e5.westus2.azurecontainerapps.i
 
 inp_details = InputDetails(inp_query='What is the weather in Dallas')
 response = requests.post(url=url, json=inp_details.model_dump())
+# response = requests.get(url=url, timeout=20)
+
 
 print(response.json())
 
