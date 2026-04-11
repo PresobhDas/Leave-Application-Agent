@@ -4,22 +4,17 @@ name: Trigger auto deployment for leave-mcp-api
 on:
   # Automatically trigger it when detected changes in repo
   push:
-    branches: 
-      [ main ]
+    branches: [main]
     paths:
-    - 'mcp_func/**'
-    - 'utils/**'
-    - 'pyproject.toml'
-    - 'uv.lock'
-    - '.github/workflows/leave-mcp-api-AutoDeployTrigger-ef216533-6c53-417d-b122-03763d2732f4.yml'
+      - "mcp_func/**"
 
-  # Allow manual trigger 
-  workflow_dispatch:      
+  # Allow manual trigger
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    permissions: 
+    permissions:
       id-token: write #This is required for requesting the OIDC JWT Token
       contents: read #Required when GH token is used to authenticate with private repo
 
@@ -29,7 +24,7 @@ jobs:
           echo "${{ secrets.LEAVEAGENTAPI_REGISTRY_PASSWORD }}" | docker login ${{ secrets.LEAVEAGENTAPI_REGISTRY_URL }} \
             --username "${{ secrets.LEAVEAGENTAPI_REGISTRY_USERNAME }}" \
             --password-stdin
-            
+
       - name: Checkout to the branch
         uses: actions/checkout@v2
 
@@ -51,5 +46,3 @@ jobs:
           containerAppName: leave-mcp-api
           resourceGroup: presobh-group
           imageToBuild: ${{ secrets.LEAVEAGENTAPI_REGISTRY_URL }}/leave-mcp-api:${{ github.sha }}
-
-
