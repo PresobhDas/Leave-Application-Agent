@@ -8,7 +8,7 @@ from utils.model_contracts import InputDetails
 from mcp.client.streamable_http import streamable_http_client
 from mcp import ClientSession
 import logging, sys, inspect, os
-import uuid
+import uuid, asyncio
 
 log = logging.getLogger('api')
 log.setLevel(logging.INFO)
@@ -32,7 +32,7 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     rid = str(uuid.uuid4())
     log.info(f"RID={rid} Entered call_agent client={request.client} ua={request.headers.get('user-agent')} xff={request.headers.get('x-forwarded-for')}")
-    async def process_ai_agent():
+    async def process_ai_agent(MCP_SESSION):
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
 
         tools = build_tools(MCP_SESSION)
@@ -66,19 +66,27 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
 
     log.info('Function Invoked')
 
+    async def call_mcp():
+        async with streamable_http_client(url=MCP_SERVER) as (read_stream, write_stream, _):
+            async with ClientSession(read_stream=read_stream, write_stream=write_stream) as MCP_SESSION:
+                await MCP_SESSION.initialize()
+                result = await process_ai_agent(MCP_SESSION)
+        return result
+
+    MAX_RETRIES = 3
+    TIMEOUT = 10
     chat_model = get_chat_model()
     MCP_SERVER = os.environ['MCP_SERVER_ENDPOINT']
     headers = {"x-functions-key": os.environ['MCP_FUNCTION_KEY']}
     log.info(f'MCP_SERVER is at {MCP_SERVER}')
-    try:
-        async with streamable_http_client(url=MCP_SERVER) as (read_stream, write_stream, _):
-            async with ClientSession(read_stream=read_stream, write_stream=write_stream) as MCP_SESSION:
-                await MCP_SESSION.initialize()
-                result = await process_ai_agent()
-        return result
-    except* Exception as e:
-        log.exception(f'Failed with Exception: {e.exceptions}')
 
+    for attempt in range(MAX_RETRIES):
+        try:
+            return await asyncio.wait_for(call_mcp(), timeout=TIMEOUT)
+        except asyncio.TimeoutError:
+            log.warning(f'Timeout while trying to connect to the MCP server at attempt {attempt+1}')
+        except Exception as err:
+            log.warning(f'Errored with exception {err} at attempt {attempt+1}')
 
 
 
