@@ -5,10 +5,9 @@ from langgraph.prebuilt import ToolNode
 from utils.llm_utils import get_chat_model, build_nodes, check_tool_condition, RagState
 from utils.model_contracts import InputDetails
 import logging, sys, inspect
-import asyncio
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
-from mcp_app import register_tools
+from api_func.mcp_app import register_tools
 
 log = logging.getLogger('api')
 log.setLevel(logging.INFO)

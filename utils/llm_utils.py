@@ -1,7 +1,6 @@
 import os, logging, sys, inspect
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
-from mcp import ClientSession
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langgraph.graph import MessagesState
 from azure.identity import DefaultAzureCredential
