@@ -205,4 +205,4 @@ mcp = FastMCP(name="Leave-application-mcp-server",
         )
 register_tools(mcp)
 
-mcp_server = mcp.streamable_http_app()
+mcp_server = mcp.streamable_http_app(app)
