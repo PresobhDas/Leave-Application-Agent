@@ -7,6 +7,7 @@ from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 import json
 from utils.model_contracts import EmployeeMasterResponseModel, EmployeeLeaveResponseModel, WeatherDataResponse, RagData
+from mcp.server.fastmcp import FastMCP
 
 VAULT_URL = "https://leave-policy-keyvault.vault.azure.net/"
 
@@ -69,7 +70,7 @@ async def check_tool_condition(state: RagState):
     else:
         return 'end'
 
-def build_tools(mcp_server):
+def build_tools(mcp_server: FastMCP):
     @tool
     async def get_weather_tool(city: str):
         '''

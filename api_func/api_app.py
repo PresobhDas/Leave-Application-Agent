@@ -41,7 +41,7 @@ async def ping():
 @api_server.post('/agent')
 async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body()]):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    tools = build_tools(mcp_server=mcp_server)
+    tools = build_tools(mcp_server=mcp)
     log.info(f'CUSTOM LOG - Retrieved tools inside : {inspect.currentframe().f_code.co_name}')
 
     llm_with_tools = chat_model.bind_tools(tools=tools)

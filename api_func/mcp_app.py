@@ -12,7 +12,7 @@ if not log.handlers:
 
 def register_tools(mcp_server:FastMCP):
     @mcp_server.tool()
-    async def get_weather_tool(city:str):
+    async def get_weather(city:str):
         log.info(f'CUSTOM LOG - Entered MCP tool: {inspect.currentframe().f_code.co_name}')
         '''
         Docstring for get_weather_tool
