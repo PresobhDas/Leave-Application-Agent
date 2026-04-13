@@ -44,7 +44,7 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
     tools = build_tools(mcp_server=mcp_server)
     log.info(f'CUSTOM LOG - Retrieved tools inside : {inspect.currentframe().f_code.co_name}')
 
-    llm_with_tools = await chat_model.bind_tools(tools=tools)
+    llm_with_tools = chat_model.bind_tools(tools=tools)
     nodes = build_nodes(llm_with_tools)
     log.info(f'CUSTOM LOG - Nodes built inside : {inspect.currentframe().f_code.co_name}')
 
