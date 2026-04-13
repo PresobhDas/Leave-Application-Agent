@@ -31,7 +31,8 @@ mcp = FastMCP(
 
 register_tools(mcp)
 chat_model = get_chat_model()
-mcp_server = mcp.streamable_http_app(api_server)
+mcp_server = mcp.streamable_http_app()
+api_server.mount("/mcp", mcp_server)
 
 @api_server.get('/ping')
 async def ping():
