@@ -87,8 +87,9 @@ def build_tools(mcp_server: FastMCP):
                                             arguments = {'city':city}
                 )
         try:
-            resp_content =  WeatherDataResponse.model_validate_json(resp)
             log.info(f'response retrieved inside build_tools is {resp_content}')
+            resp_content =  WeatherDataResponse.model_validate_json(resp)
+            
             resp_content = WeatherDataResponse.model_validate_json(resp.content[0].text)
         except Exception as err:
             log.info(f'Errored in {inspect.currentframe().f_code.co_name} with error {err}')
