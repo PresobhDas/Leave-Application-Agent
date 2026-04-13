@@ -12,9 +12,9 @@ response = requests.post(url=url, json=inp_details.model_dump())
 # response = requests.get(url=url, timeout=20)
 
 
-print(response.json())
+data = response.json()
 
-# for contents in data['messages']:
-#     print(contents['type'])
-#     print('-'*5)
-#     print(contents['content'])
+for contents in data['messages']:
+    print(contents['type'])
+    print('-'*5)
+    print(contents['content'])

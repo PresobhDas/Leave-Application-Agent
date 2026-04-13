@@ -30,8 +30,8 @@ def register_tools(mcp_server:FastMCP):
                 'language':'en',
                 'format':'json'
             }
-
-            resp = requests.get(url=url, params=params)
+            log.info(f'CUSTOM LOG - Calling external API : {url}')
+            resp = requests.get(url=url, params=params, timeout=30)
             data = resp.json()
             if 'results' not in data:
                 log.info(f'CUSTOM LOG - {city} not a valid geographical location')
@@ -52,8 +52,8 @@ def register_tools(mcp_server:FastMCP):
                 'longitude':long,
                 'current_weather':True
             }
-
-            resp = requests.get(url=url, params=params).json()
+            log.info(f'CUSTOM LOG - Calling external API : {url}')
+            resp = requests.get(url=url, params=params, timeout=60).json()
             log.info('get_weather API successfully called.')
             current_weather = WeatherData(
                 latitude=resp['latitude'],
