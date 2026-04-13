@@ -69,28 +69,28 @@ async def check_tool_condition(state: RagState):
     else:
         return 'end'
 
-# def build_tools(MCP_SESSION):
-#     @tool
-#     async def get_weather_tool(city: str):
-#         '''
-#         Docstring for weather_tool
-#         :param city: Input city whose weather is being requested for.
-#         :type city: str
+def build_tools(mcp_server):
+    @tool
+    async def get_weather_tool(city: str):
+        '''
+        Docstring for weather_tool
+        :param city: Input city whose weather is being requested for.
+        :type city: str
 
-#         This function tool get the city name as the input and returns the current weather information for that city
-#         '''
+        This function tool get the city name as the input and returns the current weather information for that city
+        '''
 
-#         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-#         resp = await MCP_SESSION.call_tool(
-#                                             name = 'get_weather',
-#                                             arguments = {'city':city}
-#                 )
-#         try:
-#             resp_content = WeatherDataResponse.model_validate_json(resp.content[0].text)
-#         except:
-#             return None
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+        resp = await mcp_server.call_tool(
+                                            name = 'get_weather',
+                                            arguments = {'city':city}
+                )
+        try:
+            resp_content = WeatherDataResponse.model_validate_json(resp.content[0].text)
+        except:
+            return None
         
-#         return resp_content
+        return resp_content
     
     # @tool
     # async def get_employee_master_record(employee_id:str):
@@ -155,7 +155,7 @@ async def check_tool_condition(state: RagState):
         
     #     return resp_content
 
-    # return [get_weather_tool]
+    return [get_weather_tool]
 
 def build_nodes(llm_with_tools):
 

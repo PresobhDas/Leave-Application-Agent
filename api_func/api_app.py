@@ -2,7 +2,7 @@ from fastapi import FastAPI, Body, Request
 from typing import Annotated
 from langgraph.graph import START, END, StateGraph
 from langgraph.prebuilt import ToolNode
-from utils.llm_utils import get_chat_model, build_nodes, check_tool_condition, RagState
+from utils.llm_utils import get_chat_model, build_nodes, check_tool_condition, build_tools, RagState
 from utils.model_contracts import InputDetails
 import logging, sys, inspect
 from mcp.server.fastmcp import FastMCP
@@ -41,9 +41,12 @@ async def ping():
 @api_server.post('/agent')
 async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body()]):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    tools = await mcp.list_tools()
+    tools = build_tools(mcp_server=mcp_server)
+    log.info(f'CUSTOM LOG - Retrieved tools inside : {inspect.currentframe().f_code.co_name}')
+
     llm_with_tools = await chat_model.bind_tools(tools=tools)
     nodes = build_nodes(llm_with_tools)
+    log.info(f'CUSTOM LOG - Nodes built inside : {inspect.currentframe().f_code.co_name}')
 
     graph = StateGraph(RagState)
     graph.add_node('node_generate_answer_from_llm', nodes['node_generate_answer_from_llm'])
@@ -60,7 +63,7 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
     )
     graph.add_edge('node_tool_execution', 'node_generate_answer_from_llm')
     graph_app = graph.compile()
-    log.info('Graph created and compiled')
+    log.info(f'CUSTOM LOG - Graph compiled and created inside : {inspect.currentframe().f_code.co_name}')
     result = await graph_app.ainvoke(
         {
             'question' : inp_details.inp_query,
