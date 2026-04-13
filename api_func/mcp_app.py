@@ -64,5 +64,5 @@ def register_tools(mcp_server:FastMCP):
             )
             weather_response.dataFound = 'FOUND'
             weather_response.weatherData = current_weather
-
+        log.info(f'Data returned from MCP is {weather_response}')
         return weather_response.model_dump_json()

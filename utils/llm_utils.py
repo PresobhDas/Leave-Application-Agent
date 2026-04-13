@@ -87,6 +87,8 @@ def build_tools(mcp_server: FastMCP):
                                             arguments = {'city':city}
                 )
         try:
+            resp_content =  WeatherDataResponse.model_validate_json(resp)
+            log.info(f'response retrieved inside build_tools is {resp_content}')
             resp_content = WeatherDataResponse.model_validate_json(resp.content[0].text)
         except:
             return None
