@@ -10,7 +10,7 @@ url = 'https://leave-agent-api.ashyglacier-369787e5.westus2.azurecontainerapps.i
 inp_details = InputDetails(inp_query='What is the weather in Greensboro')
 # response = requests.post(url=url, json=inp_details.model_dump())
 response = requests.post(url=url)
-print(response)
+print(response.json())
 # response = requests.get(url=url, timeout=20)
 
 

@@ -1,15 +1,17 @@
-import os, logging, sys, inspect
+import os, logging, sys, inspect, re
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langgraph.graph import MessagesState
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
-import json
 from utils.model_contracts import EmployeeMasterResponseModel, EmployeeLeaveResponseModel, WeatherDataResponse, RagData
 from mcp.server.fastmcp import FastMCP
+from typing import List
+from langchain_core.documents import Document
 
-VAULT_URL = "https://leave-policy-keyvault.vault.azure.net/"
+# VAULT_URL = "https://leave-policy-keyvault.vault.azure.net/"
+VAULT_URL = os.environ.get('VAULT_URL')
 
 log = logging.getLogger('utils')
 log.setLevel(logging.INFO)
@@ -203,3 +205,33 @@ def getAzureSecrets(key:str) -> str:
     client_secret = client.get_secret(key).value
 
     return client_secret
+
+def get_chunks(file_data:List[Document]) -> List[Document]:
+    full_text = ''
+    for doc in file_data:
+        full_text += doc.page_content
+
+    pattern = r'(?m)^[•]?\s*(\d+(?:\.\d+)+)\s+([^\n]+)'
+    matches = list(re.finditer(pattern, full_text))
+
+    langchain_doc = []
+
+    for i, match in enumerate(matches):
+        section_id = match.group(1)
+        title = match.group(2).strip()
+
+        start = match.end()
+        end = matches[i + 1].start() if i + 1 < len(matches) else len(full_text)
+
+        content = full_text[start:end].strip()
+        if content:
+            page_content = f'{section_id} {title}\n{content}'
+            metadata = {
+                'Section_id' : section_id,
+                'title' : title
+            }
+            langchain_doc.append(
+                Document(page_content=page_content, metadata=metadata)
+            )
+
+    return langchain_doc

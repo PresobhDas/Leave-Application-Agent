@@ -1,17 +1,16 @@
+import logging, sys, inspect, os, tempfile
 from fastapi import FastAPI, Body, Request
 from typing import Annotated
 from langgraph.graph import START, END, StateGraph
 from langgraph.prebuilt import ToolNode
-from utils.llm_utils import get_chat_model, build_nodes, check_tool_condition, build_tools, RagState
+from utils.llm_utils import get_chat_model, build_nodes, check_tool_condition, build_tools, get_chunks, RagState
 from utils.model_contracts import InputDetails
-import logging, sys, inspect
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
 from api_func.mcp_app import register_tools
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 from langchain_community.document_loaders import PyPDFLoader
-import tempfile
 
 log = logging.getLogger('api')
 log.setLevel(logging.INFO)
@@ -45,7 +44,7 @@ async def ping():
 @api_server.post('/ingest')
 async def ingest_pipeline():
     client = BlobServiceClient(
-                account_url = 'https://leaveagentaccount.blob.core.windows.net/',
+                account_url = os.environ.get('BLOB_ACCOUNT_URL'),
                 credential = DefaultAzureCredential()
             )
     container = client.get_container_client("rag-docs")
@@ -58,8 +57,9 @@ async def ingest_pipeline():
             temp_path = temp_file.name
         loader = PyPDFLoader(file_path=temp_path)
         docs = loader.load()
+        doc_chunks = get_chunks(docs)
 
-    return docs
+    return doc_chunks
 
 @api_server.post('/agent')
 async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body()]):
