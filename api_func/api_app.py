@@ -10,6 +10,8 @@ from mcp.server.transport_security import TransportSecuritySettings
 from api_func.mcp_app import register_tools
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
+from langchain_community.document_loaders import PyPDFLoader
+import tempfile
 
 log = logging.getLogger('api')
 log.setLevel(logging.INFO)
@@ -50,9 +52,14 @@ async def ingest_pipeline():
 
     for blob in container.list_blobs():
         blob_client = container.get_blob_client(blob=blob.name)
-        data = blob_client.download_blob().readall()
+        pdf_bytes = blob_client.download_blob().readall()
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
+            temp_file.write(pdf_bytes)
+            temp_path = temp_file.name
+        loader = PyPDFLoader(file_path=temp_path)
+        docs = loader.doc()
 
-    return data
+    return docs
 
 @api_server.post('/agent')
 async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body()]):
