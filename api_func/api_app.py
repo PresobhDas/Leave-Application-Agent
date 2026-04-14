@@ -8,6 +8,8 @@ import logging, sys, inspect
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
 from api_func.mcp_app import register_tools
+from azure.identity import DefaultAzureCredential
+from azure.storage.blob import BlobServiceClient
 
 log = logging.getLogger('api')
 log.setLevel(logging.INFO)
@@ -37,6 +39,20 @@ api_server.mount("/mcp", mcp_server)
 @api_server.get('/ping')
 async def ping():
     return {'response':'pong'}
+
+@api_server.post('/ingest')
+async def ingest_pipeline():
+    client = BlobServiceClient(
+                account_url = 'https://leaveagentaccount.blob.core.windows.net/',
+                credential = DefaultAzureCredential()
+            )
+    container = client.get_container_client("rag-docs")
+
+    for blob in container.list_blobs():
+        blob_client = container.get_blob_client(blob=blob.name)
+        data = blob_client.download_blob().readall()
+
+    return data
 
 @api_server.post('/agent')
 async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body()]):
