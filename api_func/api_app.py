@@ -57,7 +57,7 @@ async def ingest_pipeline():
             temp_file.write(pdf_bytes)
             temp_path = temp_file.name
         loader = PyPDFLoader(file_path=temp_path)
-        docs = loader.doc()
+        docs = loader.load()
 
     return docs
 
