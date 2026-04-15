@@ -99,7 +99,7 @@ def register_tools(mcp_server:FastMCP):
                 ],
                 select=['id', 'context_text', 'metadata_title']
             )
-            result_list = list(result)
+            result_list = list(result)[0]
             rag_response.dataFound = 'FOUND'
             rag_response.score = result_list['@search.score']
             rag_response.text = result_list['context_text']
