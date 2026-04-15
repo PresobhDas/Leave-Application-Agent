@@ -287,7 +287,7 @@ def get_chunks(file_data:List[Document], file_name:str) -> List[Document]:
             metadata = {
                 'metadata_section_id' : section_id,
                 'metadata_title' : title,
-                'metadata_doc_name' : file_path.stem
+                'metadata_doc_name' : file_path.stem.replace(' ', '')
             }
             langchain_doc.append(
                 Document(page_content=page_content, metadata=metadata)
