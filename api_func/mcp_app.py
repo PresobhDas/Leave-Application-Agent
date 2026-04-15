@@ -107,9 +107,9 @@ def register_tools(mcp_server:FastMCP):
                 rag_response.dataFound = 'FOUND'
                 rag_response.results.append(
                     RagData(
-                        result['@search.score'],
-                        result['content_text'],
-                        result['metadata_title']
+                        score = result['@search.score'],
+                        text = result['content_text'],
+                        title = result['metadata_title']
                     )
                 )
         except Exception as err:
