@@ -217,11 +217,15 @@ def generate_embeddings(doc_chunks:List[Document]) -> List:
 
 def write_embeddings(vector_db_index_list : List[Dict]):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    credential= DefaultAzureCredential()
     INDEX_SEARCH_ENDPOINT = os.environ.get('AZURE_AI_SEARCH_CONNECTION_STRING')
+    token = credential.get_token("https://search.azure.com/.default")
+    log.info(f'search endpoint is {INDEX_SEARCH_ENDPOINT}')
+    log.info(f"Token acquired successfully - {token}")
     azure_ai_search_client = SearchClient(
                             endpoint=INDEX_SEARCH_ENDPOINT,
                             index_name='leave_agent_vector_index',
-                            credential= DefaultAzureCredential()
+                            credential= credential
                             )
     
     azure_ai_search_client.upload_documents(vector_db_index_list)
