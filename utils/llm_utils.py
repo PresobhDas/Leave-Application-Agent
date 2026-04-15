@@ -13,6 +13,7 @@ from azure.search.documents import SearchClient
 from azure.search.documents.indexes import SearchIndexClient
 from azure.search.documents.indexes.models import SearchIndex
 from openai import AzureOpenAI
+from pathlib import Path
 
 VAULT_URL = os.environ.get('VAULT_URL')
 
@@ -262,6 +263,7 @@ def getAzureSecrets(key:str) -> str:
     return client_secret
 
 def get_chunks(file_data:List[Document], file_name:str) -> List[Document]:
+    file_path = Path(file_name)
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     full_text = ''
     for doc in file_data:
@@ -285,7 +287,7 @@ def get_chunks(file_data:List[Document], file_name:str) -> List[Document]:
             metadata = {
                 'metadata_section_id' : section_id,
                 'metadata_title' : title,
-                'metadata_doc_name' : file_name
+                'metadata_doc_name' : file_path.stem
             }
             langchain_doc.append(
                 Document(page_content=page_content, metadata=metadata)
