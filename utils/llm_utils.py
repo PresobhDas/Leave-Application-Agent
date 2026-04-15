@@ -1,4 +1,4 @@
-import os, logging, sys, inspect, re
+import os, logging, sys, inspect, re, json
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
@@ -10,8 +10,9 @@ from mcp.server.fastmcp import FastMCP
 from typing import List, Dict
 from langchain_core.documents import Document
 from azure.search.documents import SearchClient
+from azure.search.documents.indexes import SearchIndexClient
+from openai import AzureOpenAI
 
-# VAULT_URL = "https://leave-policy-keyvault.vault.azure.net/"
 VAULT_URL = os.environ.get('VAULT_URL')
 
 log = logging.getLogger('utils')
@@ -186,8 +187,26 @@ def build_nodes(llm_with_tools):
         'node_generate_answer_from_llm' : node_generate_answer_from_llm
     }
 
+def recreate_index(index_name:str):
+    INDEX_SEARCH_ENDPOINT = os.environ.get('AZURE_AI_SEARCH_CONNECTION_STRING')
+    index_client = SearchIndexClient(
+        endpoint=INDEX_SEARCH_ENDPOINT,
+        credential=DefaultAzureCredential()
+    )
+    try:
+        index_client.delete_index(index=index_name)
+        log.info(f'Deleted Index : {index_name}')
+    except Exception as err:
+        log.info(f'Index {index_name} not deleted because of error {err}')
+
+    with open('utils/create_index.json', 'r') as f:
+        index_schema = json.load(f)
+
+    index_client.create_index(index=index_schema)
+
+    log.info(f'Index {index_schema} created successfully')
+
 def generate_embeddings(doc_chunks:List[Document]) -> List:
-    from openai import AzureOpenAI
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     vector_db_index_list = []
     credential = DefaultAzureCredential()
@@ -217,15 +236,13 @@ def generate_embeddings(doc_chunks:List[Document]) -> List:
 
 def write_embeddings(vector_db_index_list : List[Dict]):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    credential= DefaultAzureCredential()
+    index_name='leave_agent_vector_index'
+    recreate_index(index_name)
     INDEX_SEARCH_ENDPOINT = os.environ.get('AZURE_AI_SEARCH_CONNECTION_STRING')
-    token = credential.get_token("https://search.azure.com/.default")
-    log.info(f'search endpoint is {INDEX_SEARCH_ENDPOINT}')
-    log.info(f"Token acquired successfully - {token}")
     azure_ai_search_client = SearchClient(
                             endpoint=INDEX_SEARCH_ENDPOINT,
-                            index_name='leave_agent_vector_index',
-                            credential= credential
+                            index_name=index_name,
+                            credential= DefaultAzureCredential()
                             )
     
     azure_ai_search_client.upload_documents(vector_db_index_list)
