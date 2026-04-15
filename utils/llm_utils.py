@@ -200,14 +200,14 @@ def generate_embeddings(doc_chunks:List[Document]) -> List:
     for i, doc_chunk in enumerate(doc_chunks):
         embedding = client.embeddings.create(
             model='text-embedding-3-small',
-            input=doc_chunk
+            input=doc_chunk.page_content
         )
         vector_db_index = {
             'id' : f'{doc_chunk.metadata.get('doc_name')}_{i}',
             'metadata_section_id' : doc_chunk.metadata.get('metadata_section_id'),
             'metadata_title' : doc_chunk.metadata.get('metadata_title'),
             'metadata_doc_name' : doc_chunk.metadata.get('metadata_doc_name'),
-            'content_text' : doc_chunk.get('page_content'),
+            'content_text' : doc_chunk.page_content,
             'embedding' : embedding.data[0].embedding
         }
         vector_db_index_list.append(vector_db_index)
