@@ -234,7 +234,7 @@ def generate_embeddings(doc_chunks:List[Document]) -> List:
             'embedding' : embedding.data[0].embedding
         }
         vector_db_index_list.append(vector_db_index)
-        break
+        # break
 
     return vector_db_index_list
 
@@ -248,7 +248,6 @@ def write_embeddings(vector_db_index_list : List[Dict]):
                             index_name=index_name,
                             credential= DefaultAzureCredential()
                             )
-    log.info(f'CUSTOM LOG - document being inseted is {vector_db_index_list}')
     result = azure_ai_search_client.upload_documents(vector_db_index_list)
     for r in result:
         log.info(f'CUSTOM LOG - response after uploading index document is {r}')
