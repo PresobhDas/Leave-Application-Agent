@@ -188,7 +188,7 @@ def build_nodes(llm_with_tools):
 
 def generate_embeddings(doc_chunks:List[Document]) -> List:
     from openai import AzureOpenAI
-
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     vector_db_index_list = []
     credential = DefaultAzureCredential()
     endpoint = os.environ.get('AZURE_OPENAI_ENDPOINT')
@@ -213,6 +213,7 @@ def generate_embeddings(doc_chunks:List[Document]) -> List:
     return vector_db_index_list
 
 def write_embeddings(vector_db_index_list : List[Dict]):
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     INDEX_SEARCH_ENDPOINT = os.environ.get('AZURE_AI_SEARCH_CONNECTION_STRING')
     azure_ai_search_client = SearchClient(
                             endpoint=INDEX_SEARCH_ENDPOINT,
@@ -223,6 +224,7 @@ def write_embeddings(vector_db_index_list : List[Dict]):
     azure_ai_search_client.upload_documents(vector_db_index_list)
 
 def getAzureSecrets(key:str) -> str:
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     credential = DefaultAzureCredential()
     client = SecretClient(vault_url=VAULT_URL, credential=credential)
     client_secret = client.get_secret(key).value
@@ -230,6 +232,7 @@ def getAzureSecrets(key:str) -> str:
     return client_secret
 
 def get_chunks(file_data:List[Document], file_name:str) -> List[Document]:
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     full_text = ''
     for doc in file_data:
         full_text += doc.page_content

@@ -43,6 +43,7 @@ async def ping():
 
 @api_server.post('/ingest')
 async def ingest_pipeline():
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     client = BlobServiceClient(
                 account_url = os.environ.get('BLOB_ACCOUNT_URL'),
                 credential = DefaultAzureCredential()
