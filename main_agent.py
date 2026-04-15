@@ -4,7 +4,7 @@ from pydantic import BaseModel
 class InputDetails(BaseModel):
     inp_query:str
 
-url = 'https://leave-agent-api.ashyglacier-369787e5.westus2.azurecontainerapps.io/agent'
+url = 'https://leave-agent-api.ashyglacier-369787e5.westus2.azurecontainerapps.io/ingest'
 # leave-policy-agent-mcp-1-auczcxdxa7dwftd9.westus2-01.azurewebsites.net
 
 inp_details = InputDetails(inp_query='What is the weather in Greensboro')

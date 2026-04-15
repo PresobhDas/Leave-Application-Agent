@@ -190,7 +190,9 @@ def generate_embeddings(doc_chunks:List[Document]) -> List:
     from openai import AzureOpenAI
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     vector_db_index_list = []
-    credential = DefaultAzureCredential()
+    credential = lambda: credential.get_token(
+        "https://cognitiveservices.azure.com/.default"
+    ).token
     endpoint = os.environ.get('AZURE_OPENAI_ENDPOINT')
     client = AzureOpenAI(api_version="2024-12-01-preview",azure_endpoint=endpoint, azure_ad_token_provider=credential)
 
