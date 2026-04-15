@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Literal, Optional
+from typing import Literal, Optional, List
 
 class WeatherData(BaseModel):
     latitude: float
@@ -39,11 +39,13 @@ class EmployeeLeaveResponseModel(BaseModel):
     dataFound : Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'NOT FOUND'
     employeeLeave : EmployeeLeaveData | None = None
 
-class RagDataResponseModel(BaseModel):
-    dataFound : Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'NOT FOUND'
+class RagData(BaseModel):
     score:Optional[float] = 0.0
     text:Optional[str] = ''
     title:Optional[str] = ''
+class RagDataResponseModel(BaseModel):
+    dataFound : Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'NOT FOUND'
+    results : List[RagData] = []
 
 class InputDetails(BaseModel):
     inp_query:str

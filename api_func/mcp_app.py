@@ -1,6 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 import logging, sys, inspect, requests
-from utils.model_contracts import WeatherDataResponse, WeatherData, RagDataResponseModel
+from utils.model_contracts import WeatherDataResponse, WeatherData, RagData, RagDataResponseModel
 from utils.llm_utils import get_azure_openai_client, azure_ai_search_endpoint
 from azure.search.documents import SearchClient
 from azure.identity import DefaultAzureCredential
@@ -73,7 +73,7 @@ def register_tools(mcp_server:FastMCP):
     @mcp_server.tool()
     async def get_rag_document(inp_question: str):
         log.info(f'CUSTOM LOG - Entered MCP tool: {inspect.currentframe().f_code.co_name}')
-        log.info(f'CUSTOM LOG - Passed parameter to {inspect.currentframe().f_code.co_name}' is {inp_question})
+        log.info(f'CUSTOM LOG - Passed parameter to {inspect.currentframe().f_code.co_name} is {inp_question}')
         rag_response = RagDataResponseModel()
         try:
             openai_client = get_azure_openai_client()
@@ -94,16 +94,24 @@ def register_tools(mcp_server:FastMCP):
                         'kind' : 'vector',
                         'vector' : query_embeddings.data[0].embedding,
                         'fields' : 'embedding',
-                        'k' : 1
+                        'k' : 5
                     }
                 ],
+                query_type = 'semantic',
+                semantic_configuration_name= 'default',
+                top=2,
                 select=['id', 'content_text', 'metadata_title']
             )
-            result_list = list(result)[0]
-            rag_response.dataFound = 'FOUND'
-            rag_response.score = result_list['@search.score']
-            rag_response.text = result_list['content_text']
-            rag_response.title = result_list['metadata_title']
+            result_list = list(result)
+            for result in result_list:
+                rag_response.dataFound = 'FOUND'
+                rag_response.results.append(
+                    RagData(
+                        result['@search.score'],
+                        result['content_text'],
+                        result['metadata_title']
+                    )
+                )
         except Exception as err:
             log.info(f'CUSTOM LOG - Error in MCP tool {inspect.currentframe().f_code.co_name} with error {err}')
             return rag_response.model_dump_json()
