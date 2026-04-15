@@ -99,10 +99,11 @@ def register_tools(mcp_server:FastMCP):
                 ],
                 select=['id', 'context_text', 'metadata_title']
             )
+            result_list = list(result)
             rag_response.dataFound = 'FOUND'
-            rag_response.score = result['@search.score']
-            rag_response.text = result['context_text']
-            rag_response.title = result['metadata_title']
+            rag_response.score = result_list['@search.score']
+            rag_response.text = result_list['context_text']
+            rag_response.title = result_list['metadata_title']
         except Exception as err:
             log.info(f'CUSTOM LOG - Error in MCP tool {inspect.currentframe().f_code.co_name} with error {err}')
             return rag_response.model_dump_json()
