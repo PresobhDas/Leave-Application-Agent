@@ -7,8 +7,9 @@ from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 from utils.model_contracts import EmployeeMasterResponseModel, EmployeeLeaveResponseModel, WeatherDataResponse, RagData
 from mcp.server.fastmcp import FastMCP
-from typing import List
+from typing import List, Dict
 from langchain_core.documents import Document
+from azure.search.documents import SearchClient
 
 # VAULT_URL = "https://leave-policy-keyvault.vault.azure.net/"
 VAULT_URL = os.environ.get('VAULT_URL')
@@ -185,19 +186,41 @@ def build_nodes(llm_with_tools):
         'node_generate_answer_from_llm' : node_generate_answer_from_llm
     }
 
-def generate_embeddings(text_chunk:str):
+def generate_embeddings(doc_chunks:List[Document]) -> List:
     from openai import AzureOpenAI
 
+    vector_db_index_list = []
     credential = DefaultAzureCredential()
-    endpoint = os.environ['AZURE_OPENAI_API_ENDPOINT']
+    endpoint = os.environ.get('AZURE_OPENAI_ENDPOINT')
     client = AzureOpenAI(api_version="2024-12-01-preview",azure_endpoint=endpoint, azure_ad_token_provider=credential)
 
-    embedding = client.embeddings.create(
-        model='text-embedding-3-small',
-        input=text_chunk
-    )
+    for i, doc_chunk in enumerate(doc_chunks):
+        embedding = client.embeddings.create(
+            model='text-embedding-3-small',
+            input=doc_chunk
+        )
+        vector_db_index = {
+            'id' : f'{doc_chunk.metadata.get('doc_name')}_{i}',
+            'metadata_section_id' : doc_chunk.metadata.get('metadata_section_id'),
+            'metadata_title' : doc_chunk.metadata.get('metadata_title'),
+            'metadata_doc_name' : doc_chunk.metadata.get('metadata_doc_name'),
+            'content_text' : doc_chunk.get('page_content'),
+            'embedding' : embedding.data[0].embedding
+        }
+        vector_db_index_list.append(vector_db_index)
+        break
 
-    return embedding.data[0].embedding
+    return vector_db_index_list
+
+def write_embeddings(vector_db_index_list : List[Dict]):
+    INDEX_SEARCH_ENDPOINT = os.environ.get('AZURE_AI_SEARCH_CONNECTION_STRING')
+    azure_ai_search_client = SearchClient(
+                            endpoint=INDEX_SEARCH_ENDPOINT,
+                            index_name='leave_agent_vector_index',
+                            credential= DefaultAzureCredential()
+                            )
+    
+    azure_ai_search_client.upload_documents(vector_db_index_list)
 
 def getAzureSecrets(key:str) -> str:
     credential = DefaultAzureCredential()
@@ -206,7 +229,7 @@ def getAzureSecrets(key:str) -> str:
 
     return client_secret
 
-def get_chunks(file_data:List[Document]) -> List[Document]:
+def get_chunks(file_data:List[Document], file_name:str) -> List[Document]:
     full_text = ''
     for doc in file_data:
         full_text += doc.page_content
@@ -227,8 +250,9 @@ def get_chunks(file_data:List[Document]) -> List[Document]:
         if content:
             page_content = f'{section_id} {title}\n{content}'
             metadata = {
-                'Section_id' : section_id,
-                'title' : title
+                'metadata_section_id' : section_id,
+                'metadata_title' : title,
+                'metadata_doc_name' : file_name
             }
             langchain_doc.append(
                 Document(page_content=page_content, metadata=metadata)
