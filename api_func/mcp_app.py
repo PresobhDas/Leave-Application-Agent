@@ -92,7 +92,7 @@ def register_tools(mcp_server:FastMCP):
                 vector_queries=[
                     {
                         'kind' : 'vector',
-                        'vector' : query_embeddings,
+                        'vector' : query_embeddings.data[0].embedding,
                         'fields' : 'embedding',
                         'k' : 1
                     }
