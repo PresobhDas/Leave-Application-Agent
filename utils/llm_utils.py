@@ -213,35 +213,35 @@ def recreate_index(index_name:str):
 def generate_embeddings(doc_chunks:List[Document]) -> List:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     vector_db_index_list = []
-    credential = DefaultAzureCredential()
-    token_provider = lambda: credential.get_token(
-        "https://cognitiveservices.azure.com/.default"
-    ).token
-    endpoint = os.environ.get('AZURE_OPENAI_ENDPOINT')
-    client = AzureOpenAI(api_version="2024-12-01-preview",azure_endpoint=endpoint, azure_ad_token_provider=token_provider)
+    # credential = DefaultAzureCredential()
+    # token_provider = lambda: credential.get_token(
+    #     "https://cognitiveservices.azure.com/.default"
+    # ).token
+    # endpoint = os.environ.get('AZURE_OPENAI_ENDPOINT')
+    # client = AzureOpenAI(api_version="2024-12-01-preview",azure_endpoint=endpoint, azure_ad_token_provider=token_provider)
 
-    for i, doc_chunk in enumerate(doc_chunks):
-        embedding = client.embeddings.create(
-            model='text-embedding-3-small',
-            input=doc_chunk.page_content
-        )
-        vector_db_index = {
-            'id' : f'{doc_chunk.metadata.get('metadata_doc_name')}_{i}',
-            'metadata_section_id' : doc_chunk.metadata.get('metadata_section_id'),
-            'metadata_title' : doc_chunk.metadata.get('metadata_title'),
-            'metadata_doc_name' : doc_chunk.metadata.get('metadata_doc_name'),
-            'content_text' : doc_chunk.page_content,
-            'embedding' : embedding.data[0].embedding
-        }
-        vector_db_index_list.append(vector_db_index)
-        # break
+    # for i, doc_chunk in enumerate(doc_chunks):
+    #     embedding = client.embeddings.create(
+    #         model='text-embedding-3-small',
+    #         input=doc_chunk.page_content
+    #     )
+    #     vector_db_index = {
+    #         'id' : f'{doc_chunk.metadata.get('metadata_doc_name')}_{i}',
+    #         'metadata_section_id' : doc_chunk.metadata.get('metadata_section_id'),
+    #         'metadata_title' : doc_chunk.metadata.get('metadata_title'),
+    #         'metadata_doc_name' : doc_chunk.metadata.get('metadata_doc_name'),
+    #         'content_text' : doc_chunk.page_content,
+    #         'embedding' : embedding.data[0].embedding
+    #     }
+    #     vector_db_index_list.append(vector_db_index)
+    #     break
 
     return vector_db_index_list
 
 def print_embeddings(azure_ai_search_client):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     results = azure_ai_search_client.search(
-        search_text='',
+        search_text='*',
         top=5
     )
 
@@ -251,16 +251,16 @@ def print_embeddings(azure_ai_search_client):
 def write_embeddings(vector_db_index_list : List[Dict]):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     index_name='leave_agent_vector_index'
-    recreate_index(index_name)
+    # recreate_index(index_name)
     INDEX_SEARCH_ENDPOINT = os.environ.get('AZURE_AI_SEARCH_CONNECTION_STRING')
     azure_ai_search_client = SearchClient(
                             endpoint=INDEX_SEARCH_ENDPOINT,
                             index_name=index_name,
                             credential= DefaultAzureCredential()
                             )
-    result = azure_ai_search_client.upload_documents(vector_db_index_list)
-    for r in result:
-        log.info(f'CUSTOM LOG - response after uploading index document is {r}')
+    # result = azure_ai_search_client.upload_documents(vector_db_index_list)
+    # for r in result:
+    #     log.info(f'CUSTOM LOG - response after uploading index document is {r}')
     log.info(f'CUSTOM LOG - Embeddings written successfully')
     print_embeddings(azure_ai_search_client)
 
