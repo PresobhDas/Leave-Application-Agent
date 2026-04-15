@@ -197,9 +197,9 @@ def recreate_index(index_name:str):
     )
     try:
         index_client.delete_index(index=index_name)
-        log.info(f'Deleted Index : {index_name}')
+        log.info(f'CUSTOM LOG - Deleted Index : {index_name}')
     except Exception as err:
-        log.info(f'Index {index_name} not deleted because of error {err}')
+        log.info(f'CUSTOM LOG - Index {index_name} not deleted because of error {err}')
 
     with open('utils/create_index.json', 'r') as f:
         index_schema = json.load(f)
@@ -207,7 +207,7 @@ def recreate_index(index_name:str):
     index_schema = SearchIndex.from_dict(index_schema)
     index_client.create_index(index=index_schema)
 
-    log.info(f'Index {index_schema} created successfully')
+    log.info(f'CUSTOM LOG - Index {index_schema} created successfully')
 
 def generate_embeddings(doc_chunks:List[Document]) -> List:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
@@ -247,8 +247,9 @@ def write_embeddings(vector_db_index_list : List[Dict]):
                             index_name=index_name,
                             credential= DefaultAzureCredential()
                             )
-    
+    log.info(f'CUSTOM LOG - document being inseted is {vector_db_index_list}')
     azure_ai_search_client.upload_documents(vector_db_index_list)
+    log.info(f'CUSTOM LOG - Embeddings written successfully')
 
 def getAzureSecrets(key:str) -> str:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
