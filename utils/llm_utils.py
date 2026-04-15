@@ -234,7 +234,7 @@ def generate_embeddings(doc_chunks:List[Document]) -> List:
             'embedding' : embedding.data[0].embedding
         }
         vector_db_index_list.append(vector_db_index)
-        break
+        # break
 
     return vector_db_index_list
 
