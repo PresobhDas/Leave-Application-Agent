@@ -71,6 +71,7 @@ def register_tools(mcp_server:FastMCP):
     @mcp_server.tool()
     async def get_rag_document(inp_question: str):
         log.info(f'CUSTOM LOG - Entered MCP tool: {inspect.currentframe().f_code.co_name}')
+        log.info(f'CUSTOM LOG - Passed parameter to {inspect.currentframe().f_code.co_name}' is {inp_question})
         rag_response = RagDataResponseModel()
         try:
             openai_client = get_azure_openai_client()
