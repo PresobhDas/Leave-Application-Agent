@@ -225,7 +225,7 @@ def generate_embeddings(doc_chunks:List[Document]) -> List:
             input=doc_chunk.page_content
         )
         vector_db_index = {
-            'id' : f'{doc_chunk.metadata.get('doc_name')}_{i}',
+            'id' : f'{doc_chunk.metadata.get('metadata_doc_name')}_{i}',
             'metadata_section_id' : doc_chunk.metadata.get('metadata_section_id'),
             'metadata_title' : doc_chunk.metadata.get('metadata_title'),
             'metadata_doc_name' : doc_chunk.metadata.get('metadata_doc_name'),
@@ -248,7 +248,9 @@ def write_embeddings(vector_db_index_list : List[Dict]):
                             credential= DefaultAzureCredential()
                             )
     log.info(f'CUSTOM LOG - document being inseted is {vector_db_index_list}')
-    azure_ai_search_client.upload_documents(vector_db_index_list)
+    result = azure_ai_search_client.upload_documents(vector_db_index_list)
+    for r in result:
+        log.info(f'CUSTOM LOG - response after uploading index document is {r}')
     log.info(f'CUSTOM LOG - Embeddings written successfully')
 
 def getAzureSecrets(key:str) -> str:
