@@ -2,6 +2,8 @@ from mcp.server.fastmcp import FastMCP
 import logging, sys, inspect, requests
 from utils.model_contracts import WeatherDataResponse, WeatherData, RagDataResponseModel
 from utils.llm_utils import get_azure_openai_client, azure_ai_search_endpoint
+from azure.search.documents import SearchClient
+from azure.identity import DefaultAzureCredential
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
@@ -79,8 +81,13 @@ def register_tools(mcp_server:FastMCP):
                 model='text-embedding-3-small',
                 input=inp_question
             )
-
-            result = azure_ai_search_endpoint.search(
+            index_name='leave_agent_vector_index'
+            azure_ai_search_client = SearchClient(
+                        endpoint=azure_ai_search_endpoint,
+                        index_name=index_name,
+                        credential= DefaultAzureCredential()
+                        )
+            result = azure_ai_search_client.search(
                 search_text = None,
                 vector_queries=[
                     {
