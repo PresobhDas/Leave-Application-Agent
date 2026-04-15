@@ -5,7 +5,7 @@ from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langgraph.graph import MessagesState
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
-from utils.model_contracts import EmployeeMasterResponseModel, EmployeeLeaveResponseModel, WeatherDataResponse, RagData
+from utils.model_contracts import EmployeeMasterResponseModel, EmployeeLeaveResponseModel, WeatherDataResponse, RagDataResponseModel
 from mcp.server.fastmcp import FastMCP
 from typing import List, Dict
 from langchain_core.documents import Document
@@ -25,6 +25,7 @@ if not log.handlers:
     h.setLevel(logging.INFO)
     log.addHandler(h)
 
+azure_ai_search_endpoint = os.environ.get('AZURE_AI_SEARCH_CONNECTION_STRING')
 class RagState(MessagesState):
     question:str
     tool_execution_count: int
@@ -86,7 +87,6 @@ def build_tools(mcp_server: FastMCP):
 
         This function tool get the city name as the input and returns the current weather information for that city
         '''
-
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
         resp = await mcp_server.call_tool(
                                             name = 'get_weather',
@@ -143,28 +143,30 @@ def build_tools(mcp_server: FastMCP):
         
     #     return resp_content
     
-    # @tool
-    # async def get_leave_policy_document(inp_question:str):
-    #     '''
-    #     Docstring for get_leave_policy_document
+    @tool
+    async def get_rag_document_tool(inp_question:str):
+        '''
+        Docstring for get_leave_policy_document
         
-    #     :param inp_question: This function gets the input question and then checks whether the information is present in the Leave_Policy document and return the best possible result back. This does an vector embedding similarity 
-    #     search.
-    #     :type inp_question: str
-    #     '''
-    #     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    #     resp = await mcp_session.call_tool(
-    #                                 name='get_leave_policy_document',
-    #                                 arguments={'inp_question':inp_question}
-    #     )
-    #     try:
-    #         resp_content = RagData.model_validate_json(resp.content[0].text)
-    #     except:
-    #         return None
+        :param inp_question: This function gets the input question and then checks whether the information is present in the Azure AI Search vector DB and return the best possible result back. This does an vector embedding similarity 
+        search by calling the MCP tool function get_rag_document.
+        :type inp_question: str
+        '''
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+        resp = await mcp_server.call_tool(
+                                    name='get_rag_document',
+                                    arguments={'inp_question':inp_question}
+        )
+        try:
+            log.info(f'response retrieved inside build_tools is {resp[0].text}') 
+            resp_content = RagDataResponseModel.model_validate_json(resp[0].text)
+        except Exception as err:
+            log.info(f'Errored in {inspect.currentframe().f_code.co_name} with error {err}')
+            return RagDataResponseModel()
         
-    #     return resp_content
+        return resp_content
 
-    return [get_weather_tool]
+    return [get_weather_tool, get_rag_document_tool]
 
 def build_nodes(llm_with_tools):
 
@@ -191,9 +193,8 @@ def build_nodes(llm_with_tools):
 
 def recreate_index(index_name:str):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    INDEX_SEARCH_ENDPOINT = os.environ.get('AZURE_AI_SEARCH_CONNECTION_STRING')
     index_client = SearchIndexClient(
-        endpoint=INDEX_SEARCH_ENDPOINT,
+        endpoint=azure_ai_search_endpoint,
         credential=DefaultAzureCredential()
     )
     try:
@@ -210,9 +211,8 @@ def recreate_index(index_name:str):
 
     log.info(f'CUSTOM LOG - Index {index_schema} created successfully')
 
-def generate_embeddings(doc_chunks:List[Document]) -> List:
+def get_azure_openai_client() -> AzureOpenAI:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    vector_db_index_list = []
     credential = DefaultAzureCredential()
     token_provider = lambda: credential.get_token(
         "https://cognitiveservices.azure.com/.default"
@@ -220,8 +220,15 @@ def generate_embeddings(doc_chunks:List[Document]) -> List:
     endpoint = os.environ.get('AZURE_OPENAI_ENDPOINT')
     client = AzureOpenAI(api_version="2024-12-01-preview",azure_endpoint=endpoint, azure_ad_token_provider=token_provider)
 
+    return client
+
+def generate_embeddings(doc_chunks:List[Document]) -> List:
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    vector_db_index_list = []
+    openai_client = get_azure_openai_client()
+
     for i, doc_chunk in enumerate(doc_chunks):
-        embedding = client.embeddings.create(
+        embedding = openai_client.embeddings.create(
             model='text-embedding-3-small',
             input=doc_chunk.page_content
         )
@@ -242,9 +249,8 @@ def write_embeddings(vector_db_index_list : List[Dict]):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     index_name='leave_agent_vector_index'
     recreate_index(index_name)
-    INDEX_SEARCH_ENDPOINT = os.environ.get('AZURE_AI_SEARCH_CONNECTION_STRING')
     azure_ai_search_client = SearchClient(
-                            endpoint=INDEX_SEARCH_ENDPOINT,
+                            endpoint=azure_ai_search_endpoint,
                             index_name=index_name,
                             credential= DefaultAzureCredential()
                             )

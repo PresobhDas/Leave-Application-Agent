@@ -1,6 +1,7 @@
 from mcp.server.fastmcp import FastMCP
 import logging, sys, inspect, requests
-from utils.model_contracts import WeatherDataResponse, WeatherData
+from utils.model_contracts import WeatherDataResponse, WeatherData, RagDataResponseModel
+from utils.llm_utils import get_azure_openai_client, azure_ai_search_endpoint
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
@@ -66,3 +67,36 @@ def register_tools(mcp_server:FastMCP):
             weather_response.weatherData = current_weather
 
         return weather_response.model_dump_json()
+    
+    @mcp_server.tool()
+    async def get_rag_document(inp_question: str):
+        log.info(f'CUSTOM LOG - Entered MCP tool: {inspect.currentframe().f_code.co_name}')
+        rag_response = RagDataResponseModel()
+        try:
+            openai_client = get_azure_openai_client()
+            query_embeddings = openai_client.embeddings.create(
+                model='text-embedding-3-small',
+                input=inp_question
+            )
+
+            result = azure_ai_search_endpoint.search(
+                search_text = None,
+                vector_queries=[
+                    {
+                        'kind' : 'vector',
+                        'vector' : query_embeddings,
+                        'fields' : 'embedding',
+                        'k' : 1
+                    }
+                ],
+                select=['id', 'context_text', 'metadata_title']
+            )
+            rag_response.dataFound = 'FOUND'
+            rag_response.score = result['@search.score']
+            rag_response.text = result['context_text']
+            rag_response.title = result['metadata_title']
+        except Exception as err:
+            log.info(f'CUSTOM LOG - Error in MCP tool {inspect.currentframe().f_code.co_name} with error {err}')
+            return rag_response.model_dump_json()
+
+        return rag_response.model_dump_json()

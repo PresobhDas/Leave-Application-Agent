@@ -39,11 +39,11 @@ class EmployeeLeaveResponseModel(BaseModel):
     dataFound : Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'NOT FOUND'
     employeeLeave : EmployeeLeaveData | None = None
 
-class RagData(BaseModel):
-    id:str
-    partiion_key_id:str
-    test:str
-    matchPercent:int
+class RagDataResponseModel(BaseModel):
+    dataFound : Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'NOT FOUND'
+    score:float
+    text:str
+    title:str
 
 class InputDetails(BaseModel):
     inp_query:str
