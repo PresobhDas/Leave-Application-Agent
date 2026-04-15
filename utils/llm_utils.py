@@ -11,6 +11,7 @@ from typing import List, Dict
 from langchain_core.documents import Document
 from azure.search.documents import SearchClient
 from azure.search.documents.indexes import SearchIndexClient
+from azure.search.documents.indexes.models import SearchIndex
 from openai import AzureOpenAI
 
 VAULT_URL = os.environ.get('VAULT_URL')
@@ -188,6 +189,7 @@ def build_nodes(llm_with_tools):
     }
 
 def recreate_index(index_name:str):
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     INDEX_SEARCH_ENDPOINT = os.environ.get('AZURE_AI_SEARCH_CONNECTION_STRING')
     index_client = SearchIndexClient(
         endpoint=INDEX_SEARCH_ENDPOINT,
@@ -202,6 +204,7 @@ def recreate_index(index_name:str):
     with open('utils/create_index.json', 'r') as f:
         index_schema = json.load(f)
 
+    index_schema = SearchIndex.from_dict(index_schema)
     index_client.create_index(index=index_schema)
 
     log.info(f'Index {index_schema} created successfully')
