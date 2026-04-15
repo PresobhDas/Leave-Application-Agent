@@ -238,6 +238,16 @@ def generate_embeddings(doc_chunks:List[Document]) -> List:
 
     return vector_db_index_list
 
+def print_embeddings(azure_ai_search_client):
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    results = azure_ai_search_client.search(
+        search_text='',
+        top=5
+    )
+
+    for result in results:
+        print(result)
+
 def write_embeddings(vector_db_index_list : List[Dict]):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     index_name='leave_agent_vector_index'
@@ -252,6 +262,7 @@ def write_embeddings(vector_db_index_list : List[Dict]):
     for r in result:
         log.info(f'CUSTOM LOG - response after uploading index document is {r}')
     log.info(f'CUSTOM LOG - Embeddings written successfully')
+    print_embeddings(azure_ai_search_client)
 
 def getAzureSecrets(key:str) -> str:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
