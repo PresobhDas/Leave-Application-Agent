@@ -117,7 +117,7 @@ def register_tools(mcp_server:FastMCP):
 
         return rag_response.model_dump_json()
     
-    @mcp_server.tool
+    @mcp_server.tool()
     async def get_employee_master_record(employee_id : str):
         log.info(f'CUSTOM LOG - Entered MCP tool: {inspect.currentframe().f_code.co_name} with parameter {employee_id}')
         employee_master = EmployeeMasterResponseModel()
