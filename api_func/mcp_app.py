@@ -129,7 +129,7 @@ def register_tools(mcp_server:FastMCP):
 
             table_client = table_service.get_table_client('EmployeeMaster')
             entities = table_client.query_entities(
-                query_filter=f'RowKey eq {employee_id}'
+                query_filter=f"RowKey eq '{employee_id}'"
             )
 
             for entity in entities:
