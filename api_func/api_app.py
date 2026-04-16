@@ -48,9 +48,9 @@ async def ingest_pipeline(request:Request):
     events = await request.json()
     event = events[0]
     if event['eventType'] == 'Microsoft.EventGrid.SubscriptionValidationEvent':
-        validation_code = event['data']['ValidationCode']
+        validation_code = event['data']['validationCode']
         return {
-            'ValidationResponse' : validation_code
+            'validationResponse' : validation_code
         }
     
     if event['eventType'] == 'Microsoft.Storage.BlobCreated':
