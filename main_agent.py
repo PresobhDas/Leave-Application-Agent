@@ -7,7 +7,7 @@ class InputDetails(BaseModel):
 url = 'https://leave-agent-api.ashyglacier-369787e5.westus2.azurecontainerapps.io/agent'
 # leave-policy-agent-mcp-1-auczcxdxa7dwftd9.westus2-01.azurewebsites.net
 
-inp_details = InputDetails(inp_query='How often will be salary credited to my bank account based on RAG document?')
+inp_details = InputDetails(inp_query='Provide information on direct deposit from RAG document?')
 response = requests.post(url=url, json=inp_details.model_dump())
 # response = requests.post(url=url)
 # response = requests.get(url=url, timeout=20)

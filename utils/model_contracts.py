@@ -12,19 +12,17 @@ class WeatherDataResponse(BaseModel):
     dataFound : Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'NOT FOUND'
     weatherData : WeatherData | None = None
 
-class EmployeeData(BaseModel):
-    id:str
+class EmployeeMaster(BaseModel):
     employeeId:str
     name:str
     department:str
-    managerId:str
-    hireDate:str
-    workLocation:str
+    location:str
+    DOB:int
     isActive:bool
 
 class EmployeeMasterResponseModel(BaseModel):
     dataFound: Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'NOT FOUND'
-    employee: EmployeeData | None = None
+    employee: List[EmployeeMaster] = []
 
 class EmployeeLeaveData(BaseModel):
     id:str

@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
   "azure-cosmos>=4.14.5",
+  "azure-data-tables>=12.7.0",
   "azure-functions>=1.24.0",
   "azure-identity>=1.25.1",
   "azure-keyvault-secrets>=4.10.0",

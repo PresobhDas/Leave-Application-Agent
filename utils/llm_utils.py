@@ -101,25 +101,27 @@ def build_tools(mcp_server: FastMCP):
         
         return resp_content
     
-    # @tool
-    # async def get_employee_master_record(employee_id:str):
-    #     '''
-    #     Docstring for get_employee_master_record
+    @tool
+    async def get_employee_master_record(employee_id:str):
+        '''
+        Docstring for get_employee_master_record
         
-    #     :param employee_id: This function takes the Employee ID as a parameter and returns the employee details from the Cosmos DB Database.
-    #     :type employee_id: str
-    #     '''
-    #     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    #     resp = await MCP_SESSION.call_tool(
-    #                                         name = 'get_employee_master_record',
-    #                                         arguments = {'employee_id':employee_id}
-    #             )
-    #     try:
-    #         resp_content = EmployeeMasterResponseModel.model_validate_json(resp.content[0].text)
-    #     except:
-    #         return None
+        :param employee_id: This function takes the Employee ID as a parameter and returns the employee details from the Cosmos DB Database.
+        :type employee_id: str
+        '''
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+        resp = await mcp_server.call_tool(
+                                            name = 'get_employee_master_record',
+                                            arguments = {'employee_id':employee_id}
+                )
+        try:
+            log.info(f'response retrieved inside build_tools is {resp[0].text}') 
+            resp_content = EmployeeMasterResponseModel.model_validate_json(resp[0].text)
+        except Exception as err:
+            log.info(f'Errored in {inspect.currentframe().f_code.co_name} with error {err}')
+            return EmployeeMasterResponseModel()
         
-    #     return resp_content
+        return resp_content
     
     # @tool
     # async def get_employee_leave_record(employee_id:str):

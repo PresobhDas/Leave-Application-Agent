@@ -1,9 +1,10 @@
 from mcp.server.fastmcp import FastMCP
-import logging, sys, inspect, requests
-from utils.model_contracts import WeatherDataResponse, WeatherData, RagData, RagDataResponseModel
+import logging, sys, inspect, requests, os
+from utils.model_contracts import WeatherDataResponse, WeatherData, RagData, RagDataResponseModel, EmployeeMasterResponseModel, EmployeeMaster
 from utils.llm_utils import get_azure_openai_client, azure_ai_search_endpoint
 from azure.search.documents import SearchClient
 from azure.identity import DefaultAzureCredential
+from azure.data.tables import TableServiceClient
 
 log = logging.getLogger('mcp')
 log.setLevel(logging.INFO)
@@ -72,8 +73,7 @@ def register_tools(mcp_server:FastMCP):
     
     @mcp_server.tool()
     async def get_rag_document(inp_question: str):
-        log.info(f'CUSTOM LOG - Entered MCP tool: {inspect.currentframe().f_code.co_name}')
-        log.info(f'CUSTOM LOG - Passed parameter to {inspect.currentframe().f_code.co_name} is {inp_question}')
+        log.info(f'CUSTOM LOG - Entered MCP tool: {inspect.currentframe().f_code.co_name} with parameter {inp_question}')
         rag_response = RagDataResponseModel()
         try:
             openai_client = get_azure_openai_client()
@@ -114,6 +114,38 @@ def register_tools(mcp_server:FastMCP):
                 )
         except Exception as err:
             log.info(f'CUSTOM LOG - Error in MCP tool {inspect.currentframe().f_code.co_name} with error {err}')
-            return rag_response.model_dump_json()
 
         return rag_response.model_dump_json()
+    
+    @mcp_server.tool
+    async def get_employee_master_record(employee_id : str):
+        log.info(f'CUSTOM LOG - Entered MCP tool: {inspect.currentframe().f_code.co_name} with parameter {employee_id}')
+        employee_master = EmployeeMasterResponseModel()
+        try:
+            table_service = TableServiceClient(
+                endpoint=os.environ.get('TABLE_ACCOUNT_URL'),
+                credential=DefaultAzureCredential()
+            )
+
+            table_client = table_service.get_table_client('EmployeeMaster')
+            entities = table_client.query_entities(
+                query_filter=f'RowKey eq {employee_id}'
+            )
+
+            for entity in entities:
+                employee_master.dataFound = 'FOUND'
+                employee_master.employee.append(
+                    EmployeeMaster(
+                        employeeId=entity['RowKey'],
+                        name=entity['Name'],
+                        department=entity['PartitionKey'],
+                        location=entity['Location'],
+                        DOB=entity['DOB'],
+                        isActive=entity['Active']
+                    )
+                )
+        except Exception as err:
+            log.info(f'CUSTOM LOG - Error in MCP tool {inspect.currentframe().f_code.co_name} with error {err}')
+        
+        return employee_master.model_dump_json()
+
