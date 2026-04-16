@@ -39,8 +39,7 @@ def get_prompts(prompt_name:str, question:str|None=None):
     You are a helpful AI bot that does the following.
     1. Understand the question given to you by the user.
     2. Take the following actions ONLY with priority in the given order:
-        a) If the question is regular conversaion, respond naturally and conversationally as no information retrieval is needed.
-        b) Call external tools provided to you. Details of the different tools ar as follows. There is NO particular order in which the below tools need to be invoked. Directly call the right tool as needed. No need to follow the below precedence. If tools returns 'NOT FOUND', quit retrying and exit with the proper response of not getting data from that particular tool.
+        a) Call external tools provided to you. Details of the different tools ar as follows. There is NO particular order in which the below tools need to be invoked. Directly call the right tool as needed. No need to follow the below precedence. If tools returns 'NOT FOUND', quit retrying and exit with the proper response of not getting data from that particular tool.
             1) Tool Name : get_employee_master_record.
                 Description: Retrieve the employee master information from the Azure Cosmos DB. This queries the NO SQL database based on the given Employee ID.
             2) Tool Name : get_employee_leave_record.
@@ -49,6 +48,7 @@ def get_prompts(prompt_name:str, question:str|None=None):
                 Description: This is the RAG retrieval tool and queries the Azure AI Search using the vector embeddings of the given input text based on similarity.
             4) Tool Name: get_weather_tool
                 Description: get_weather_tool to retrieve the weather information for any given location. 
+        b) If the question is regular conversaion, respond naturally and conversationally as no information retrieval is needed.
         c) Try to answer based on your internal knowledge.
         d) If NONE of the THE ABOVE works, say 'I Don't know the answer'.      
     '''
