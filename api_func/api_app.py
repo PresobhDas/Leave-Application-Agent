@@ -11,6 +11,7 @@ from api_func.mcp_app import register_tools
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 from langchain_community.document_loaders import PyPDFLoader
+from urllib.parse import urlparse, unquote
 
 log = logging.getLogger('api')
 log.setLevel(logging.INFO)
@@ -42,28 +43,51 @@ async def ping():
     return {'response':'pong'}
 
 @api_server.post('/ingest')
-async def ingest_pipeline():
+async def ingest_pipeline(request:Request):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    client = BlobServiceClient(
-                account_url = os.environ.get('BLOB_ACCOUNT_URL'),
-                credential = DefaultAzureCredential()
-            )
-    container = client.get_container_client("rag-docs")
+    events = await request.json()
+    event = events[0]
+    if event['eventType'] == 'Microsoft.EventGrid.SubscriptionValidationEvent':
+        validation_code = event['data']['ValidationCode']
+        return {
+            'ValidationResponse' : validation_code
+        }
+    
+    if event['eventType'] == 'Microsoft.Storage.BlobCreated':
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name} followed by the event of BLOB file creation')
+        blob_url = event['data']['url']
 
-    for blob in container.list_blobs():
-        blob_client = container.get_blob_client(blob=blob.name)
+        parsed = urlparse(blob_url)
+        path_parts = parsed.path.lstrip('/').split('/', 1)
+        container_name = path_parts[0]
+        blob_name = unquote(path_parts[1])
+        file_extension = os.path.splitext(os.path.basename(parsed.path))
+
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name} with container name : {container_name}, blob name : {blob_name}, file extension : {file_extension}')
+
+        blob_service_client = BlobServiceClient(
+                    account_url = f"{parsed.scheme}://{parsed.netloc}",
+                    credential = DefaultAzureCredential()
+                )
+
+        blob_client = blob_service_client.get_blob_client(
+            container=container_name,
+            blob=blob_name
+        )
         pdf_bytes = blob_client.download_blob().readall()
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=file_extension) as temp_file:
             temp_file.write(pdf_bytes)
             temp_path = temp_file.name
         loader = PyPDFLoader(file_path=temp_path)
         docs = loader.load()
-        doc_chunks = get_chunks(docs, blob.name)
+        doc_chunks = get_chunks(docs, blob_name)
 
-    embedding_list = generate_embeddings(doc_chunks)
-    write_embeddings(embedding_list)
+        log.info(f'CUSTOM LOG - {len(doc_chunks)} chunks retrieved')
 
-    return {'status' : 'ok'}
+        # embedding_list = generate_embeddings(doc_chunks)
+        # write_embeddings(embedding_list)
+
+        return {'status' : 'ok'}
 
 @api_server.post('/agent')
 async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body()]):
