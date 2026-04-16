@@ -40,10 +40,10 @@ def get_prompts(prompt_name:str, question:str|None=None):
     1. Understand the question given to you by the user.
     2. Take the following actions ONLY with priority in the given order:
         a) Call external tools provided to you. Details of the different tools ar as follows. There is NO particular order in which the below tools need to be invoked. Directly call the right tool as needed. No need to follow the below precedence. If tools returns 'NOT FOUND', quit retrying and exit with the proper response of not getting data from that particular tool.
-            1) Tool Name : get_employee_master_record.
-                Description: Retrieve the employee master information from the Azure Cosmos DB. This queries the NO SQL database based on the given Employee ID.
-            2) Tool Name : get_employee_leave_record.
-                Description: Retrieve the employee leave information from the Azure Cosmos DB. This queries the NO SQL database based on the given Employee ID.
+            1) Tool Name : get_employee_master_record_tool.
+                Description: Retrieve the employee master information from the Azure Storage Account Table. This queries the table on the given Employee ID.
+            2) Tool Name : get_employee_leave_record_tool.
+                Description: Retrieve the employee leave information from the Azure Storage Account Table. This queries the table on the given Employee ID.
             3) Tool Name : get_rag_document_tool.
                 Description: This is the RAG retrieval tool and queries the Azure AI Search using the vector embeddings of the given input text based on similarity.
             4) Tool Name: get_weather_tool
@@ -102,7 +102,7 @@ def build_tools(mcp_server: FastMCP):
         return resp_content
     
     @tool
-    async def get_employee_master_record(employee_id:str):
+    async def get_employee_master_record_tool(employee_id:str):
         '''
         Docstring for get_employee_master_record
         
@@ -124,7 +124,7 @@ def build_tools(mcp_server: FastMCP):
         return resp_content
     
     # @tool
-    # async def get_employee_leave_record(employee_id:str):
+    # async def get_employee_leave_record_tool(employee_id:str):
     #     '''
     #     Docstring for get_employee_leave_record
         
@@ -168,7 +168,7 @@ def build_tools(mcp_server: FastMCP):
         
         return resp_content
 
-    return [get_weather_tool, get_rag_document_tool]
+    return [get_weather_tool, get_rag_document_tool, get_employee_master_record_tool]
 
 def build_nodes(llm_with_tools):
 
