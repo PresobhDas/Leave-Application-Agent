@@ -77,15 +77,18 @@ def redact_pii(content_to_redact:Dict):
         credential=DefaultAzureCredential()
     )
 
-    for key, value in content_to_redact.items():
-        if isinstance(value, str):
-            response = text_analytics_client.recognize_pii_entities(
-                [value],
-                language='en'
-            )
+    # for key, value in content_to_redact.items():
+        # if isinstance(value, str):
+        #     response = text_analytics_client.recognize_pii_entities(
+        #         [value],
+        #         language='en'
+        #     )
+        # if isinstance(value, list):
+        #     for employee in value:
+        #         for item in value.
 
-        for doc in response:
-            log.info(f'CUSTOM LOG - redacted text is {doc.redacted_text}')
+        # for doc in response:
+        #     log.info(f'CUSTOM LOG - redacted text is {doc.redacted_text}')
     return 
 
 async def check_tool_condition(state: RagState):

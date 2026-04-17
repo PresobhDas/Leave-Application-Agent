@@ -22,7 +22,7 @@ class EmployeeMaster(BaseModel):
 
 class EmployeeMasterResponseModel(BaseModel):
     dataFound: Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'NOT FOUND'
-    employee: List[EmployeeMaster] = []
+    employee: EmployeeMaster = None
 
 class EmployeeLeaveData(BaseModel):
     id:str

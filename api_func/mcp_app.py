@@ -128,22 +128,21 @@ def register_tools(mcp_server:FastMCP):
             )
 
             table_client = table_service.get_table_client('EmployeeMaster')
-            entities = table_client.query_entities(
+            entity = table_client.query_entities(
                 query_filter=f"RowKey eq '{employee_id}'"
             )
 
-            for entity in entities:
-                employee_master.dataFound = 'FOUND'
-                employee_master.employee.append(
-                    EmployeeMaster(
-                        employeeId=entity['RowKey'],
-                        name=entity['Name'],
-                        department=entity['PartitionKey'],
-                        location=entity['Location'],
-                        DOB=entity['DOB'],
-                        isActive=entity['Active']
-                    )
+            employee_master.dataFound = 'FOUND'
+            employee_master.employee(
+                EmployeeMaster(
+                    employeeId=entity['RowKey'],
+                    name=entity['Name'],
+                    department=entity['PartitionKey'],
+                    location=entity['Location'],
+                    DOB=entity['DOB'],
+                    isActive=entity['Active']
                 )
+            )
         except Exception as err:
             log.info(f'CUSTOM LOG - Error in MCP tool {inspect.currentframe().f_code.co_name} with error {err}')
         
