@@ -19,7 +19,8 @@ class EmployeeMaster(BaseModel):
     location:str
     DOB:int
     isActive:bool
-
+    email:str
+    ssn:str
 class EmployeeMasterResponseModel(BaseModel):
     dataFound: Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'NOT FOUND'
     employee: EmployeeMaster = None

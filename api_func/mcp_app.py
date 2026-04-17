@@ -140,7 +140,9 @@ def register_tools(mcp_server:FastMCP):
                         department=entity['PartitionKey'],
                         location=entity['Location'],
                         DOB=entity['DOB'],
-                        isActive=entity['Active']
+                        isActive=entity['Active'],
+                        email=entity['Email'],
+                        ssn=entity['SSN']
                     )
             
         except Exception as err:
