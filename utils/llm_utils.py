@@ -84,7 +84,7 @@ def redact_pii(content_to_redact:Dict):
         texts_to_redact = []
         all_results = []
 
-        for key, val in content_to_redact.get('employee').items():
+        for key, val in content_to_redact.items():
             if isinstance(val, int) or isinstance(val, str):
                 texts_to_redact.append(f'{key} - {val}')
         log.info(f'CUSTOM LOG - value of texts_to_redact is {texts_to_redact}')
@@ -96,7 +96,7 @@ def redact_pii(content_to_redact:Dict):
             )
             all_results.extend(response)
 
-        for i, key in enumerate(content_to_redact.get('employee').keys()):
+        for i, key in enumerate(content_to_redact.keys()):
             if len(all_results[i].entities) > 0:
                 content_to_redact[key] = '*' * len(content_to_redact[key])
 
@@ -159,7 +159,7 @@ def build_tools(mcp_server: FastMCP):
         try:
             log.info(f'response retrieved inside build_tools is {resp[0].text}') 
             resp_content = EmployeeMasterResponseModel.model_validate_json(resp[0].text)
-            redact_pii(json.loads(resp[0].text))
+            redact_pii(json.loads(resp[0].text).get('employee'))
         except Exception as err:
             log.info(f'Errored in {inspect.currentframe().f_code.co_name} with error {err}')
             return EmployeeMasterResponseModel()
