@@ -79,7 +79,8 @@ def redact_pii(content_to_redact:Dict):
         )
         texts_to_redact = []
         for key, val in content_to_redact.get('employee').items():
-            texts_to_redact.append(val)
+            if isinstance(val, int) or isinstance(val, str):
+                texts_to_redact.append(f'{key} - {val}')
         log.info(f'CUSTOM LOG - value of texts_to_redact is {texts_to_redact}')
         reponse = text_analytics_client.recognize_pii_entities(texts_to_redact)
 
