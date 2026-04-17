@@ -72,19 +72,27 @@ def redact_pii(content_to_redact:Dict):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     log.info(f'CUSTOM LOG - content to redact is {content_to_redact} with type {type(content_to_redact)}')
     try:
+        def chunk_list(items, size=5):
+            for i in range(0, len(items), size):
+                yield items[i:i+size]
+
         PII_REDACTOR = os.environ.get('PII_REDACTOR')
         text_analytics_client = TextAnalyticsClient(
             endpoint=PII_REDACTOR,
             credential=DefaultAzureCredential()
         )
         texts_to_redact = []
+        all_results = []
         for key, val in content_to_redact.get('employee').items():
             if isinstance(val, int) or isinstance(val, str):
                 texts_to_redact.append(f'{key} - {val}')
         log.info(f'CUSTOM LOG - value of texts_to_redact is {texts_to_redact}')
-        reponse = text_analytics_client.recognize_pii_entities(texts_to_redact)
 
-        log.info(f'CUSTOM LOG - redacted content is {reponse}')
+        for chunk in chunk_list(texts_to_redact, size=5):
+            response = text_analytics_client.recognize_pii_entities(chunk)
+            all_results.extend(response)
+
+        log.info(f'CUSTOM LOG - redacted content is {all_results}')
     except Exception as err:
         log.info(f'CUSTOM LOG - Errored in {inspect.currentframe().f_code.co_name} with error {err}')
 
