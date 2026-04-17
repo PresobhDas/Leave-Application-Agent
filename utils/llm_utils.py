@@ -14,6 +14,8 @@ from azure.search.documents.indexes import SearchIndexClient
 from azure.search.documents.indexes.models import SearchIndex
 from openai import AzureOpenAI
 from pathlib import Path
+from azure.ai.textanalytics import TextAnalyticsClient
+
 
 VAULT_URL = os.environ.get('VAULT_URL')
 
@@ -66,6 +68,10 @@ def get_chat_model() -> ChatOpenAI:
     log.info('Retrieved the chat model')
     return chat_model
 
+def redact_pii(content_to_redact:Dict):
+    log.info(f'value of content to redact is {content_to_redact} with type {type(content_to_redact)}')
+    return 
+
 async def check_tool_condition(state: RagState):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     if state.get('tool_execution_count',0) >= 5:
@@ -117,6 +123,7 @@ def build_tools(mcp_server: FastMCP):
         try:
             log.info(f'response retrieved inside build_tools is {resp[0].text}') 
             resp_content = EmployeeMasterResponseModel.model_validate_json(resp[0].text)
+            redact_pii(resp_content)
         except Exception as err:
             log.info(f'Errored in {inspect.currentframe().f_code.co_name} with error {err}')
             return EmployeeMasterResponseModel()
