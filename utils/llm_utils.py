@@ -69,7 +69,23 @@ def get_chat_model() -> ChatOpenAI:
     return chat_model
 
 def redact_pii(content_to_redact:Dict):
-    log.info(f'value of content to redact is {content_to_redact} with type {type(content_to_redact)}')
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    log.info(f'CUSTOM LOG - content to redact is {content_to_redact}')
+    PII_REDACTOR = os.environ.get('PII_REDACTOR')
+    text_analytics_client = TextAnalyticsClient(
+        endpoint=PII_REDACTOR,
+        credential=DefaultAzureCredential()
+    )
+
+    for key, value in content_to_redact.items():
+        if isinstance(value, str):
+            response = text_analytics_client.recognize_pii_entities(
+                [value],
+                language='en'
+            )
+
+        for doc in response:
+            log.info(f'CUSTOM LOG - redacted text is {doc.redacted_text}')
     return 
 
 async def check_tool_condition(state: RagState):
@@ -122,8 +138,8 @@ def build_tools(mcp_server: FastMCP):
                 )
         try:
             log.info(f'response retrieved inside build_tools is {resp[0].text}') 
-            resp_content = EmployeeMasterResponseModel.model_validate_json(resp[0].text)
-            redact_pii(resp_content.model_dump())
+            # resp_content = EmployeeMasterResponseModel.model_validate_json(resp[0].text)
+            redact_pii(resp[0].text)
         except Exception as err:
             log.info(f'Errored in {inspect.currentframe().f_code.co_name} with error {err}')
             return EmployeeMasterResponseModel()
