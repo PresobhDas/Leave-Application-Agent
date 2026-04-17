@@ -71,18 +71,21 @@ def get_chat_model() -> ChatOpenAI:
 def redact_pii(content_to_redact:Dict):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     log.info(f'CUSTOM LOG - content to redact is {content_to_redact} with type {type(content_to_redact)}')
-    PII_REDACTOR = os.environ.get('PII_REDACTOR')
-    text_analytics_client = TextAnalyticsClient(
-        endpoint=PII_REDACTOR,
-        credential=DefaultAzureCredential()
-    )
-    texts_to_redact = []
-    for key, val in content_to_redact.get('employee').items():
-        texts_to_redact.append(val)
+    try:
+        PII_REDACTOR = os.environ.get('PII_REDACTOR')
+        text_analytics_client = TextAnalyticsClient(
+            endpoint=PII_REDACTOR,
+            credential=DefaultAzureCredential()
+        )
+        texts_to_redact = []
+        for key, val in content_to_redact.get('employee').items():
+            texts_to_redact.append(val)
+        log.info(f'CUSTOM LOG - value of texts_to_redact is {texts_to_redact}')
+        reponse = text_analytics_client.recognize_pii_entities(texts_to_redact)
 
-    reponse = text_analytics_client.recognize_pii_entities(texts_to_redact)
-
-    log.info(f'CUSTOM LOG - redacted content is {reponse}')
+        log.info(f'CUSTOM LOG - redacted content is {reponse}')
+    except Exception as err:
+        log.info(f'CUSTOM LOG - Errored in {inspect.currentframe().f_code.co_name} with error {err}')
 
     return 
 
