@@ -133,8 +133,7 @@ def register_tools(mcp_server:FastMCP):
             )
 
             employee_master.dataFound = 'FOUND'
-            employee_master.employee(
-                EmployeeMaster(
+            employee_master.employee = EmployeeMaster(
                     employeeId=entity['RowKey'],
                     name=entity['Name'],
                     department=entity['PartitionKey'],
@@ -142,7 +141,7 @@ def register_tools(mcp_server:FastMCP):
                     DOB=entity['DOB'],
                     isActive=entity['Active']
                 )
-            )
+            
         except Exception as err:
             log.info(f'CUSTOM LOG - Error in MCP tool {inspect.currentframe().f_code.co_name} with error {err}')
         
