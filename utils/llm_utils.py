@@ -98,7 +98,7 @@ def redact_pii(content_to_redact:Dict):
 
         for i, key in enumerate(content_to_redact.get('employee').keys()):
             if len(all_results[i].entities) > 0:
-                content_to_redact['key'] = '*' * len(content_to_redact['key'])
+                content_to_redact[key] = '*' * len(content_to_redact[key])
 
         log.info(f'CUSTOM LOG - azure response is  {all_results}')
 
