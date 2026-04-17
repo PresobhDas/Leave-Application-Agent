@@ -139,7 +139,7 @@ def build_tools(mcp_server: FastMCP):
         try:
             log.info(f'response retrieved inside build_tools is {resp[0].text}') 
             resp_content = EmployeeMasterResponseModel.model_validate_json(resp[0].text)
-            redact_pii(resp[0].text)
+            redact_pii(json.loads(resp[0].text))
         except Exception as err:
             log.info(f'Errored in {inspect.currentframe().f_code.co_name} with error {err}')
             return EmployeeMasterResponseModel()
