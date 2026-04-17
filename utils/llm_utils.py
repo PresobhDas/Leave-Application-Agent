@@ -83,14 +83,24 @@ def redact_pii(content_to_redact:Dict):
         )
         texts_to_redact = []
         all_results = []
+
         for key, val in content_to_redact.get('employee').items():
             if isinstance(val, int) or isinstance(val, str):
                 texts_to_redact.append(f'{key} - {val}')
         log.info(f'CUSTOM LOG - value of texts_to_redact is {texts_to_redact}')
 
         for chunk in chunk_list(texts_to_redact, size=5):
-            response = text_analytics_client.recognize_pii_entities(chunk)
+            response = text_analytics_client.recognize_pii_entities(
+                chunk,
+                categories_filter=["USSocialSecurityNumber", "Email"]
+            )
             all_results.extend(response)
+
+        for i, key in enumerate(content_to_redact.get('employee').keys()):
+            if len(all_results[i].entities) > 0:
+                content_to_redact['key'] = '*' * len(content_to_redact['key'])
+
+        print(content_to_redact)
 
         log.info(f'CUSTOM LOG - redacted content is {all_results}')
     except Exception as err:
