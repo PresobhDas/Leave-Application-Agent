@@ -100,9 +100,9 @@ def redact_pii(content_to_redact:Dict):
             if len(all_results[i].entities) > 0:
                 content_to_redact['key'] = '*' * len(content_to_redact['key'])
 
-        print(content_to_redact)
+        log.info(f'CUSTOM LOG - azure response is  {all_results}')
 
-        log.info(f'CUSTOM LOG - redacted content is {all_results}')
+        log.info(f'CUSTOM LOG - redacted content is {content_to_redact}')
     except Exception as err:
         log.info(f'CUSTOM LOG - Errored in {inspect.currentframe().f_code.co_name} with error {err}')
 
