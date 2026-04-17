@@ -70,7 +70,7 @@ def get_chat_model() -> ChatOpenAI:
 
 def redact_pii(content_to_redact:Dict):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    log.info(f'CUSTOM LOG - content to redact is {content_to_redact}')
+    log.info(f'CUSTOM LOG - content to redact is {content_to_redact} with type {type(content_to_redact)}')
     PII_REDACTOR = os.environ.get('PII_REDACTOR')
     text_analytics_client = TextAnalyticsClient(
         endpoint=PII_REDACTOR,
@@ -138,7 +138,7 @@ def build_tools(mcp_server: FastMCP):
                 )
         try:
             log.info(f'response retrieved inside build_tools is {resp[0].text}') 
-            # resp_content = EmployeeMasterResponseModel.model_validate_json(resp[0].text)
+            resp_content = EmployeeMasterResponseModel.model_validate_json(resp[0].text)
             redact_pii(resp[0].text)
         except Exception as err:
             log.info(f'Errored in {inspect.currentframe().f_code.co_name} with error {err}')
