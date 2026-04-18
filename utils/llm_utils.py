@@ -97,7 +97,7 @@ def redact_pii(content_to_redact:Dict):
 
         for i, key in enumerate(content_to_redact.get('employee').keys()):
             if len(all_results[i].entities) > 0:
-                content_to_redact.get('employee').get(key) = '*' * len(content_to_redact.get('employee').get(key))
+                content_to_redact['employee'][key] = '*' * len(content_to_redact['employee'][key])
 
     except Exception as err:
         log.info(f'CUSTOM LOG - Errored in {inspect.currentframe().f_code.co_name} with error {err}')
