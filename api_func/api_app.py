@@ -86,7 +86,7 @@ async def ingest_pipeline(request:Request):
             log.info(f'CUSTOM LOG - {len(doc_chunks)} chunks retrieved')
 
     except Exception as err:
-        log_error(err)
+        log.exception(f'CUSTOM LOG - Exception occurred at {inspect.currentframe().f_code.co_name}')
         return {'status' : 'Errored'}
 
         # embedding_list = generate_embeddings(doc_chunks)
