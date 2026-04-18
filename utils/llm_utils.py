@@ -1,4 +1,4 @@
-import os, logging, sys, inspect, re, json
+import os, logging, sys, inspect, re, json, traceback
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
@@ -339,3 +339,8 @@ def get_chunks(file_data:List[Document], file_name:str) -> List[Document]:
             )
 
     return langchain_doc
+
+def log_error(err:Exception):
+    tb = traceback.extract_tb(err.__traceback__)[-1]
+    log.info(f'CUSTOM LOG - Errored at File:{tb.filename}, Line:{tb.lineno}, Function:{tb.name}, Code:{tb.line}')
+    return

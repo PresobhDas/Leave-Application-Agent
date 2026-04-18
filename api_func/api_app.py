@@ -3,7 +3,7 @@ from fastapi import FastAPI, Body, Request
 from typing import Annotated
 from langgraph.graph import START, END, StateGraph
 from langgraph.prebuilt import ToolNode
-from utils.llm_utils import get_chat_model, build_nodes, check_tool_condition, build_tools, get_chunks, generate_embeddings, write_embeddings, RagState
+from utils.llm_utils import get_chat_model, build_nodes, check_tool_condition, build_tools, get_chunks, generate_embeddings, write_embeddings, log_error, RagState
 from utils.model_contracts import InputDetails
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
@@ -44,50 +44,55 @@ async def ping():
 
 @api_server.post('/ingest')
 async def ingest_pipeline(request:Request):
-    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    events = await request.json()
-    event = events[0]
-    if event['eventType'] == 'Microsoft.EventGrid.SubscriptionValidationEvent':
-        validation_code = event['data']['validationCode']
-        return {
-            'validationResponse' : validation_code
-        }
-    
-    if event['eventType'] == 'Microsoft.Storage.BlobCreated':
-        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name} followed by the event of BLOB file creation')
-        blob_url = event['data']['url']
+    try:
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+        events = await request.json()
+        event = events[0]
+        if event['eventType'] == 'Microsoft.EventGrid.SubscriptionValidationEvent':
+            validation_code = event['data']['validationCode']
+            return {
+                'validationResponse' : validation_code
+            }
+        
+        if event['eventType'] == 'Microsoft.Storage.BlobCreated':
+            log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name} followed by the event of BLOB file creation')
+            blob_url = event['data']['url']
 
-        parsed = urlparse(blob_url)
-        path_parts = parsed.path.lstrip('/').split('/', 1)
-        container_name = path_parts[0]
-        blob_name = unquote(path_parts[1])
-        file_extension = os.path.splitext(os.path.basename(parsed.path))
+            parsed = urlparse(blob_url)
+            path_parts = parsed.path.lstrip('/').split('/', 1)
+            container_name = path_parts[0]
+            blob_name = unquote(path_parts[1])
+            file_extension = os.path.splitext(os.path.basename(parsed.path))
 
-        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name} with container name : {container_name}, blob name : {blob_name}, file extension : {file_extension}')
+            log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name} with container name : {container_name}, blob name : {blob_name}, file extension : {file_extension}')
 
-        blob_service_client = BlobServiceClient(
-                    account_url = f"{parsed.scheme}://{parsed.netloc}",
-                    credential = DefaultAzureCredential()
-                )
+            blob_service_client = BlobServiceClient(
+                        account_url = f"{parsed.scheme}://{parsed.netloc}",
+                        credential = DefaultAzureCredential()
+                    )
 
-        blob_client = blob_service_client.get_blob_client(
-            container=container_name,
-            blob=blob_name
-        )
-        pdf_bytes = blob_client.download_blob().readall()
-        with tempfile.NamedTemporaryFile(delete=False, suffix=file_extension) as temp_file:
-            temp_file.write(pdf_bytes)
-            temp_path = temp_file.name
-        loader = PyPDFLoader(file_path=temp_path)
-        docs = loader.load()
-        doc_chunks = get_chunks(docs, blob_name)
+            blob_client = blob_service_client.get_blob_client(
+                container=container_name,
+                blob=blob_name
+            )
+            pdf_bytes = blob_client.download_blob().readall()
+            with tempfile.NamedTemporaryFile(delete=False, suffix=file_extension) as temp_file:
+                temp_file.write(pdf_bytes)
+                temp_path = temp_file.name
+            loader = PyPDFLoader(file_path=temp_path)
+            docs = loader.load()
+            doc_chunks = get_chunks(docs, blob_name)
 
-        log.info(f'CUSTOM LOG - {len(doc_chunks)} chunks retrieved')
+            log.info(f'CUSTOM LOG - {len(doc_chunks)} chunks retrieved')
+
+    except Exception as err:
+        log_error(err)
+        return {'status' : 'Errored'}
 
         # embedding_list = generate_embeddings(doc_chunks)
         # write_embeddings(embedding_list)
 
-        return {'status' : 'ok'}
+    return {'status' : 'uploaded'}
 
 @api_server.post('/agent')
 async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body()]):
