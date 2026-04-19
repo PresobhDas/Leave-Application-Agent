@@ -303,7 +303,6 @@ def generate_embeddings(doc_chunks:List[Document]) -> List:
 
 def write_embeddings(vector_db_index_list : List[Dict]):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    recreate_index('leave_agent_vector_index')
     if vector_db_index_list:
         index_name='leave_agent_vector_index'
         azure_ai_search_client = SearchClient(
