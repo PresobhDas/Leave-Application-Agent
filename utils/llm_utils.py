@@ -1,4 +1,4 @@
-import os, logging, sys, inspect, re, json, traceback
+import os, logging, sys, inspect, re, json, hashlib
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
@@ -15,6 +15,8 @@ from azure.search.documents.indexes.models import SearchIndex
 from openai import AzureOpenAI
 from pathlib import Path
 from azure.ai.textanalytics import TextAnalyticsClient
+from azure.data.tables import TableClient
+from azure.core.exceptions import ResourceNotFoundError
 
 
 VAULT_URL = os.environ.get('VAULT_URL')
@@ -264,40 +266,51 @@ def get_azure_openai_client() -> AzureOpenAI:
 
 def generate_embeddings(doc_chunks:List[Document]) -> List:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    recreate_index('leave_agent_vector_index')
     vector_db_index_list = []
     openai_client = get_azure_openai_client()
-
+    table_client = TableClient(
+        endpoint=os.environ.get('TABLE_ACCOUNT_URL'),
+        table_name='RAG_HASH',
+        credential=DefaultAzureCredential()
+    )
     for i, doc_chunk in enumerate(doc_chunks):
-        embedding = openai_client.embeddings.create(
-            model='text-embedding-3-small',
-            input=doc_chunk.page_content
-        )
-        vector_db_index = {
-            'id' : f'{doc_chunk.metadata.get('metadata_doc_name')}_{i}',
-            'metadata_section_id' : doc_chunk.metadata.get('metadata_section_id'),
-            'metadata_title' : doc_chunk.metadata.get('metadata_title'),
-            'metadata_doc_name' : doc_chunk.metadata.get('metadata_doc_name'),
-            'content_text' : doc_chunk.page_content,
-            'embedding' : embedding.data[0].embedding
-        }
-        vector_db_index_list.append(vector_db_index)
-        # break
+        normalized_chunk = ' '.join(doc_chunk.page_content.strip().lower().split())
+        chunk_hash = hashlib.sha256(normalized_chunk.encode('utf-8')).hexdigest()
+        try:
+            entity = table_client.get_entity('hashkey', chunk_hash)
+        except ResourceNotFoundError:
+            embedding = openai_client.embeddings.create(
+                model='text-embedding-3-small',
+                input=doc_chunk.page_content
+            )
+            vector_db_index = {
+                'id' : f'{doc_chunk.metadata.get('metadata_doc_name')}_{i}',
+                'metadata_section_id' : doc_chunk.metadata.get('metadata_section_id'),
+                'metadata_title' : doc_chunk.metadata.get('metadata_title'),
+                'metadata_doc_name' : doc_chunk.metadata.get('metadata_doc_name'),
+                'content_text' : doc_chunk.page_content,
+                'embedding' : embedding.data[0].embedding
+            }
+            vector_db_index_list.append(vector_db_index)
+        else:
+            log.info(f'CUSTOM LOG - Hash key for chunk {doc_chunk.metadata.get('metadata_doc_name')}_{i} already present. Skipping embedding')
 
     return vector_db_index_list
 
 def write_embeddings(vector_db_index_list : List[Dict]):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    index_name='leave_agent_vector_index'
-    recreate_index(index_name)
-    azure_ai_search_client = SearchClient(
-                            endpoint=azure_ai_search_endpoint,
-                            index_name=index_name,
-                            credential= DefaultAzureCredential()
-                            )
-    result = azure_ai_search_client.upload_documents(vector_db_index_list)
-    for r in result:
-        log.info(f'CUSTOM LOG - response after uploading index document is {r}')
-    log.info(f'CUSTOM LOG - Embeddings written successfully')
+    if vector_db_index_list:
+        index_name='leave_agent_vector_index'
+        azure_ai_search_client = SearchClient(
+                                endpoint=azure_ai_search_endpoint,
+                                index_name=index_name,
+                                credential= DefaultAzureCredential()
+                                )
+        result = azure_ai_search_client.upload_documents(vector_db_index_list)
+        for r in result:
+            log.info(f'CUSTOM LOG - response after uploading index document is {r}')
+        log.info(f'CUSTOM LOG - Embeddings written successfully')
 
 def getAzureSecrets(key:str) -> str:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
@@ -339,8 +352,3 @@ def get_chunks(file_data:List[Document], file_name:str) -> List[Document]:
             )
 
     return langchain_doc
-
-def log_error(err:Exception):
-    tb = traceback.extract_tb(err.__traceback__)[-1]
-    log.info(f'CUSTOM LOG - Errored at File:{tb.filename}, Line:{tb.lineno}, Function:{tb.name}, Code:{tb.line}')
-    return

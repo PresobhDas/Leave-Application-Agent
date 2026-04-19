@@ -3,7 +3,7 @@ from fastapi import FastAPI, Body, Request
 from typing import Annotated
 from langgraph.graph import START, END, StateGraph
 from langgraph.prebuilt import ToolNode
-from utils.llm_utils import get_chat_model, build_nodes, check_tool_condition, build_tools, get_chunks, generate_embeddings, write_embeddings, log_error, RagState
+from utils.llm_utils import get_chat_model, build_nodes, check_tool_condition, build_tools, get_chunks, generate_embeddings, write_embeddings, RagState
 from utils.model_contracts import InputDetails
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
@@ -84,13 +84,14 @@ async def ingest_pipeline(request:Request):
             doc_chunks = get_chunks(docs, blob_name)
 
             log.info(f'CUSTOM LOG - {len(doc_chunks)} chunks retrieved')
+            embedding_list = generate_embeddings(doc_chunks)
+            write_embeddings(embedding_list)
 
     except Exception as err:
         log.exception(f'CUSTOM LOG - Exception occurred at {inspect.currentframe().f_code.co_name}')
         return {'status' : 'Errored'}
 
-        # embedding_list = generate_embeddings(doc_chunks)
-        # write_embeddings(embedding_list)
+
 
     return {'status' : 'uploaded'}
 
