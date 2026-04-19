@@ -266,7 +266,6 @@ def get_azure_openai_client() -> AzureOpenAI:
 
 def generate_embeddings(doc_chunks:List[Document]) -> List:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    recreate_index('leave_agent_vector_index')
     vector_db_index_list = []
     openai_client = get_azure_openai_client()
     table_client = TableClient(
