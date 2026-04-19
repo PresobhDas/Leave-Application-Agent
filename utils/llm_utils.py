@@ -276,6 +276,7 @@ def generate_embeddings(doc_chunks:List[Document]) -> List:
     for i, doc_chunk in enumerate(doc_chunks):
         normalized_chunk = ' '.join(doc_chunk.page_content.strip().lower().split())
         chunk_hash = hashlib.sha256(normalized_chunk.encode('utf-8')).hexdigest()
+        operations = []
         try:
             entity = table_client.get_entity('hashkey', chunk_hash)
         except ResourceNotFoundError:
@@ -292,13 +293,16 @@ def generate_embeddings(doc_chunks:List[Document]) -> List:
                 'embedding' : embedding.data[0].embedding
             }
             vector_db_index_list.append(vector_db_index)
+            operations.append(('create', {"PartitionKey": "hashkey", "RowKey": chunk_hash}))
         else:
             log.info(f'CUSTOM LOG - Hash key for chunk {doc_chunk.metadata.get('metadata_doc_name')}_{i} already present. Skipping embedding')
-
+    if operations:
+        table_client.submit_transaction(operations=operations)
     return vector_db_index_list
 
 def write_embeddings(vector_db_index_list : List[Dict]):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    recreate_index('leave_agent_vector_index')
     if vector_db_index_list:
         index_name='leave_agent_vector_index'
         azure_ai_search_client = SearchClient(
@@ -307,8 +311,6 @@ def write_embeddings(vector_db_index_list : List[Dict]):
                                 credential= DefaultAzureCredential()
                                 )
         result = azure_ai_search_client.upload_documents(vector_db_index_list)
-        for r in result:
-            log.info(f'CUSTOM LOG - response after uploading index document is {r}')
         log.info(f'CUSTOM LOG - Embeddings written successfully')
 
 def getAzureSecrets(key:str) -> str:
