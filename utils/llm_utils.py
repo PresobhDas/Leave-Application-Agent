@@ -293,10 +293,12 @@ def generate_embeddings(doc_chunks:List[Document]) -> List:
                 'embedding' : embedding.data[0].embedding
             }
             vector_db_index_list.append(vector_db_index)
+            log.info(f'CUSTOM LOG - hash for {doc_chunk.metadata.get('metadata_doc_name')}_{i} is {chunk_hash}')
             operations.append(('create', {"PartitionKey": "hashkey", "RowKey": chunk_hash}))
         else:
             log.info(f'CUSTOM LOG - Hash key for chunk {doc_chunk.metadata.get('metadata_doc_name')}_{i} already present. Skipping embedding')
     if operations:
+        log.info(f'CUSTOM LOG - operations list is {operations}')
         table_client.submit_transaction(operations=operations)
     return vector_db_index_list
 
