@@ -271,7 +271,7 @@ def generate_embeddings(doc_chunks:List[Document]) -> List:
     openai_client = get_azure_openai_client()
     table_client = TableClient(
         endpoint=os.environ.get('TABLE_ACCOUNT_URL'),
-        table_name='RAG_HASH',
+        table_name='Rag_Hash',
         credential=DefaultAzureCredential()
     )
     for i, doc_chunk in enumerate(doc_chunks):
