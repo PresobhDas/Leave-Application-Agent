@@ -49,11 +49,11 @@ def get_prompts(prompt_name:str, question:str|None=None):
             2) Tool Name : get_employee_leave_record_tool.
                 Description: Retrieve the employee leave information from the Azure Storage Account Table. This queries the table on the given Employee ID.
             3) Tool Name : get_rag_document_tool.
-                Description: This is the RAG retrieval tool and queries the Azure AI Search using the vector embeddings of the given input text based on similarity.
+                Description: If the question is about compensation, payroll, Health, Insurance, Leave Policy or anything in general about HR and company policies, call the RAG retrieval tool and queries the Azure AI Search using the vector embeddings of the given input text based on similarity.
             4) Tool Name: get_weather_tool
                 Description: get_weather_tool to retrieve the weather information for any given location. 
         b) If the question is regular conversaion, respond naturally and conversationally as no information retrieval is needed.
-        c) Try to answer based on your internal knowledge.
+        c) Try to answer based on your internal knowledge. Do this ONLY if tool call is NOT applicable.
         d) If NONE of the THE ABOVE works, say 'I Don't know the answer'.      
     '''
 
