@@ -48,3 +48,6 @@ class RagDataResponseModel(BaseModel):
 
 class InputDetails(BaseModel):
     inp_query:str
+
+class UploadRequest(BaseModel):
+    filename: str
