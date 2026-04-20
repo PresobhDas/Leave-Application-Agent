@@ -12,6 +12,7 @@ from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 from langchain_community.document_loaders import PyPDFLoader
 from urllib.parse import urlparse, unquote
+from fastapi.middleware.cors import CORSMiddleware
 
 log = logging.getLogger('api')
 log.setLevel(logging.INFO)
@@ -25,6 +26,14 @@ log.propagate = False
 log.info(f"LOGGER_DIAG handlers={len(log.handlers)} handler_ids={[id(h) for h in log.handlers]}")
 
 api_server = FastAPI()
+api_server.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 mcp = FastMCP(
                 name="Leave-application-mcp-server",
                 transport_security=TransportSecuritySettings(
