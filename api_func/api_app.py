@@ -13,6 +13,8 @@ from azure.storage.blob import BlobServiceClient
 from langchain_community.document_loaders import PyPDFLoader
 from urllib.parse import urlparse, unquote
 from fastapi.middleware.cors import CORSMiddleware
+from azure.storage.blob import generate_blob_sas, BlobSasPermissions
+from datetime import datetime, timedelta
 
 log = logging.getLogger('api')
 log.setLevel(logging.INFO)
@@ -50,6 +52,22 @@ api_server.mount("/mcp", mcp_server)
 @api_server.get('/ping')
 async def ping():
     return {'response':'pong'}
+
+@api_server.post('/get-upload-url')
+def get_upload_url(filename: str):
+    ACCOUNT_NAME = 'leaveagentaccount'
+    CONTAINER = 'rag-docs'
+    sas = generate_blob_sas(
+        account_name=ACCOUNT_NAME,
+        container_name=CONTAINER,
+        blob_name=filename,
+        account_key=os.environ.get('STORAGE_ACCOUNT_KEY'),
+        permission=BlobSasPermissions(write=True),
+        expiry=datetime.utcnow() + timedelta(minutes=10),
+    )
+
+    url = f"https://{ACCOUNT_NAME}.blob.core.windows.net/{CONTAINER}/{filename}?{sas}"
+    return {"uploadUrl": url}
 
 @api_server.post('/ingest')
 async def ingest_pipeline(request:Request):
