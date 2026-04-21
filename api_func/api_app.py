@@ -63,7 +63,7 @@ def get_upload_url(req: UploadRequest):
         container_name=CONTAINER,
         blob_name=filename,
         account_key=os.environ.get('STORAGE_ACCOUNT_KEY'),
-        permission=BlobSasPermissions(write=True),
+        permission=BlobSasPermissions(write=True, create=True),
         expiry=datetime.utcnow() + timedelta(minutes=10),
     )
 
