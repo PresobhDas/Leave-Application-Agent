@@ -1,4 +1,4 @@
-import logging, sys, inspect, os, tempfile
+import logging, sys, inspect, os, tempfile, json
 from fastapi import FastAPI, Body, Request
 from typing import Annotated
 from langgraph.graph import START, END, StateGraph
@@ -15,6 +15,7 @@ from urllib.parse import urlparse, unquote
 from fastapi.middleware.cors import CORSMiddleware
 from azure.storage.blob import generate_blob_sas, BlobSasPermissions
 from datetime import datetime, timedelta
+from utils.model_contracts import RagDataResponseModel
 
 log = logging.getLogger('api')
 log.setLevel(logging.INFO)
@@ -157,6 +158,24 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
     )
 
     return result
+
+@api_server.post('/evaluate')
+async def call_evaluate():
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    with open('utils/evaluation_dataset.json', 'r') as f:
+        dataset_list = json.load(f)
+
+    for item in dataset_list:
+        inp_question = item['query']
+        resp = await mcp_server.call_tool(
+                name='get_rag_document',
+                arguments={'inp_question':inp_question}
+            )
+        resp_content = RagDataResponseModel.model_validate_json(resp[0].text)
+
+        log.info(f'CUSTOM LOG - File name from dataset : {item['document_name']}. File name from Vector DB is {resp_content.docName}')
+        break
+    
 
 
 
