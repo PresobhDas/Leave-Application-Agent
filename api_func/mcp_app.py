@@ -113,11 +113,10 @@ def register_tools(mcp_server:FastMCP):
                         docName = result['metadata_doc_name']
                     )
                 )
+            return rag_response.model_dump_json()
         except Exception as err:
-            log.info(f'CUSTOM LOG - Error in MCP tool {inspect.currentframe().f_code.co_name} with error {err}')
-
-        return rag_response.model_dump_json()
-    
+            log.exception(f'CUSTOM LOG - Error in MCP tool {inspect.currentframe().f_code.co_name}')
+ 
     @mcp_server.tool()
     async def get_employee_master_record(employee_id : str):
         log.info(f'CUSTOM LOG - Entered MCP tool: {inspect.currentframe().f_code.co_name} with parameter {employee_id}')
