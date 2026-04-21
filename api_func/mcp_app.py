@@ -100,7 +100,7 @@ def register_tools(mcp_server:FastMCP):
                 query_type = 'semantic',
                 semantic_configuration_name= 'default',
                 top=2,
-                select=['id', 'content_text', 'metadata_title']
+                select=['id', 'content_text', 'metadata_title', 'metadata_doc_name']
             )
             result_list = list(result)
             for result in result_list:
