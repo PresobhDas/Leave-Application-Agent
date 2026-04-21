@@ -42,6 +42,7 @@ class RagData(BaseModel):
     score:Optional[float] = 0.0
     text:Optional[str] = ''
     title:Optional[str] = ''
+    docName:Optional[str] = ''
 class RagDataResponseModel(BaseModel):
     dataFound : Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'NOT FOUND'
     results : List[RagData] = []

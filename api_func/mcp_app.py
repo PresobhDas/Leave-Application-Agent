@@ -109,7 +109,8 @@ def register_tools(mcp_server:FastMCP):
                     RagData(
                         score = result['@search.score'],
                         text = result['content_text'],
-                        title = result['metadata_title']
+                        title = result['metadata_title'],
+                        docName = result['metadata_doc_name']
                     )
                 )
         except Exception as err:
