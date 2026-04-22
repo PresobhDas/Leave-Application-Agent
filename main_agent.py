@@ -14,8 +14,9 @@ response = requests.post(url=url)
 
 
 data = response.json()
+print(data)
 
-for contents in data['messages']:
-    print(contents['type'])
-    print('-'*5)
-    print(contents['content'])
+# for contents in data['messages']:
+#     print(contents['type'])
+#     print('-'*5)
+#     print(contents['content'])
