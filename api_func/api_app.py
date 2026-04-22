@@ -37,6 +37,7 @@ logging.basicConfig(
 )
 
 log = logging.getLogger("api")
+logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(logging.WARNING)
 log.setLevel(logging.INFO)
 
 # IMPORTANT: allow propagation so OpenTelemetry can capture logs
