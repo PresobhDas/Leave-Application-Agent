@@ -43,8 +43,8 @@ log.setLevel(logging.INFO)
 # IMPORTANT: allow propagation so OpenTelemetry can capture logs
 log.propagate = True
 
-configure_azure_monitor(sampling_ratio=1.0)
-LoggingInstrumentor().instrument(set_logging_format=True)
+configure_azure_monitor(sampling_ratio=0.1)
+LoggingInstrumentor().instrument(set_logging_format=False)
 # log = logging.getLogger(__name__)
 # log.setLevel(logging.INFO)
 log.info("Hello from App Insights!")
