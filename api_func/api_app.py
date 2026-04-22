@@ -20,39 +20,18 @@ from azure.monitor.opentelemetry import configure_azure_monitor
 from opentelemetry.instrumentation.logging import LoggingInstrumentor
 from opentelemetry import trace
 
-# log = logging.getLogger('api')
-# log.setLevel(logging.INFO)
-
-# if not log.handlers:
-#     h = logging.StreamHandler(sys.stdout) 
-#     h.setLevel(logging.INFO)
-#     log.addHandler(h)
-
-# log.propagate = False
-# log.info(f"LOGGER_DIAG handlers={len(log.handlers)} handler_ids={[id(h) for h in log.handlers]}")
-
 logging.basicConfig(
     level=logging.INFO,
     handlers=[logging.StreamHandler(sys.stdout)]
 )
 
-log = logging.getLogger("api")
-logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(logging.WARNING)
+log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
-
-# IMPORTANT: allow propagation so OpenTelemetry can capture logs
 log.propagate = True
+logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(logging.WARNING)
+logging.getLogger("azure").setLevel(logging.WARNING)
 
 configure_azure_monitor(sampling_ratio=0.1)
-LoggingInstrumentor().instrument(set_logging_format=False)
-# log = logging.getLogger(__name__)
-# log.setLevel(logging.INFO)
-log.info("Hello from App Insights!")
-
-tracer = trace.get_tracer(__name__)
-
-with tracer.start_as_current_span("test-span"):
-    log.info("inside span")
 
 api_server = FastAPI()
 api_server.add_middleware(
@@ -152,10 +131,6 @@ async def ingest_pipeline(request:Request):
 
 @api_server.post('/agent')
 async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body()]):
-    tracer = trace.get_tracer(__name__)
-
-    with tracer.start_as_current_span("test-span"):
-        log.info("inside span")
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     tools = build_tools(mcp_server=mcp)
     log.info(f'CUSTOM LOG - Retrieved tools inside : {inspect.currentframe().f_code.co_name}')
