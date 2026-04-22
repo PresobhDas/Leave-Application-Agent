@@ -169,8 +169,7 @@ async def call_evaluate():
         for item in dataset_list:
             inp_question = item['query']
             resp = await rag_retreival_function(inp_question = inp_question)
-            log.info(f'CUSTOM LOG - Value of resp is {resp} with type {type(resp)}')
-            resp_content = RagDataResponseModel.model_validate_json(resp[0].text)
+            resp_content = RagDataResponseModel.model_validate_json(resp)
 
             log.info(f'CUSTOM LOG - File name from dataset : {item['document_name']}. File name from Vector DB is {resp_content.docName}')
             break
