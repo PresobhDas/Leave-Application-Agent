@@ -10,7 +10,7 @@ class WeatherData(BaseModel):
 
 class WeatherDataResponse(BaseModel):
     dataFound : Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'NOT FOUND'
-    weatherData : WeatherData | None
+    weatherData : WeatherData | None = None
 
 class EmployeeMaster(BaseModel):
     employeeId:str
@@ -23,7 +23,7 @@ class EmployeeMaster(BaseModel):
     ssn:str
 class EmployeeMasterResponseModel(BaseModel):
     dataFound: Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'NOT FOUND'
-    employee: EmployeeMaster | None
+    employee: EmployeeMaster | None = None
 
 class EmployeeLeaveData(BaseModel):
     employeeId:str
@@ -35,7 +35,7 @@ class EmployeeLeaveData(BaseModel):
 
 class EmployeeLeaveResponseModel(BaseModel):
     dataFound : Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'NOT FOUND'
-    employeeLeave : EmployeeLeaveData | None
+    employeeLeave : EmployeeLeaveData | None = None
 
 class RagData(BaseModel):
     score:Optional[float] = 0.0
