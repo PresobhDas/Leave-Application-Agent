@@ -16,6 +16,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from azure.storage.blob import generate_blob_sas, BlobSasPermissions
 from datetime import datetime, timedelta
 from utils.model_contracts import RagDataResponseModel
+from azure.monitor.opentelemetry import configure_azure_monitor
+from opentelemetry.instrumentation.logging import LoggingInstrumentor
 
 log = logging.getLogger('api')
 log.setLevel(logging.INFO)
@@ -27,6 +29,12 @@ if not log.handlers:
 
 log.propagate = False
 log.info(f"LOGGER_DIAG handlers={len(log.handlers)} handler_ids={[id(h) for h in log.handlers]}")
+configure_azure_monitor()
+LoggingInstrumentor().instrument(set_logging_format=True)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+logger.info("Hello from App Insights!")
 
 api_server = FastAPI()
 api_server.add_middleware(
