@@ -1,6 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 import logging, sys, inspect, requests, os
-from utils.model_contracts import WeatherDataResponse, WeatherData, RagData, RagDataResponseModel, EmployeeMasterResponseModel, EmployeeMaster
+from utils.model_contracts import WeatherDataResponse, WeatherData, RagData, RagDataResponseModel, EmployeeMasterResponseModel, EmployeeMaster, EmployeeLeaveResponseModel, EmployeeLeaveData
 from utils.llm_utils import get_azure_openai_client, azure_ai_search_endpoint
 from azure.search.documents import SearchClient
 from azure.identity import DefaultAzureCredential
@@ -114,7 +114,7 @@ def register_tools(mcp_server:FastMCP):
                     )
                 )
             return rag_response.model_dump_json()
-        except Exception as err:
+        except Exception:
             log.exception(f'CUSTOM LOG - Error in MCP tool {inspect.currentframe().f_code.co_name}')
  
     @mcp_server.tool()
@@ -145,10 +145,41 @@ def register_tools(mcp_server:FastMCP):
                         ssn=entity['SSN']
                     )
             
-        except Exception as err:
-            log.info(f'CUSTOM LOG - Error in MCP tool {inspect.currentframe().f_code.co_name} with error {err}')
+        except Exception:
+            log.exception(f'CUSTOM LOG - Error in MCP tool {inspect.currentframe().f_code.co_name}')
         
         return employee_master.model_dump_json()
+    
+    @mcp_server.tool()
+    async def get_employee_leave_record(employee_id : str):
+        log.info(f'CUSTOM LOG - Entered MCP tool: {inspect.currentframe().f_code.co_name} with parameter {employee_id}')
+        employee_leave_master = EmployeeLeaveResponseModel()
+        try:
+            table_service = TableServiceClient(
+                endpoint=os.environ.get('TABLE_ACCOUNT_URL'),
+                credential=DefaultAzureCredential()
+            )
+
+            table_client = table_service.get_table_client('EmployeeLeaveMaster')
+            entities = table_client.query_entities(
+                query_filter=f"RowKey eq '{employee_id}'"
+            )
+
+            employee_leave_master.dataFound = 'FOUND'
+            for entity in entities:
+                employee_leave_master.employeeLeave = EmployeeLeaveData(
+                        employeeId=entity['RowKey'],
+                        department=entity['PartitionKey'],
+                        leaveType=entity['LeaveType'],
+                        startDate=entity['LeaveStart'],
+                        endDate=entity['LeaveEnd'],
+                        numberOfDays=entity['NoOfDays'],
+                    )
+            
+        except Exception:
+            log.exception(f'CUSTOM LOG - Error in MCP tool {inspect.currentframe().f_code.co_name}')
+        
+        return employee_leave_master.model_dump_json()
     
     return get_rag_document
 

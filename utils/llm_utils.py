@@ -135,8 +135,8 @@ def build_tools(mcp_server: FastMCP):
         try:
             log.info(f'response retrieved inside build_tools is {resp[0].text}')         
             resp_content = WeatherDataResponse.model_validate_json(resp[0].text)
-        except Exception as err:
-            log.info(f'Errored in {inspect.currentframe().f_code.co_name} with error {err}')
+        except Exception:
+            log.exception(f'Errored in {inspect.currentframe().f_code.co_name}')
             return WeatherDataResponse()
         
         return resp_content
@@ -146,7 +146,7 @@ def build_tools(mcp_server: FastMCP):
         '''
         Docstring for get_employee_master_record
         
-        :param employee_id: This function takes the Employee ID as a parameter and returns the employee details from the Cosmos DB Database.
+        :param employee_id: This function takes the Employee ID as a parameter and returns the employee details from Azure Storage Account table 'EmployeeMaster'
         :type employee_id: str
         '''
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
@@ -155,35 +155,37 @@ def build_tools(mcp_server: FastMCP):
                                             arguments = {'employee_id':employee_id}
                 )
         try:
-            log.info(f'response retrieved inside build_tools is {resp[0].text}') 
+            log.info(f'response retrieved inside build_tools {inspect.currentframe().f_code.co_name} is {resp[0].text}') 
             resp_content = EmployeeMasterResponseModel.model_validate_json(json.dumps(redact_pii(json.loads(resp[0].text))))
-        except Exception as err:
-            log.info(f'Errored in {inspect.currentframe().f_code.co_name} with error {err}')
+        except Exception:
+            log.exception(f'Errored in {inspect.currentframe().f_code.co_name}')
             return EmployeeMasterResponseModel()
         
         return resp_content
     
-    # @tool
-    # async def get_employee_leave_record_tool(employee_id:str):
-    #     '''
-    #     Docstring for get_employee_leave_record
+    @tool
+    async def get_employee_leave_record_tool(employee_id:str):
+        '''
+        Docstring for get_employee_leave_record
         
-    #     :param employee_id: This function takes the employee ID as a parameter and returns that employees leave information from Cosmos DB Database.
-    #     :type employee_id: str
-    #     '''
+        :param employee_id: This function takes the employee ID as a parameter and returns that employees leave information from Azure Storage Account table 'EmployeeLeaveMaster'
+        :type employee_id: str
+        '''
 
-    #     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    #     resp = await MCP_SESSION.call_tool(
-    #                                         name = 'get_employee_leave_record',
-    #                                         arguments = {'employee_id':employee_id}
-    #             )
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+        resp = await mcp_server.call_tool(
+                                            name = 'get_employee_leave_record',
+                                            arguments = {'employee_id':employee_id}
+                )
 
-    #     try:
-    #         resp_content = EmployeeLeaveResponseModel.model_validate_json(resp.content[0].text)
-    #     except:
-    #         return None
+        try:
+            log.info(f'response retrieved inside build_tools {inspect.currentframe().f_code.co_name} is {resp[0].text}') 
+            resp_content = EmployeeLeaveResponseModel.model_validate_json(resp.content[0].text)
+        except Exception:
+            log.exception(f'Errored in {inspect.currentframe().f_code.co_name}')
+            return EmployeeLeaveResponseModel()
         
-    #     return resp_content
+        return resp_content
     
     @tool
     async def get_rag_document_tool(inp_question:str):

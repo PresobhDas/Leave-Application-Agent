@@ -26,9 +26,8 @@ class EmployeeMasterResponseModel(BaseModel):
     employee: EmployeeMaster = None
 
 class EmployeeLeaveData(BaseModel):
-    id:str
     employeeId:str
-    name:str
+    department:str
     leaveType:str
     startDate:str
     endDate:str
@@ -36,7 +35,7 @@ class EmployeeLeaveData(BaseModel):
 
 class EmployeeLeaveResponseModel(BaseModel):
     dataFound : Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'NOT FOUND'
-    employeeLeave : EmployeeLeaveData | None = None
+    employeeLeave : EmployeeLeaveData = None
 
 class RagData(BaseModel):
     score:Optional[float] = 0.0
