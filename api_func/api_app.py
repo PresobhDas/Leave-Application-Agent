@@ -163,22 +163,25 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
 async def call_evaluate():
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     def recall(retrieved_docs, relevant_docs):
+        log.info(f'CUSTOM LOG - retreived docs: {retrieved_docs} relevant docs: {relevant_docs} in {inspect.currentframe().f_code.co_name}')
         retrieved_ids = {doc.docName for doc in retrieved_docs.results}
         relevant_ids = set(relevant_docs)
-
+        log.info(f'CUSTOM LOG - retreived id: {retrieved_ids} relevant id: {relevant_ids} in {inspect.currentframe().f_code.co_name}')
         hits = retrieved_ids.intersection(relevant_ids)
         return len(hits) / len(relevant_ids) if relevant_ids else 0
     
     def precision(retrieved_docs, relevant_docs):
+        log.info(f'CUSTOM LOG - retreived docs: {retrieved_docs} relevant docs: {relevant_docs} in {inspect.currentframe().f_code.co_name}')
         retrieved_ids = [doc.docName for doc in retrieved_docs.results]
         relevant_ids = set(relevant_docs)
-
+        log.info(f'CUSTOM LOG - retreived id: {retrieved_ids} relevant id: {relevant_ids} in {inspect.currentframe().f_code.co_name}')
         hits = sum(1 for doc_id in retrieved_ids if doc_id in relevant_ids)
         return hits / 2
     
     def reciprocal_rank(retrieved_docs, relevant_docs):
+        log.info(f'CUSTOM LOG - retreived docs: {retrieved_docs} relevant docs: {relevant_docs} in {inspect.currentframe().f_code.co_name}')
         relevant_ids = set(relevant_docs)
-
+        log.info(f'CUSTOM LOG - relevant id: {relevant_ids} in {inspect.currentframe().f_code.co_name}')
         for rank, doc in enumerate(retrieved_docs.results, start=1):
             if doc.docName in relevant_ids:
                 return 1 / rank
