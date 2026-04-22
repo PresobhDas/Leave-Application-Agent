@@ -162,6 +162,28 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
 @api_server.post('/evaluate')
 async def call_evaluate():
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    def recall(retrieved_docs, relevant_docs):
+        retrieved_ids = {doc.docName for doc in retrieved_docs.results}
+        relevant_ids = set(relevant_docs)
+
+        hits = retrieved_ids.intersection(relevant_ids)
+        return len(hits) / len(relevant_ids) if relevant_ids else 0
+    
+    def precision(retrieved_docs, relevant_docs):
+        retrieved_ids = [doc.docName for doc in retrieved_docs.results]
+        relevant_ids = set(relevant_docs)
+
+        hits = sum(1 for doc_id in retrieved_ids if doc_id in relevant_ids)
+        return hits / 2
+    
+    def reciprocal_rank(retrieved_docs, relevant_docs):
+        relevant_ids = set(relevant_docs)
+
+        for rank, doc in enumerate(retrieved_docs.results, start=1):
+            if doc.docName in relevant_ids:
+                return 1 / rank
+        return 0
+    
     try:
         with open('utils/evaluation_dataset.json', 'r') as f:
             dataset_list = json.load(f)
@@ -173,6 +195,28 @@ async def call_evaluate():
 
             log.info(f'CUSTOM LOG - File name from dataset : {item['document_name']}. File name from Vector DB is {resp_content.results[0].docName}')
             break
+
+        total_recall = 0
+        total_precision = 0
+        total_mrr = 0
+
+        for item in dataset_list:
+            inp_question = item["query"]              
+            relevant_docs = item["document_name"]
+            resp = await rag_retreival_function(inp_question = inp_question)
+            retrieved_docs = RagDataResponseModel.model_validate_json(resp)   
+
+            total_recall += recall(retrieved_docs, relevant_docs)
+            total_precision += precision(retrieved_docs, relevant_docs)
+            total_mrr += reciprocal_rank(retrieved_docs, relevant_docs)
+
+        n = len(dataset_list)
+
+        return {
+            "Recall@K": total_recall / n,
+            "Precision@K": total_precision / n,
+            "MRR": total_mrr / n
+        }
     except Exception:
         log.exception(f'CUSTOM LOG - Errored in {inspect.currentframe().f_code.co_name}')
     
