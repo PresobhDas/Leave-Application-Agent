@@ -18,6 +18,7 @@ from datetime import datetime, timedelta
 from utils.model_contracts import RagDataResponseModel
 from azure.monitor.opentelemetry import configure_azure_monitor
 from opentelemetry.instrumentation.logging import LoggingInstrumentor
+from opentelemetry import trace
 
 # log = logging.getLogger('api')
 # log.setLevel(logging.INFO)
@@ -29,12 +30,16 @@ from opentelemetry.instrumentation.logging import LoggingInstrumentor
 
 # log.propagate = False
 # log.info(f"LOGGER_DIAG handlers={len(log.handlers)} handler_ids={[id(h) for h in log.handlers]}")
-configure_azure_monitor()
+configure_azure_monitor(sampling_ratio=1.0)
 LoggingInstrumentor().instrument(set_logging_format=True)
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
-
 log.info("Hello from App Insights!")
+
+tracer = trace.get_tracer(__name__)
+
+with tracer.start_as_current_span("test-span"):
+    log.info("inside span")
 
 api_server = FastAPI()
 api_server.add_middleware(
@@ -134,6 +139,10 @@ async def ingest_pipeline(request:Request):
 
 @api_server.post('/agent')
 async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body()]):
+    tracer = trace.get_tracer(__name__)
+
+    with tracer.start_as_current_span("test-span"):
+        log.info("inside span")
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     tools = build_tools(mcp_server=mcp)
     log.info(f'CUSTOM LOG - Retrieved tools inside : {inspect.currentframe().f_code.co_name}')
