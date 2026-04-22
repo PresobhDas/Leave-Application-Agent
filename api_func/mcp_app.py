@@ -149,4 +149,6 @@ def register_tools(mcp_server:FastMCP):
             log.info(f'CUSTOM LOG - Error in MCP tool {inspect.currentframe().f_code.co_name} with error {err}')
         
         return employee_master.model_dump_json()
+    
+    return get_rag_document
 

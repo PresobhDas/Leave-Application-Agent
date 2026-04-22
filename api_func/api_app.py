@@ -45,7 +45,7 @@ mcp = FastMCP(
                 )
             )
 
-register_tools(mcp)
+rag_retreival_function = register_tools(mcp)
 chat_model = get_chat_model()
 mcp_server = mcp.streamable_http_app()
 api_server.mount("/mcp", mcp_server)
@@ -162,19 +162,19 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
 @api_server.post('/evaluate')
 async def call_evaluate():
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    with open('utils/evaluation_dataset.json', 'r') as f:
-        dataset_list = json.load(f)
+    try:
+        with open('utils/evaluation_dataset.json', 'r') as f:
+            dataset_list = json.load(f)
 
-    for item in dataset_list:
-        inp_question = item['query']
-        resp = await mcp_server.call_tool(
-                name='get_rag_document',
-                arguments={'inp_question':inp_question}
-            )
-        resp_content = RagDataResponseModel.model_validate_json(resp[0].text)
+        for item in dataset_list:
+            inp_question = item['query']
+            resp = await rag_retreival_function(inp_question = inp_question)
+            resp_content = RagDataResponseModel.model_validate_json(resp[0].text)
 
-        log.info(f'CUSTOM LOG - File name from dataset : {item['document_name']}. File name from Vector DB is {resp_content.docName}')
-        break
+            log.info(f'CUSTOM LOG - File name from dataset : {item['document_name']}. File name from Vector DB is {resp_content.docName}')
+            break
+    except Exception:
+        log.exception(f'CUSTOM LOG - Errored in {inspect.currentframe().f_code.co_name}')
     
 
 
