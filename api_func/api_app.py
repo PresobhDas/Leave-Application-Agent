@@ -171,7 +171,7 @@ async def call_evaluate():
             resp = await rag_retreival_function(inp_question = inp_question)
             resp_content = RagDataResponseModel.model_validate_json(resp)
 
-            log.info(f'CUSTOM LOG - File name from dataset : {item['document_name']}. File name from Vector DB is {resp_content.docName}')
+            log.info(f'CUSTOM LOG - File name from dataset : {item['document_name']}. File name from Vector DB is {resp_content.results[0].docName}')
             break
     except Exception:
         log.exception(f'CUSTOM LOG - Errored in {inspect.currentframe().f_code.co_name}')
