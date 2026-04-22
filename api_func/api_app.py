@@ -205,7 +205,7 @@ async def call_evaluate():
 
         for item in dataset_list:
             inp_question = item["query"]              
-            relevant_docs = item["document_name"]
+            relevant_docs = [item["document_name"]]
             resp = await rag_retreival_function(inp_question = inp_question)
             retrieved_docs = RagDataResponseModel.model_validate_json(resp)   
 
