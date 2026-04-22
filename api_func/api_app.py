@@ -30,10 +30,22 @@ from opentelemetry import trace
 
 # log.propagate = False
 # log.info(f"LOGGER_DIAG handlers={len(log.handlers)} handler_ids={[id(h) for h in log.handlers]}")
+
+logging.basicConfig(
+    level=logging.INFO,
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
+
+log = logging.getLogger("api")
+log.setLevel(logging.INFO)
+
+# IMPORTANT: allow propagation so OpenTelemetry can capture logs
+log.propagate = True
+
 configure_azure_monitor(sampling_ratio=1.0)
 LoggingInstrumentor().instrument(set_logging_format=True)
-log = logging.getLogger(__name__)
-log.setLevel(logging.INFO)
+# log = logging.getLogger(__name__)
+# log.setLevel(logging.INFO)
 log.info("Hello from App Insights!")
 
 tracer = trace.get_tracer(__name__)
