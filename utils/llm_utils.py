@@ -210,7 +210,7 @@ def build_tools(mcp_server: FastMCP):
         
         return resp_content
 
-    return [get_weather_tool, get_rag_document_tool, get_employee_master_record_tool]
+    return [get_weather_tool, get_rag_document_tool, get_employee_master_record_tool, get_employee_leave_record_tool]
 
 def build_nodes(llm_with_tools):
 
