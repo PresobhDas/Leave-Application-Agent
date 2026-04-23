@@ -206,8 +206,10 @@ def build_tools(mcp_server: FastMCP):
                                     arguments={'inp_question':inp_question}
         )
         try:
-            log.info(f'response retrieved inside build_tools is {resp[0].text}') 
-            resp_content = RagDataResponseModel.model_validate_json(resp[0].text)
+            log.info(f'response retrieved inside build_tools is {resp[0].text} with type {type(resp[0].text)}') 
+            # resp_content = RagDataResponseModel.model_validate_json(resp[0].text)
+            
+            resp_content = resp[0].text
         except Exception as err:
             log.info(f'Errored in {inspect.currentframe().f_code.co_name} with error {err}')
             return RagDataResponseModel()
@@ -372,7 +374,7 @@ def extract_rag_data(state):
     if rag_msgs:
         try:
             log.info(f'CUSTOM LOG . raw data before parsing is {rag_msgs[-1]} with type {type(rag_msgs[-1])} and type {type(rag_msgs[-1].content)}')
-            parsed = RagDataResponseModel.model_validate_json(rag_msgs[-1].content)
+            parsed = RagData.model_validate_json(rag_msgs[-1].content)
             log.info(f'CUSTOM LOG . Data in the extract_rag is {parsed}')
 
             # for doc in parsed.results:
