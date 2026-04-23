@@ -371,7 +371,7 @@ def extract_rag_data(state):
 
     if rag_msgs:
         try:
-            log.info(f'CUSTOM LOG . raw data before parsing is {rag_msgs[-1]} with type {type(rag_msgs[-1])} and type {rag_msgs[-1].content}')
+            log.info(f'CUSTOM LOG . raw data before parsing is {rag_msgs[-1]} with type {type(rag_msgs[-1])} and type {type(rag_msgs[-1].content)}')
             parsed = RagDataResponseModel.model_validate_json(rag_msgs[-1].content)
             log.info(f'CUSTOM LOG . Data in the extract_rag is {parsed}')
 
