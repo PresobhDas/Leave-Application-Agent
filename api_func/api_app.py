@@ -1,4 +1,4 @@
-import logging, sys, inspect, os, tempfile, json
+import logging, sys, inspect, os, tempfile, json, asyncio
 from fastapi import FastAPI, Body, Request
 from typing import Annotated
 from langgraph.graph import START, END, StateGraph
@@ -185,14 +185,17 @@ async def call_evaluate():
         log.info(f'CUSTOM LOG - ragas data is {ragas_data}')
         dataset = Dataset.from_dict(ragas_data)
 
-        results = await evaluate(
-            dataset,
-            metrics=[
-                    _ContextPrecision,
-                    _ContextRecall,
-                    _ContextRelevance
+        def run_ragas():
+            return evaluate(
+                dataset,
+                metrics=[
+                    _ContextPrecision(),
+                    _ContextRecall(),
+                    _ContextRelevance()
                 ]
-        )
+            )
+        
+        results = await asyncio.to_thread(run_ragas)
         log.info(f'CUSTOM LOGS - RAGAS result is {results}')
         return results
 
