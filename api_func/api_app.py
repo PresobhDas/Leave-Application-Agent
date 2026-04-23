@@ -179,13 +179,13 @@ async def call_evaluate():
         for item in dataset_list:
             ragas_data["question"].append(item["question"])
             ragas_data["ground_truth"].append(item["groundtruth"])
-            resp = await rag_retreival_function(inp_question = ragas_data["question"])
+            resp = await rag_retreival_function(inp_question = item["question"])
             ragas_data['contexts'].append(resp)
 
         log.info(f'CUSTOM LOG - ragas data is {ragas_data}')
         dataset = Dataset.from_dict(ragas_data)
 
-        results = evaluate(
+        results = await evaluate(
             dataset,
             metrics=[
                     _ContextPrecision,
