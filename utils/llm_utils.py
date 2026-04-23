@@ -366,20 +366,25 @@ def get_chunks(file_data:List[Document], file_name:str) -> List[Document]:
 def extract_rag_data(state):
     from langchain_core.messages import ToolMessage
 
+    messages = state["messages"]
     rag_msgs = [
-        m for m in state["messages"]
+        m for m in messages
         if isinstance(m, ToolMessage) and m.name == "get_rag_document_tool"
     ]
 
     if rag_msgs:
+        latest_tool_msg = rag_msgs[-1]
+        idx = messages.index(latest_tool_msg)
+        if idx + 1 < len(messages):
+            next_msg = messages[idx + 1]
+
+            if isinstance(next_msg, AIMessage) and not getattr(next_msg, "tool_calls", None):
+                answer = next_msg.content
+                log.info(f'CUSTOM LOG . Data in the extract_rag AI MESSAGE is {answer}')
         try:
             log.info(f'CUSTOM LOG . raw data before parsing is {rag_msgs[-1]} with type {type(rag_msgs[-1])} and type {type(rag_msgs[-1].content)}')
             parsed = RagDataResponseModel.model_validate_json(rag_msgs[-1].content)
             log.info(f'CUSTOM LOG . Data in the extract_rag is {parsed}')
-
-            # for doc in parsed.results:
-            #     documents.append(doc.docName)
-            #     contexts.append(doc.page_content)
 
         except Exception:
             log.exception("RAG extraction failed")
