@@ -179,7 +179,8 @@ async def call_evaluate():
         ragas_data = {
             'question' : [],
             'contexts' : [],
-            'ground_truth' : []
+            'ground_truth' : [],
+            'response' : []
         }
 
         for item in dataset_list:
