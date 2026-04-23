@@ -16,22 +16,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from azure.storage.blob import generate_blob_sas, BlobSasPermissions
 from datetime import datetime, timedelta
 from utils.model_contracts import RagDataResponseModel
-from azure.monitor.opentelemetry import configure_azure_monitor
-from opentelemetry.instrumentation.logging import LoggingInstrumentor
-from opentelemetry import trace
 
-logging.basicConfig(
-    level=logging.INFO,
-    handlers=[logging.StreamHandler(sys.stdout)]
-)
-
-log = logging.getLogger(__name__)
+log = logging.getLogger('utils')
 log.setLevel(logging.INFO)
-log.propagate = True
-logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(logging.WARNING)
-logging.getLogger("azure").setLevel(logging.WARNING)
 
-configure_azure_monitor(sampling_ratio=0.1)
+if not log.handlers:
+    h = logging.StreamHandler(sys.stdout) 
+    h.setLevel(logging.INFO)
+    log.addHandler(h)
 
 api_server = FastAPI()
 api_server.add_middleware(
