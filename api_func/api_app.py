@@ -193,9 +193,9 @@ async def call_evaluate():
                 metrics=[
                     _ContextPrecision(),
                     _ContextRecall(),
-                    _ContextRelevance(),
-                    _Faithfulness(),
-                    _ResponseRelevancy()
+                    _ContextRelevance()
+                    # _Faithfulness(),
+                    # _ResponseRelevancy()
                 ]
             )
         
