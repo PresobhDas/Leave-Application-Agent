@@ -230,7 +230,7 @@ def build_nodes(llm_with_tools):
         count = state.get('tool_execution_count',0)
         if getattr(response, 'tool_calls', None):
             count += 1
-
+        extract_rag_data(state=state)
         return {
         'messages':[HUMAN_MESSAGE, response],
         'tool_execution_count' : count
@@ -361,11 +361,22 @@ def get_chunks(file_data:List[Document], file_name:str) -> List[Document]:
 
     return langchain_doc
 
-# def write_ragas_data(inp_question:str, rag_data_list:List[RagData]):
-#     ragas_dict = {
-#         "type": "rag_eval",
-#         "query": inp_question,
-#         "retrieved_docs": [rag_data.docName for rag_data in rag_data_list],
-#         "contexts": [rag_data.text for rag_data in rag_data_list],
-#         "answer": "..."
-#     }
+def extract_rag_data(state):
+    from langchain_core.messages import ToolMessage
+
+    rag_msgs = [
+        m for m in state["messages"]
+        if isinstance(m, ToolMessage) and m.name == "get_rag_document_tool"
+    ]
+
+    if rag_msgs:
+        try:
+            parsed = RagDataResponseModel.model_validate_json(rag_msgs[-1].content)
+            log.info(f'CUSTOM LOG . Data in the extract_rag is {parsed}')
+
+            # for doc in parsed.results:
+            #     documents.append(doc.docName)
+            #     contexts.append(doc.page_content)
+
+        except Exception:
+            log.exception("RAG extraction failed")
