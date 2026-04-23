@@ -408,10 +408,10 @@ def get_llm_answer_for_ragas(question:str, context:list):
     {question}
     """
 
-    open_ai_client = get_azure_openai_client()
+    open_ai_client = get_chat_model()
 
     response = open_ai_client.chat.completions.create(
-        model='text-embedding-3-small',  
+        model='gpt-4o-mini',  
         messages=[
             {"role": "system", "content": "Answer strictly from context."},
             {"role": "user", "content": prompt}
