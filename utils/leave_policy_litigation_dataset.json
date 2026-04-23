@@ -1,0 +1,62 @@
+[
+  {
+    "question": "What is the official leave year defined in the policy and how does it impact leave entitlement calculation?",
+    "groundtruth": "The leave year runs from January 1st to December 31st, and leave entitlements are calculated based on this period. Employees joining mid-year receive prorated leave."
+  },
+  {
+    "question": "What is the mandatory process for submitting leave requests and what exceptions exist?",
+    "groundtruth": "All leave requests must be submitted through the HRIS portal in advance, except emergencies like sickness, where verbal or email communication is allowed temporarily but must be followed by an official HRIS submission."
+  },
+  {
+    "question": "How does the approval workflow function for leave requests and what responsibilities do managers have?",
+    "groundtruth": "Leave requests are routed to the employee\u2019s line manager via HRIS. Managers must review requests considering workload and business needs, provide reasons for rejection, and alternate approvers may act if managers are unavailable."
+  },
+  {
+    "question": "What are the rules governing PTO carry-forward and expiry?",
+    "groundtruth": "A maximum of 5 days of unused PTO can be carried forward, but must be used by March 31st of the following year or it will lapse."
+  },
+  {
+    "question": "What limitations apply to leave encashment during employment and upon separation?",
+    "groundtruth": "Leave encashment is generally not allowed during employment. However, unused PTO is paid out upon separation, subject to local laws."
+  },
+  {
+    "question": "How is leave treated during the probation period and what restrictions apply?",
+    "groundtruth": "Employees accrue leave during probation, but taking PTO is discouraged and subject to manager discretion. Sick leave and statutory leaves are allowed."
+  },
+  {
+    "question": "What restrictions exist for taking leave during the notice period?",
+    "groundtruth": "Leave during the notice period is generally not allowed except for medical emergencies. Pre-planned leave may be approved case-by-case, and the company may extend the notice period."
+  },
+  {
+    "question": "What constitutes unauthorized absence and what are the consequences?",
+    "groundtruth": "Absence of three or more consecutive workdays without notifying the manager or HR is considered unauthorized and may lead to disciplinary action, including termination."
+  },
+  {
+    "question": "What are the expectations regarding employee availability during leave?",
+    "groundtruth": "Employees should be fully disengaged during leave but must set out-of-office responses with alternate contacts. Managers should only contact them in genuine emergencies."
+  },
+  {
+    "question": "How is PTO entitlement determined based on years of service?",
+    "groundtruth": "Employees receive 18 days PTO for 0\u20132 years, 22 days for 2\u20135 years, and 25 days for 5+ years, with part-time employees receiving prorated entitlements."
+  },
+  {
+    "question": "What are the advance notice requirements for planning PTO?",
+    "groundtruth": "Employees must request PTO at least two weeks in advance for short leave and four weeks for long leave, subject to business needs and potential blackout periods."
+  },
+  {
+    "question": "What rules govern PTO usage and balance restrictions?",
+    "groundtruth": "PTO must be taken in minimum half-day increments and cannot result in a negative balance. Employees cannot take more leave than they have accrued."
+  },
+  {
+    "question": "What are the notification and documentation requirements for sick leave?",
+    "groundtruth": "Employees must notify their manager as early as possible and submit a formal HRIS request. A medical certificate is required for absences of three or more consecutive days."
+  },
+  {
+    "question": "What provisions exist for long-term sickness and return-to-work requirements?",
+    "groundtruth": "Employees with extended illness must contact HR to explore options such as extended leave or benefits. A fitness-to-work certificate may be required for absences exceeding 10 working days."
+  },
+  {
+    "question": "How does the policy differentiate between bereavement leave and compassionate leave?",
+    "groundtruth": "Bereavement leave applies after the death of a family member, while compassionate leave applies when supporting a family member with serious illness or injury."
+  }
+]
