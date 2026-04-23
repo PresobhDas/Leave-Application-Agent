@@ -17,7 +17,8 @@ from azure.storage.blob import generate_blob_sas, BlobSasPermissions
 from datetime import datetime, timedelta
 from datasets import Dataset
 from ragas import evaluate
-from ragas.metrics import _ContextPrecision, _ContextRecall, _ContextRelevance
+from ragas.metrics import _ContextPrecision, _ContextRecall, _ContextRelevance, _Faithfulness, _ResponseRelevancy
+from utils.model_contracts import RagDataResponseModel
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
@@ -180,7 +181,8 @@ async def call_evaluate():
             ragas_data["question"].append(item["question"])
             ragas_data["ground_truth"].append(item["groundtruth"])
             resp = await rag_retreival_function(inp_question = item["question"])
-            ragas_data['contexts'].append(resp)
+            resp_data = RagDataResponseModel.model_validate_json(resp)
+            ragas_data['contexts'].append([data.text for data in resp_data.results])
 
         log.info(f'CUSTOM LOG - ragas data is {ragas_data}')
         dataset = Dataset.from_dict(ragas_data)
@@ -191,7 +193,9 @@ async def call_evaluate():
                 metrics=[
                     _ContextPrecision(),
                     _ContextRecall(),
-                    _ContextRelevance()
+                    _ContextRelevance(),
+                    _Faithfulness(),
+                    _ResponseRelevancy()
                 ]
             )
         
