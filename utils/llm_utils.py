@@ -5,7 +5,7 @@ from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langgraph.graph import MessagesState
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
-from utils.model_contracts import EmployeeMasterResponseModel, EmployeeLeaveResponseModel, WeatherDataResponse, RagDataResponseModel
+from utils.model_contracts import EmployeeMasterResponseModel, EmployeeLeaveResponseModel, WeatherDataResponse, RagDataResponseModel, RagData
 from mcp.server.fastmcp import FastMCP
 from typing import List, Dict
 from langchain_core.documents import Document
@@ -226,6 +226,7 @@ def build_nodes(llm_with_tools):
         SYSTEM_MESSAGE = SystemMessage(content=inp_system_message)
         HUMAN_MESSAGE = HumanMessage(content=inp_human_message)
         response = await llm_with_tools.ainvoke(state['messages'] + [SYSTEM_MESSAGE, HUMAN_MESSAGE])
+        log.info(f'CUSTOM LOG - THIS IS THE RESPONSE BACK FROM THE LLM CALL {response}')
         count = state.get('tool_execution_count',0)
         if getattr(response, 'tool_calls', None):
             count += 1
@@ -359,3 +360,12 @@ def get_chunks(file_data:List[Document], file_name:str) -> List[Document]:
             )
 
     return langchain_doc
+
+# def write_ragas_data(inp_question:str, rag_data_list:List[RagData]):
+#     ragas_dict = {
+#         "type": "rag_eval",
+#         "query": inp_question,
+#         "retrieved_docs": [rag_data.docName for rag_data in rag_data_list],
+#         "contexts": [rag_data.text for rag_data in rag_data_list],
+#         "answer": "..."
+#     }

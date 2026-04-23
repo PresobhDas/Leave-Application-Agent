@@ -117,6 +117,8 @@ def register_tools(mcp_server:FastMCP):
                         docName = result['metadata_doc_name']
                     )
                 )
+            # if len(result_list) > 0:
+            #     write_ragas_data(inp_question, rag_response.results)
             return rag_response.model_dump_json()
         except Exception:
             log.exception(f'CUSTOM LOG - Error in MCP tool {inspect.currentframe().f_code.co_name}')
