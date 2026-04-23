@@ -237,7 +237,7 @@ def build_nodes(llm_with_tools):
                 'tool_execution_count' : count
             }
         
-        extract_rag_data(state=state)
+        extract_rag_data(state, response)
         return {
                 'messages':[HUMAN_MESSAGE, response],
                 'tool_execution_count' : count
@@ -368,7 +368,7 @@ def get_chunks(file_data:List[Document], file_name:str) -> List[Document]:
 
     return langchain_doc
 
-def extract_rag_data(state):
+def extract_rag_data(state, response):
     from langchain_core.messages import ToolMessage
 
     messages = state["messages"]
@@ -380,7 +380,7 @@ def extract_rag_data(state):
     if rag_msgs:
         latest_tool_msg = rag_msgs[-1]
         idx = messages.index(latest_tool_msg)
-        log.info(f'CUSTOM LOG all messages are {messages} and value of idx is {idx} and length {len(messages)}')
+        log.info(f'CUSTOM LOG all messages are {messages} and value of idx is {idx} and length {len(messages)} and response is {response}')
 
         if idx + 1 < len(messages):
             next_msg = messages[idx + 1]
