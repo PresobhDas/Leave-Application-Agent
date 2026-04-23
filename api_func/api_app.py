@@ -17,8 +17,12 @@ from azure.storage.blob import generate_blob_sas, BlobSasPermissions
 from datetime import datetime, timedelta
 from utils.model_contracts import RagDataResponseModel
 
-log = logging.getLogger('utils')
+log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
+logging.getLogger("azure").setLevel(logging.WARNING)
+logging.getLogger("azure.core").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.getLogger("opentelemetry").setLevel(logging.ERROR)
 
 if not log.handlers:
     h = logging.StreamHandler(sys.stdout) 
