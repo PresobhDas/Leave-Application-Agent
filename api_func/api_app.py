@@ -166,16 +166,13 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
 @api_server.post('/evaluate')
 async def call_evaluate():
     from ragas.llms import LangchainLLMWrapper
-    from langchain_openai import ChatOpenAI
     from ragas.embeddings import OpenAIEmbeddings
+    from openai import OpenAI
 
-    llm = LangchainLLMWrapper(
-    ChatOpenAI(
-            model="gpt-4o-mini",
-            temperature=0
-        )
-    )
-    embeddings = OpenAIEmbeddings()
+    chat_client = get_chat_model()
+
+    llm = LangchainLLMWrapper(chat_client)
+    embeddings = OpenAIEmbeddings(client=OpenAI())
 
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
 
