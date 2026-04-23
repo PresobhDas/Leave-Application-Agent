@@ -375,9 +375,10 @@ def extract_rag_data(state):
     if rag_msgs:
         latest_tool_msg = rag_msgs[-1]
         idx = messages.index(latest_tool_msg)
+        log.info(f'CUSTOM LOG all messages are {messages} and value of idx is {idx} and length {len(messages)}')
+
         if idx + 1 < len(messages):
             next_msg = messages[idx + 1]
-
             if isinstance(next_msg, AIMessage) and not getattr(next_msg, "tool_calls", None):
                 answer = next_msg.content
                 log.info(f'CUSTOM LOG . Data in the extract_rag AI MESSAGE is {answer}')
