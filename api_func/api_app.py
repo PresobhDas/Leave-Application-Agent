@@ -165,10 +165,17 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
 
 @api_server.post('/evaluate')
 async def call_evaluate():
-    from ragas.llms import llm_factory
+    from ragas.llms import LangchainLLMWrapper
+    from langchain_openai import ChatOpenAI
+    from ragas.embeddings import OpenAIEmbeddings
 
-    openai_client = get_azure_openai_client()
-    llm = llm_factory("gpt-4o-mini", client=openai_client)
+    llm = LangchainLLMWrapper(
+    ChatOpenAI(
+            model="gpt-4o-mini",
+            temperature=0
+        )
+    )
+    embeddings = OpenAIEmbeddings()
 
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
 
@@ -205,7 +212,8 @@ async def call_evaluate():
                     _Faithfulness(),
                     _ResponseRelevancy()
                 ],
-                llm=llm
+                llm=llm,
+                embeddings=embeddings
             )
         
         results = await asyncio.to_thread(run_ragas)
