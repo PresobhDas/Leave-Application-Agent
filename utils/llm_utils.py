@@ -232,11 +232,16 @@ def build_nodes(llm_with_tools):
         count = state.get('tool_execution_count',0)
         if getattr(response, 'tool_calls', None):
             count += 1
+            return {
+                'messages':[HUMAN_MESSAGE, response],
+                'tool_execution_count' : count
+            }
+        
         extract_rag_data(state=state)
         return {
-        'messages':[HUMAN_MESSAGE, response],
-        'tool_execution_count' : count
-        }
+                'messages':[HUMAN_MESSAGE, response],
+                'tool_execution_count' : count
+            }
     
     return {
         'node_generate_answer_from_llm' : node_generate_answer_from_llm
