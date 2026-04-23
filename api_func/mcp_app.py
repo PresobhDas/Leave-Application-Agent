@@ -6,8 +6,12 @@ from azure.search.documents import SearchClient
 from azure.identity import DefaultAzureCredential
 from azure.data.tables import TableServiceClient
 
-log = logging.getLogger('mcp')
+log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
+logging.getLogger("azure").setLevel(logging.WARNING)
+logging.getLogger("azure.core").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.getLogger("opentelemetry").setLevel(logging.ERROR)
 
 if not log.handlers:
     h = logging.StreamHandler(sys.stdout) 
