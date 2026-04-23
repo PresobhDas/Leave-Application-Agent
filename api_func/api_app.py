@@ -3,7 +3,7 @@ from fastapi import FastAPI, Body, Request
 from typing import Annotated
 from langgraph.graph import START, END, StateGraph
 from langgraph.prebuilt import ToolNode
-from utils.llm_utils import get_chat_model, build_nodes, check_tool_condition, build_tools, get_chunks, generate_embeddings, write_embeddings, get_azure_openai_client, RagState
+from utils.llm_utils import get_chat_model, build_nodes, check_tool_condition, build_tools, get_chunks, generate_embeddings, write_embeddings, get_azure_openai_client, get_llm_answer_for_ragas, RagState
 from utils.model_contracts import InputDetails, UploadRequest
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
@@ -188,6 +188,8 @@ async def call_evaluate():
             resp = await rag_retreival_function(inp_question = item["question"])
             resp_data = RagDataResponseModel.model_validate_json(resp)
             ragas_data['contexts'].append([data.text for data in resp_data.results])
+            llm_answer = get_llm_answer_for_ragas(item["question"], [data.text for data in resp_data.results])
+            ragas_data["response"].append(llm_answer)
 
         log.info(f'CUSTOM LOG - ragas data is {ragas_data}')
         dataset = Dataset.from_dict(ragas_data)

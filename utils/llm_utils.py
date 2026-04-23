@@ -394,3 +394,29 @@ def extract_rag_data(state, response):
 
         except Exception:
             log.exception("RAG extraction failed")
+
+def get_llm_answer_for_ragas(question:str, context:list):
+    context_text = "\n\n".join(context)
+    prompt = f"""
+    You are a helpful assistant. Use ONLY the provided context to answer the question.
+    If the answer is not in the context, say "I don't know".
+
+    Context:
+    {context_text}
+
+    Question:
+    {question}
+    """
+
+    open_ai_client = get_azure_openai_client()
+
+    response = open_ai_client.chat.completions.create(
+        # model="your-deployment-name",   # Azure deployment name
+        messages=[
+            {"role": "system", "content": "Answer strictly from context."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0
+    )
+
+    return response.choices[0].message.content
