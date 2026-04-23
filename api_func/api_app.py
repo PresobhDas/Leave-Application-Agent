@@ -17,7 +17,7 @@ from azure.storage.blob import generate_blob_sas, BlobSasPermissions
 from datetime import datetime, timedelta
 from datasets import Dataset
 from ragas import evaluate
-from ragas.metrics import ContextPrecision, ContextRecall
+from ragas.metrics import _ContextPrecision, _ContextRecall, _ContextRelevance
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
@@ -188,8 +188,9 @@ async def call_evaluate():
         results = evaluate(
             dataset,
             metrics=[
-                ContextPrecision(),
-                ContextRecall()
+                    _ContextPrecision,
+                    _ContextRecall,
+                    _ContextRelevance
                 ]
         )
         log.info(f'CUSTOM LOGS - RAGAS result is {results}')
