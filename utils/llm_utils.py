@@ -206,10 +206,11 @@ def build_tools(mcp_server: FastMCP):
                                     arguments={'inp_question':inp_question}
         )
         try:
-            log.info(f'response retrieved inside build_tools is {resp[0].text} with type {type(resp[0].text)}') 
+            log.info(f'response retrieved inside build_tools is {resp[0].text} with type {type(resp[0].text)} and {resp} with type {type(resp)}') 
             # resp_content = RagDataResponseModel.model_validate_json(resp[0].text)
             
-            resp_content = resp[0].text
+            # resp_content = resp[0].text
+            resp_content = resp[0]
         except Exception as err:
             log.info(f'Errored in {inspect.currentframe().f_code.co_name} with error {err}')
             return RagDataResponseModel()
