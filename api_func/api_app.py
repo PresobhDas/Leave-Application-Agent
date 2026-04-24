@@ -168,11 +168,17 @@ async def call_evaluate():
     from ragas.llms import LangchainLLMWrapper
     from ragas.embeddings import OpenAIEmbeddings
     from openai import OpenAI
+    from langchain_openai import OpenAIEmbeddings as LCOpenAIEmbeddings
+    from ragas.embeddings import LangchainEmbeddingsWrapper 
+    import math
 
     chat_client = get_chat_model()
 
     llm = LangchainLLMWrapper(chat_client)
-    embeddings = OpenAIEmbeddings(client=OpenAI())
+    # embeddings = OpenAIEmbeddings(client=OpenAI())
+    embeddings = LangchainEmbeddingsWrapper(
+    LCOpenAIEmbeddings(model="text-embedding-3-small")
+    )
 
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
 
@@ -213,9 +219,13 @@ async def call_evaluate():
                 embeddings=embeddings
             )
         
-        results = await asyncio.to_thread(run_ragas)
-        log.info(f'CUSTOM LOGS - RAGAS result is {results}')
-        return results
+        result = await asyncio.to_thread(run_ragas)
+        log.info(f'CUSTOM LOGS - RAGAS result is {result}')
+        reponse = {
+                k: (v if not (isinstance(v, float) and math.isnan(v)) else 0.0)
+                for k, v in result.items()
+                }
+        return reponse
 
     except Exception:
         log.exception(f'CUSTOM LOG - Errored in {inspect.currentframe().f_code.co_name}')
