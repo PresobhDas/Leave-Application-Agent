@@ -166,8 +166,6 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
 @api_server.post('/evaluate')
 async def call_evaluate():
     from ragas.llms import LangchainLLMWrapper
-    from ragas.embeddings import OpenAIEmbeddings
-    from openai import OpenAI
     from langchain_openai import OpenAIEmbeddings as LCOpenAIEmbeddings
     from ragas.embeddings import LangchainEmbeddingsWrapper 
     import math
@@ -175,7 +173,6 @@ async def call_evaluate():
     chat_client = get_chat_model()
 
     llm = LangchainLLMWrapper(chat_client)
-    # embeddings = OpenAIEmbeddings(client=OpenAI())
     embeddings = LangchainEmbeddingsWrapper(
     LCOpenAIEmbeddings(model="text-embedding-3-small")
     )
