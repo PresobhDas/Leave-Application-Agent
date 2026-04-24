@@ -221,7 +221,7 @@ async def call_evaluate():
         
         result = await asyncio.to_thread(run_ragas)
         log.info(f'CUSTOM LOGS - RAGAS result is {result}')
-        result_dict = dict(result)
+        result_dict = result._scores_dict
         reponse = {
                 k: (v if not (isinstance(v, float) and math.isnan(v)) else 0.0)
                 for k, v in result_dict.items()
