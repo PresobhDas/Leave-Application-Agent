@@ -54,11 +54,20 @@ def get_prompts(prompt_name:str, question:str|None=None):
                 Description: Retrieve the employee leave information from the Azure Storage Account Table. This queries the table on the given Employee ID.
             3) Tool Name : get_rag_document_tool.
                 Description: If the question is about compensation, payroll, Health, Insurance, Leave Policy or anything in general about HR and company policies, call the RAG retrieval tool and queries the Azure AI Search using the vector embeddings of the given input text based on similarity.
+                IMPORTANT: When using the results from this tool:
+                - You MUST cite sources using [Source X] in the answer.
+                - You MUST include the document Title and Document Name in the final response when relevant.
+                - Do NOT ignore metadata such as Title and Document.
             4) Tool Name: get_weather_tool
                 Description: get_weather_tool to retrieve the weather information for any given location. 
         b) If the question is regular conversaion, respond naturally and conversationally as no information retrieval is needed.
         c) Try to answer based on your internal knowledge. Do this ONLY if tool call is NOT applicable.
-        d) If NONE of the THE ABOVE works, say 'I Don't know the answer'.      
+        d) If NONE of the THE ABOVE works, say 'I Don't know the answer'.     
+        
+    Additionally, when responding using RAG tool results:
+    - Include inline citations like [Source 1], [Source 2].
+    - At the end of the answer, include a "Sources" section listing:
+        - [Source X] <Title> (<Document Name>)
     '''
 
     return prompt_dict.get(prompt_name, 'Invalid prompt passed')
@@ -233,7 +242,7 @@ def build_tools(mcp_server: FastMCP):
             ]
             context_text = "\n\n---\n\n".join(contexts)
             log.info(f'CUSTOM LOGS - {context_text}')
-            
+
         except Exception as err:
             log.info(f'Errored in {inspect.currentframe().f_code.co_name} with error {err}')
             return RagDataResponseModel()
