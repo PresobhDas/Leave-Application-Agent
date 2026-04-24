@@ -209,13 +209,36 @@ def build_tools(mcp_server: FastMCP):
             log.info(f'response retrieved inside build_tools is {resp[0].text} with type {type(resp[0].text)} and {resp} with type {type(resp)}') 
             # resp_content = RagDataResponseModel.model_validate_json(resp[0].text)
             
-            # resp_content = resp[0].text
-            resp_content = resp[0]
+            resp_dict = json.loads(resp[0].text)
+            results = resp_dict.get("results", [])
+            parsed_chunks = [
+                {
+                    "text": r.get("text", ""),
+                    "title": r.get("title", ""),
+                    "docName": r.get("docName", ""),
+                    "score": r.get("score", 0.0)
+                }
+                for r in results
+            ]
+
+            contexts = [
+                f"""
+            [Source {i+1}]
+            Document: {c['docName']}
+            Title: {c['title']}
+
+            {c['text']}
+            """
+                for i, c in enumerate(parsed_chunks)
+            ]
+            context_text = "\n\n---\n\n".join(contexts)
+            log.info(f'CUSTOM LOGS - {context_text}')
+            
         except Exception as err:
             log.info(f'Errored in {inspect.currentframe().f_code.co_name} with error {err}')
             return RagDataResponseModel()
         
-        return resp_content
+        return context_text
 
     return [get_weather_tool, get_rag_document_tool, get_employee_master_record_tool, get_employee_leave_record_tool]
 
@@ -238,7 +261,7 @@ def build_nodes(llm_with_tools):
                 'tool_execution_count' : count
             }
         
-        extract_rag_data(state, response)
+        # extract_rag_data(state, response)
         return {
                 'messages':[HUMAN_MESSAGE, response],
                 'tool_execution_count' : count
