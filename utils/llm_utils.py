@@ -190,7 +190,7 @@ def build_tools(mcp_server: FastMCP):
             log.info(f'response retrieved inside build_tools {inspect.currentframe().f_code.co_name} is {resp[0].text}') 
             resp_content = EmployeeLeaveResponseModel.model_validate_json(resp[0].text)
         except Exception:
-            log.exception(f'Errored in {inspect.currentframe().f_code.co_name}')
+            log.exception(f'Errored : {inspect.currentframe().f_code.co_name}')
             return EmployeeLeaveResponseModel()
         
         return resp_content
