@@ -117,11 +117,13 @@ async def ingest_pipeline(request:Request):
 
             DI_ENDPOINT = os.getenv('DI_ENDPOINT')
             di_client = DocumentIntelligenceClient(endpoint=DI_ENDPOINT, credential=DefaultAzureCredential())
-            poller = di_client.begin_analyze_document(
-                model_id='prebuilt-layout',
-                body=io.BytesIO(pdf_bytes)
-            )
-            log.info(f'CUSTOM - LOG : Name of the file name is {file_name}')
+            with open(temp_path, "rb") as f:
+                poller = di_client.begin_analyze_document(
+                    model_id="prebuilt-layout",
+                    body=f,   
+                    content_type="application/pdf"   
+                )
+            log.info(f'CUSTOM - LOG : Name of the file name is {file_name} and path is {temp_path}')
             log.info(f'CUSTOM LOG : PDF size: {len(pdf_bytes)}')
             log.info(f'CUSTOM LOG : PDF data: {pdf_bytes[:10]}')
             result = poller.result().as_dict()
