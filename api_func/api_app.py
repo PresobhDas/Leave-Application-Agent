@@ -3,7 +3,7 @@ from fastapi import FastAPI, Body, Request
 from typing import Annotated
 from langgraph.graph import START, END, StateGraph
 from langgraph.prebuilt import ToolNode
-from utils.llm_utils import get_chat_model, build_nodes, check_tool_condition, build_tools, get_chunks, generate_embeddings, write_embeddings, get_azure_openai_client, get_llm_answer_for_ragas, RagState
+from utils.llm_utils import get_chat_model, build_nodes, check_tool_condition, build_tools, get_chunks, generate_embeddings, write_embeddings, get_azure_openai_client, get_llm_answer_for_ragas, RagState,  delete_existing_embeddings
 from utils.model_contracts import InputDetails, UploadRequest
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
@@ -115,30 +115,29 @@ async def ingest_pipeline(request:Request):
                 temp_file.write(pdf_bytes)
                 temp_path = temp_file.name
 
-            DI_ENDPOINT = os.getenv('DI_ENDPOINT')
-            di_client = DocumentIntelligenceClient(endpoint=DI_ENDPOINT, credential=DefaultAzureCredential())
-            with open(temp_path, "rb") as f:
-                poller = di_client.begin_analyze_document(
-                    model_id="prebuilt-layout",
-                    body=f,   
-                    content_type="application/pdf"   
-                )
-            log.info(f'CUSTOM - LOG : Name of the file name is {file_name} and path is {temp_path}')
-            log.info(f'CUSTOM LOG : PDF size: {len(pdf_bytes)}')
-            log.info(f'CUSTOM LOG : PDF data: {pdf_bytes[:10]}')
-            result = poller.result().as_dict()
-            json_blob_client = blob_service_client.get_blob_client(
-                container='rag-docs-json',
-                blob=f'{file_name}.json'
-            )
+            # DI_ENDPOINT = os.getenv('DI_ENDPOINT')
+            # di_client = DocumentIntelligenceClient(endpoint=DI_ENDPOINT, credential=DefaultAzureCredential())
+            # with open(temp_path, "rb") as f:
+            #     poller = di_client.begin_analyze_document(
+            #         model_id="prebuilt-layout",
+            #         body=f,   
+            #         content_type="application/pdf"   
+            #     )
 
-            json_blob_client.upload_blob(
-                json.dumps(result, indent=2),
-                overwrite=True
-            )
+            # result = poller.result().as_dict()
+            # json_blob_client = blob_service_client.get_blob_client(
+            #     container='rag-docs-json',
+            #     blob=f'{file_name}.json'
+            # )
 
-            log.info(f'CUSTOM - LOG : JSON written into {temp_file}.json')
+            # json_blob_client.upload_blob(
+            #     json.dumps(result, indent=2),
+            #     overwrite=True
+            # )
 
+            # log.info(f'CUSTOM - LOG : JSON written into {temp_file}.json')
+
+            delete_existing_embeddings(file_name=file_name)
             # loader = PyPDFLoader(file_path=temp_path)
             # docs = loader.load()
             # doc_chunks = get_chunks(docs, blob_name)

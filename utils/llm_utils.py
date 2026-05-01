@@ -275,6 +275,29 @@ def build_nodes(llm_with_tools):
         'node_generate_answer_from_llm' : node_generate_answer_from_llm
     }
 
+def delete_existing_embeddings(file_name:str):
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    index_name='leave_agent_vector_index'
+    azure_ai_search_client = SearchClient(
+                            endpoint=azure_ai_search_endpoint,
+                            index_name=index_name,
+                            credential= DefaultAzureCredential()
+                            )
+    
+    results = azure_ai_search_client.search(
+    search_text="*",
+    filter=f'metadata_doc_name eq {file_name}',
+    select=["id"]
+    )
+
+    to_delete = [{"id": r["id"]} for r in results]
+    azure_ai_search_client.delete_documents(documents=to_delete)
+    if to_delete:
+        log.info(f'CUSTOM LOG : Existing embeddings deleted')
+        return
+    
+    return log.info(f'CUSTOM LOG : No existing embeddings found to be deleted')
+
 def recreate_index(index_name:str):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     index_client = SearchIndexClient(
