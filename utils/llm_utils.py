@@ -286,7 +286,7 @@ def delete_existing_embeddings(file_name:str):
     
     results = azure_ai_search_client.search(
     search_text="*",
-    filter=f'metadata_doc_name eq {file_name}',
+    filter=f"metadata_doc_name eq '{file_name}'",
     select=["id"]
     )
 
