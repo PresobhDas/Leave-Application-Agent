@@ -122,6 +122,8 @@ async def ingest_pipeline(request:Request):
                 body=io.BytesIO(pdf_bytes)
             )
             log.info(f'CUSTOM - LOG : Name of the file name is {file_name}')
+            log.info(f'CUSTOM LOG : PDF size: {len(pdf_bytes)}')
+            log.info(f'CUSTOM LOG : PDF data: {pdf_bytes[:10]}')
             result = poller.result().as_dict()
             json_blob_client = blob_service_client.get_blob_client(
                 container='rag-docs-json',
