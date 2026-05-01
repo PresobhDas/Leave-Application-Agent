@@ -116,15 +116,14 @@ async def ingest_pipeline(request:Request):
 
             DI_ENDPOINT = os.getenv('DI_ENDPOINT')
             di_client = DocumentIntelligenceClient(endpoint=DI_ENDPOINT, credential=DefaultAzureCredential())
-            with open(temp_path, 'rb') as f:
-                poller = di_client.begin_analyze_document(
-                    model_id='prebuilt-layout',
-                    body=f
+            poller = di_client.begin_analyze_document(
+                model_id='prebuilt-layout',
+                body=pdf_bytes
             )
             result = poller.result().as_dict()
             json_blob_client = blob_service_client.get_blob_client(
                 container='rag_docs_json',
-                blob=f'{os.path.basename(temp_path)}.json'
+                blob=f'{blob_name}.json'
             )
 
             json_blob_client.upload_blob(
