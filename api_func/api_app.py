@@ -124,7 +124,7 @@ async def ingest_pipeline(request:Request):
             log.info(f'CUSTOM - LOG : Name of the file name is {file_name}')
             result = poller.result().as_dict()
             json_blob_client = blob_service_client.get_blob_client(
-                container='rag_docs_json',
+                container='rag-docs-json',
                 blob=f'{file_name}.json'
             )
 
