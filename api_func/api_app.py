@@ -141,7 +141,7 @@ async def ingest_pipeline(request:Request):
             delete_existing_embeddings(file_name=file_name)
             # loader = PyPDFLoader(file_path=temp_path)
             # docs = loader.load()
-            doc_chunks = get_chunks(json_di, file_name=file_name)
+            doc_chunks = get_chunks(json.loads(json_di), file_name=file_name)
 
             log.info(f'CUSTOM LOG - {len(doc_chunks)} chunks retrieved')
             log.info(f'CUSTOM LOG - {doc_chunks[0]} first chunks retrieved')

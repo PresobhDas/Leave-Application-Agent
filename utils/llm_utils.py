@@ -386,7 +386,7 @@ def getAzureSecrets(key:str) -> str:
 
     return client_secret
 
-def get_chunks(di_data:str, file_name:str) -> List[Document]:
+def get_chunks(di_data:dict, file_name:str) -> List[Document]:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     # full_text = ''
     # for doc in file_data:
