@@ -11,3 +11,4 @@ wheels/
 test.py
 text_embedder.py
 main_agent.py
+Docs/

@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+  "azure-ai-documentintelligence>=1.0.2",
   "azure-ai-textanalytics>=5.4.0",
   "azure-cosmos>=4.14.5",
   "azure-data-tables>=12.7.0",
@@ -25,6 +26,7 @@ dependencies = [
   "langgraph>=1.0.5",
   "mcp>=1.26.0",
   "opentelemetry-sdk>=1.40.0",
+  "pandoc>=2.4",
   "pydantic>=2.12.5",
   "pypdf>=6.6.2",
   "python-docx>=1.2.0",

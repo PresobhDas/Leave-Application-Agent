@@ -19,6 +19,7 @@ from datasets import Dataset
 from ragas import evaluate
 from ragas.metrics import _ContextPrecision, _ContextRecall, _ContextRelevance, _Faithfulness, _ResponseRelevancy
 from utils.model_contracts import RagDataResponseModel
+from azure.ai.documentintelligence import DocumentIntelligenceClient
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
@@ -112,13 +113,34 @@ async def ingest_pipeline(request:Request):
             with tempfile.NamedTemporaryFile(delete=False, suffix=file_extension) as temp_file:
                 temp_file.write(pdf_bytes)
                 temp_path = temp_file.name
-            loader = PyPDFLoader(file_path=temp_path)
-            docs = loader.load()
-            doc_chunks = get_chunks(docs, blob_name)
 
-            log.info(f'CUSTOM LOG - {len(doc_chunks)} chunks retrieved')
-            embedding_list = generate_embeddings(doc_chunks)
-            write_embeddings(embedding_list)
+            DI_ENDPOINT = os.getenv('DI_ENDPOINT')
+            di_client = DocumentIntelligenceClient(endpoint=DI_ENDPOINT, credential=DefaultAzureCredential())
+            with open(temp_file, 'rb') as f:
+                poller = di_client.begin_analyze_document(
+                    model_id='prebuilt-layout',
+                    body=f
+            )
+            result = poller.result().as_dict()
+            json_blob_client = blob_service_client.get_blob_client(
+                container='rag_docs_json',
+                blob=f'{temp_file}.json'
+            )
+
+            json_blob_client.upload_blob(
+                json.dumps(result, indent=2),
+                overwrite=True
+            )
+
+            log.info(f'CUSTOM - LOG : JSON written into {temp_file}.json')
+
+            # loader = PyPDFLoader(file_path=temp_path)
+            # docs = loader.load()
+            # doc_chunks = get_chunks(docs, blob_name)
+
+            # log.info(f'CUSTOM LOG - {len(doc_chunks)} chunks retrieved')
+            # embedding_list = generate_embeddings(doc_chunks)
+            # write_embeddings(embedding_list)
 
     except Exception as err:
         log.exception(f'CUSTOM LOG - Exception occurred at {inspect.currentframe().f_code.co_name}')
