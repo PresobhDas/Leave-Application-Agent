@@ -1,4 +1,4 @@
-import logging, sys, inspect, os, tempfile, json, asyncio, io
+import logging, sys, inspect, os, tempfile, json, asyncio
 from fastapi import FastAPI, Body, Request
 from typing import Annotated
 from langgraph.graph import START, END, StateGraph
@@ -10,7 +10,6 @@ from mcp.server.transport_security import TransportSecuritySettings
 from api_func.mcp_app import register_tools
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
-from langchain_community.document_loaders import PyPDFLoader
 from urllib.parse import urlparse, unquote
 from fastapi.middleware.cors import CORSMiddleware
 from azure.storage.blob import generate_blob_sas, BlobSasPermissions
@@ -139,14 +138,11 @@ async def ingest_pipeline(request:Request):
             log.info(f'CUSTOM - LOG : JSON written into {temp_file}.json')
 
             delete_existing_embeddings(file_name=file_name)
-            # loader = PyPDFLoader(file_path=temp_path)
-            # docs = loader.load()
             doc_chunks = get_chunks(json.loads(json_di), file_name=file_name)
-
             log.info(f'CUSTOM LOG - {len(doc_chunks)} chunks retrieved')
-            log.info(f'CUSTOM LOG - {doc_chunks[0]} first chunks retrieved')
-            # embedding_list = generate_embeddings(doc_chunks)
-            # write_embeddings(embedding_list)
+
+            embedding_list = generate_embeddings(doc_chunks)
+            write_embeddings(embedding_list)
 
     except Exception as err:
         log.exception(f'CUSTOM LOG - Exception occurred at {inspect.currentframe().f_code.co_name}')
