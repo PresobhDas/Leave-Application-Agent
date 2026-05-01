@@ -96,6 +96,7 @@ async def ingest_pipeline(request:Request):
             path_parts = parsed.path.lstrip('/').split('/', 1)
             container_name = path_parts[0]
             blob_name = unquote(path_parts[1])
+            file_name = os.path.splitext(os.path.basename(parsed.path))[0]
             file_extension = os.path.splitext(os.path.basename(parsed.path))[1]
 
             log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name} with container name : {container_name}, blob name : {blob_name}, file extension : {file_extension}')
@@ -120,11 +121,11 @@ async def ingest_pipeline(request:Request):
                 model_id='prebuilt-layout',
                 body=pdf_bytes
             )
-            log.info(f'CUSTOM - LOG : Name of the blob name is {blob_name}')
+            log.info(f'CUSTOM - LOG : Name of the blob name is {file_name}')
             result = poller.result().as_dict()
             json_blob_client = blob_service_client.get_blob_client(
                 container='rag_docs_json',
-                blob=f'{blob_name}.json'
+                blob=f'{file_name}.json'
             )
 
             json_blob_client.upload_blob(
