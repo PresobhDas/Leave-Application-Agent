@@ -1,4 +1,4 @@
-import logging, sys, inspect, os, tempfile, json, asyncio
+import logging, sys, inspect, os, tempfile, json, asyncio, io
 from fastapi import FastAPI, Body, Request
 from typing import Annotated
 from langgraph.graph import START, END, StateGraph
@@ -119,7 +119,7 @@ async def ingest_pipeline(request:Request):
             di_client = DocumentIntelligenceClient(endpoint=DI_ENDPOINT, credential=DefaultAzureCredential())
             poller = di_client.begin_analyze_document(
                 model_id='prebuilt-layout',
-                body=pdf_bytes
+                body=io.BytesIO(pdf_bytes)
             )
             log.info(f'CUSTOM - LOG : Name of the file name is {file_name}')
             result = poller.result().as_dict()
