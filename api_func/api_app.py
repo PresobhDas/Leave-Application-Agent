@@ -115,34 +115,36 @@ async def ingest_pipeline(request:Request):
                 temp_file.write(pdf_bytes)
                 temp_path = temp_file.name
 
-            # DI_ENDPOINT = os.getenv('DI_ENDPOINT')
-            # di_client = DocumentIntelligenceClient(endpoint=DI_ENDPOINT, credential=DefaultAzureCredential())
-            # with open(temp_path, "rb") as f:
-            #     poller = di_client.begin_analyze_document(
-            #         model_id="prebuilt-layout",
-            #         body=f,   
-            #         content_type="application/pdf"   
-            #     )
+            DI_ENDPOINT = os.getenv('DI_ENDPOINT')
+            di_client = DocumentIntelligenceClient(endpoint=DI_ENDPOINT, credential=DefaultAzureCredential())
+            with open(temp_path, "rb") as f:
+                poller = di_client.begin_analyze_document(
+                    model_id="prebuilt-layout",
+                    body=f,   
+                    content_type="application/pdf"   
+                )
 
-            # result = poller.result().as_dict()
-            # json_blob_client = blob_service_client.get_blob_client(
-            #     container='rag-docs-json',
-            #     blob=f'{file_name}.json'
-            # )
+            result = poller.result().as_dict()
+            json_di = json.dumps(result, indent=2)
+            json_blob_client = blob_service_client.get_blob_client(
+                container='rag-docs-json',
+                blob=f'{file_name}.json'
+            )
 
-            # json_blob_client.upload_blob(
-            #     json.dumps(result, indent=2),
-            #     overwrite=True
-            # )
+            json_blob_client.upload_blob(
+                json_di,
+                overwrite=True
+            )
 
-            # log.info(f'CUSTOM - LOG : JSON written into {temp_file}.json')
+            log.info(f'CUSTOM - LOG : JSON written into {temp_file}.json')
 
             delete_existing_embeddings(file_name=file_name)
             # loader = PyPDFLoader(file_path=temp_path)
             # docs = loader.load()
-            # doc_chunks = get_chunks(docs, blob_name)
+            doc_chunks = get_chunks(json_di, file_name=file_name)
 
-            # log.info(f'CUSTOM LOG - {len(doc_chunks)} chunks retrieved')
+            log.info(f'CUSTOM LOG - {len(doc_chunks)} chunks retrieved')
+            log.info(f'CUSTOM LOG - {doc_chunks[0]} first chunks retrieved')
             # embedding_list = generate_embeddings(doc_chunks)
             # write_embeddings(embedding_list)
 

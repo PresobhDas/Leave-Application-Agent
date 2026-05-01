@@ -291,8 +291,8 @@ def delete_existing_embeddings(file_name:str):
     )
 
     to_delete = [{"id": r["id"]} for r in results]
-    azure_ai_search_client.delete_documents(documents=to_delete)
     if to_delete:
+        azure_ai_search_client.delete_documents(documents=to_delete)
         log.info(f'CUSTOM LOG : Existing embeddings deleted')
         return
     
@@ -386,36 +386,161 @@ def getAzureSecrets(key:str) -> str:
 
     return client_secret
 
-def get_chunks(file_data:List[Document], file_name:str) -> List[Document]:
-    file_path = Path(file_name)
+def get_chunks(di_data:str, file_name:str) -> List[Document]:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    full_text = ''
-    for doc in file_data:
-        full_text += doc.page_content
+    # full_text = ''
+    # for doc in file_data:
+    #     full_text += doc.page_content
 
-    pattern = r'(?m)^[•]?\s*(\d+(?:\.\d+)+)\s+([^\n]+)'
-    matches = list(re.finditer(pattern, full_text))
+    # pattern = r'(?m)^[•]?\s*(\d+(?:\.\d+)+)\s+([^\n]+)'
+    # matches = list(re.finditer(pattern, full_text))
 
+    # langchain_doc = []
+
+    # for i, match in enumerate(matches):
+    #     section_id = match.group(1)
+    #     title = match.group(2).strip()
+
+    #     start = match.end()
+    #     end = matches[i + 1].start() if i + 1 < len(matches) else len(full_text)
+
+    #     content = full_text[start:end].strip()
+    #     if content:
+    #         page_content = f'{section_id} {title}\n{content}'
+    #         metadata = {
+    #             'metadata_section_id' : section_id,
+    #             'metadata_title' : title,
+    #             'metadata_doc_name' : file_path.stem.replace(' ', '')
+    #         }
+    #         langchain_doc.append(
+    #             Document(page_content=page_content, metadata=metadata)
+    #         )
     langchain_doc = []
+    paragraphs = di_data.get("paragraphs", [])
 
-    for i, match in enumerate(matches):
-        section_id = match.group(1)
-        title = match.group(2).strip()
+    # -------------------------------
+    # Helpers
+    # -------------------------------
 
-        start = match.end()
-        end = matches[i + 1].start() if i + 1 < len(matches) else len(full_text)
+    def extract_section_number(text):
+        text = text.strip()
 
-        content = full_text[start:end].strip()
-        if content:
-            page_content = f'{section_id} {title}\n{content}'
-            metadata = {
-                'metadata_section_id' : section_id,
-                'metadata_title' : title,
-                'metadata_doc_name' : file_path.stem.replace(' ', '')
+        # Strict pattern: only allow 1.0, 2.1, 2.1.3 etc
+        match = re.match(r"^(\d+(\.\d+)+)\s+", text)
+
+        if match:
+            return match.group(1)
+
+        return None
+
+
+    def section_sort_key(section_number):
+        return [int(x) for x in section_number.split('.')]
+
+
+    def get_level(section_number):
+        parts = section_number.split('.')
+        if len(parts) == 2 and parts[1] == "0":
+            return 1
+        return len(parts)
+
+    def get_parent_section(sec_num, section_map):
+        parts = sec_num.split('.')
+        while len(parts) > 1:
+            parts.pop()
+            parent = ".".join(parts)
+            if parent + ".0" in section_map:
+                return section_map[parent + ".0"]
+
+            if parent in section_map:
+                return section_map[parent]
+
+        return None
+
+    def is_probable_toc_line(text):
+        # Detect TOC-like lines: "· 2.1 Something"
+        return bool(re.match(r"^[\u2022\.\-]?\s*\d+(\.\d+)+\s+", text))
+    # -------------------------------
+    # Pass 1: Build section map
+    # -------------------------------
+
+    section_map = {}
+
+    for para in paragraphs:
+        text = para.get("content", "").strip()
+
+        sec_num = extract_section_number(text)
+
+        if sec_num:
+            if len(text.split()) < 15:   # heuristic: headings are short
+                section_map[sec_num] = text
+
+    # -------------------------------
+    # Pass 2: Chunking
+    # -------------------------------
+
+    chunks = []
+    current_chunk = None
+
+    for para in paragraphs:
+        text = para.get("content", "").strip()
+        role = para.get("role", "paragraph")
+
+        if not text:
+            continue
+
+        sec_num = extract_section_number(text)
+
+        # ---------------------------
+        # New section
+        # ---------------------------
+        if role == "sectionHeading" and sec_num:
+            parent = get_parent_section(sec_num, section_map)
+            current_chunk = {
+                "section_id": sec_num,
+                "title": f"{parent} > {text}" if parent else text,
+                "content": ""
+                # "metadata": {
+                #     "parent_sections": [parent] if parent else [],
+                #     "hierarchy_path": f"{parent} > {text}" if parent else text,
+                #     "level": get_level(sec_num)
+                # }
             }
-            langchain_doc.append(
-                Document(page_content=page_content, metadata=metadata)
-            )
+
+            chunks.append(current_chunk)
+
+        # ---------------------------
+        # Skip TOC-like junk
+        # ---------------------------
+        elif is_probable_toc_line(text):
+            continue
+
+        # ---------------------------
+        # Append content
+        # ---------------------------
+        else:
+            if current_chunk:
+                if role == "listItem":
+                    current_chunk["content"] += "• " + text + "\n"
+                else:
+                    current_chunk["content"] += text + "\n"
+
+    # -------------------------------
+    # Optional: Clean empty chunks
+    # -------------------------------
+
+    chunks = [c for c in chunks if c["content"].strip()]
+
+    for chunk in chunks:
+        page_content = f'{chunk['section_id']} {chunk['title']}\n{chunk['content']}'
+        metadata = {
+            'metadata_section_id' : chunk['section_id'],
+            'metadata_title' : chunk['title'],
+            'metadata_doc_name' : file_name
+        }
+        langchain_doc.append(
+            Document(page_content=page_content, metadata=metadata)
+        )
 
     return langchain_doc
 

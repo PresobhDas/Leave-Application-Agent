@@ -1,518 +1,217 @@
 [
   {
-    "section_number": "1.0",
-    "heading": "1.0 Introduction",
-    "content": "\u00b7 1.1 Purpose and Scope\n\u00b7 1.3 Applicability\n\u00b7 1.4 Key Definitions\n",
-    "metadata": {
-      "parent_sections": [
-        "1.0 Jan 1, 2024"
-      ],
-      "hierarchy_path": "1.0 Jan 1, 2024 > 1.0 Introduction",
-      "level": 1
-    }
+    "metadata_section_id": "1.0",
+    "metadata_title": "1.0 Jan 1, 2024 > 1.0 Introduction",
+    "content": "\u00b7 1.1 Purpose and Scope\n\u00b7 1.3 Applicability\n\u00b7 1.4 Key Definitions\n"
   },
   {
-    "section_number": "2.0",
-    "heading": "2.0 General Leave Provisions",
-    "content": "\u00b7 2.1 The Leave Year\n\u00b7 2.2 Procedure for Requesting Leave\n\u00b7 2.3 Approval Workflow\n\u00b7 2.5 Leave Carry-Forward\n\u00b7 2.6 Leave Encashment\n\u00b7 2.7 Leave During Probation Period\n\u00b7 2.8 Leave During Notice Period\n\u00b7 2.9 Unauthorized Absence (Abandonment of Employment)\n\u00b7 2.10 Contact During Leave\n",
-    "metadata": {
-      "parent_sections": [
-        "2.0 General Leave Provisions"
-      ],
-      "hierarchy_path": "2.0 General Leave Provisions > 2.0 General Leave Provisions",
-      "level": 1
-    }
+    "metadata_section_id": "2.0",
+    "metadata_title": "2.0 General Leave Provisions > 2.0 General Leave Provisions",
+    "content": "\u00b7 2.1 The Leave Year\n\u00b7 2.2 Procedure for Requesting Leave\n\u00b7 2.3 Approval Workflow\n\u00b7 2.5 Leave Carry-Forward\n\u00b7 2.6 Leave Encashment\n\u00b7 2.7 Leave During Probation Period\n\u00b7 2.8 Leave During Notice Period\n\u00b7 2.9 Unauthorized Absence (Abandonment of Employment)\n\u00b7 2.10 Contact During Leave\n"
   },
   {
-    "section_number": "3.0",
-    "heading": "3.0 Paid Time Off (PTO) / Annual Leave",
-    "content": "\u00b7 3.1 Purpose\n\u00b7 3.3 Accrual Schedule\n\u00b7 3.5 Restrictions\n\u00b7 3.6 Case Example\n",
-    "metadata": {
-      "parent_sections": [
-        "3.0 Paid Time Off (PTO) / Annual Leave"
-      ],
-      "hierarchy_path": "3.0 Paid Time Off (PTO) / Annual Leave > 3.0 Paid Time Off (PTO) / Annual Leave",
-      "level": 1
-    }
+    "metadata_section_id": "3.0",
+    "metadata_title": "3.0 Paid Time Off (PTO) / Annual Leave > 3.0 Paid Time Off (PTO) / Annual Leave",
+    "content": "\u00b7 3.1 Purpose\n\u00b7 3.3 Accrual Schedule\n\u00b7 3.5 Restrictions\n\u00b7 3.6 Case Example\n"
   },
   {
-    "section_number": "4.0",
-    "heading": "4.0 Sick Leave",
-    "content": "\u00b7 4.1 Purpose\n\u00b7 4.2 Entitlement\n\u00b7 4.3 Notification Procedure\n\u00b7 4.6 Return to Work\n\u00b7 4.7 Case Example\n",
-    "metadata": {
-      "parent_sections": [
-        "4.0 Sick Leave"
-      ],
-      "hierarchy_path": "4.0 Sick Leave > 4.0 Sick Leave",
-      "level": 1
-    }
+    "metadata_section_id": "4.0",
+    "metadata_title": "4.0 Sick Leave > 4.0 Sick Leave",
+    "content": "\u00b7 4.1 Purpose\n\u00b7 4.2 Entitlement\n\u00b7 4.3 Notification Procedure\n\u00b7 4.6 Return to Work\n\u00b7 4.7 Case Example\n"
   },
   {
-    "section_number": "5.0",
-    "heading": "5.0 Public Holidays",
-    "content": "\u00b7 5.1 Official Holiday Schedule\n",
-    "metadata": {
-      "parent_sections": [
-        "5.0 Public Holidays"
-      ],
-      "hierarchy_path": "5.0 Public Holidays > 5.0 Public Holidays",
-      "level": 1
-    }
+    "metadata_section_id": "5.0",
+    "metadata_title": "5.0 Public Holidays > 5.0 Public Holidays",
+    "content": "\u00b7 5.1 Official Holiday Schedule\n"
   },
   {
-    "section_number": "6.0",
-    "heading": "6.0 Maternity Leave",
-    "content": "\u00b7 6.1 Purpose and Eligibility\n\u00b7 6.2 Duration and Pay\n\u00b7 6.3 Application Procedure\n\u00b7 6.4 Benefits During Leave\n\u00b7 6.5 Returning to Work\n\u00b7 6.6 Case Example\n",
-    "metadata": {
-      "parent_sections": [
-        "6.0 Maternity Leave"
-      ],
-      "hierarchy_path": "6.0 Maternity Leave > 6.0 Maternity Leave",
-      "level": 1
-    }
+    "metadata_section_id": "6.0",
+    "metadata_title": "6.0 Maternity Leave > 6.0 Maternity Leave",
+    "content": "\u00b7 6.1 Purpose and Eligibility\n\u00b7 6.2 Duration and Pay\n\u00b7 6.3 Application Procedure\n\u00b7 6.4 Benefits During Leave\n\u00b7 6.5 Returning to Work\n\u00b7 6.6 Case Example\n"
   },
   {
-    "section_number": "7.0",
-    "heading": "7.0 Paternity Leave",
-    "content": "\u00b7 7.1 Purpose and Eligibility\n\u00b7 7.2 Duration and Pay\n\u00b7 7.3 Application Procedure\n\u00b7 7.4 Case Example\n",
-    "metadata": {
-      "parent_sections": [
-        "7.0 Paternity Leave"
-      ],
-      "hierarchy_path": "7.0 Paternity Leave > 7.0 Paternity Leave",
-      "level": 1
-    }
+    "metadata_section_id": "7.0",
+    "metadata_title": "7.0 Paternity Leave > 7.0 Paternity Leave",
+    "content": "\u00b7 7.1 Purpose and Eligibility\n\u00b7 7.2 Duration and Pay\n\u00b7 7.3 Application Procedure\n\u00b7 7.4 Case Example\n"
   },
   {
-    "section_number": "8.0",
-    "heading": "8.0 Bereavement Leave",
-    "content": "\u00b7 8.1 Purpose\n\u00b7 8.2 Entitlement\n\u00b7 8.3 Definition of Family Members\n\u00b7 8.4 Procedure\n\u00b7 8.5 Case Example\n",
-    "metadata": {
-      "parent_sections": [
-        "8.0 Bereavement Leave"
-      ],
-      "hierarchy_path": "8.0 Bereavement Leave > 8.0 Bereavement Leave",
-      "level": 1
-    }
+    "metadata_section_id": "8.0",
+    "metadata_title": "8.0 Bereavement Leave > 8.0 Bereavement Leave",
+    "content": "\u00b7 8.1 Purpose\n\u00b7 8.2 Entitlement\n\u00b7 8.3 Definition of Family Members\n\u00b7 8.4 Procedure\n\u00b7 8.5 Case Example\n"
   },
   {
-    "section_number": "9.0",
-    "heading": "9.0 Jury Duty and Civic Responsibility Leave",
-    "content": "\u00b7 9.1 Purpose\n\u00b7 9.2 Procedure and Pay\n\u00b7 9.3 Documentation\n\u00b7 9.4 Case Example\n",
-    "metadata": {
-      "parent_sections": [
-        "9.0 Jury Duty and Civic Responsibility Leave"
-      ],
-      "hierarchy_path": "9.0 Jury Duty and Civic Responsibility Leave > 9.0 Jury Duty and Civic Responsibility Leave",
-      "level": 1
-    }
+    "metadata_section_id": "9.0",
+    "metadata_title": "9.0 Jury Duty and Civic Responsibility Leave > 9.0 Jury Duty and Civic Responsibility Leave",
+    "content": "\u00b7 9.1 Purpose\n\u00b7 9.2 Procedure and Pay\n\u00b7 9.3 Documentation\n\u00b7 9.4 Case Example\n"
   },
   {
-    "section_number": "10.0",
-    "heading": "10.0 Unpaid Leave of Absence (LOA)",
-    "content": "\u00b7 10.1 Purpose and Eligibility\n\u00b7 10.2 Duration\n\u00b7 10.3 Application and Approval Process\n\u00b7 10.5 Case Example: Sabbatical for Education\n",
-    "metadata": {
-      "parent_sections": [
-        "10.0 Unpaid Leave of Absence (LOA)"
-      ],
-      "hierarchy_path": "10.0 Unpaid Leave of Absence (LOA) > 10.0 Unpaid Leave of Absence (LOA)",
-      "level": 1
-    }
+    "metadata_section_id": "10.0",
+    "metadata_title": "10.0 Unpaid Leave of Absence (LOA) > 10.0 Unpaid Leave of Absence (LOA)",
+    "content": "\u00b7 10.1 Purpose and Eligibility\n\u00b7 10.2 Duration\n\u00b7 10.3 Application and Approval Process\n\u00b7 10.5 Case Example: Sabbatical for Education\n"
   },
   {
-    "section_number": "11.0",
-    "heading": "11.0 Compassionate Leave",
-    "content": "\u00b7 11.1 Purpose\n\u00b7 11.2 Eligibility and Duration\n\u00b7 11.3 Application and Documentation\n\u00b7 11.4 Case Example\n",
-    "metadata": {
-      "parent_sections": [
-        "11.0 Compassionate Leave"
-      ],
-      "hierarchy_path": "11.0 Compassionate Leave > 11.0 Compassionate Leave",
-      "level": 1
-    }
+    "metadata_section_id": "11.0",
+    "metadata_title": "11.0 Compassionate Leave > 11.0 Compassionate Leave",
+    "content": "\u00b7 11.1 Purpose\n\u00b7 11.2 Eligibility and Duration\n\u00b7 11.3 Application and Documentation\n\u00b7 11.4 Case Example\n"
   },
   {
-    "section_number": "12.0",
-    "heading": "12.0 Special Leave Categories",
-    "content": "\u00b7 12.1 Adoption Leave\n\u00b7 12.2 Voting Leave\n",
-    "metadata": {
-      "parent_sections": [
-        "12.0 Special Leave Categories"
-      ],
-      "hierarchy_path": "12.0 Special Leave Categories > 12.0 Special Leave Categories",
-      "level": 1
-    }
+    "metadata_section_id": "12.0",
+    "metadata_title": "12.0 Special Leave Categories > 12.0 Special Leave Categories",
+    "content": "\u00b7 12.1 Adoption Leave\n\u00b7 12.2 Voting Leave\n"
   },
   {
-    "section_number": "13.0",
-    "heading": "13.0 Roles and Responsibilities",
-    "content": "\u00b7 13.1 Employee Responsibilities\n\u00b7 13.2 Manager Responsibilities\n\u00b7 13.3 Human Resources (HR) Department Responsibilities\n",
-    "metadata": {
-      "parent_sections": [
-        "13.0 Roles and Responsibilities"
-      ],
-      "hierarchy_path": "13.0 Roles and Responsibilities > 13.0 Roles and Responsibilities",
-      "level": 1
-    }
+    "metadata_section_id": "13.0",
+    "metadata_title": "13.0 Roles and Responsibilities > 13.0 Roles and Responsibilities",
+    "content": "\u00b7 13.1 Employee Responsibilities\n\u00b7 13.2 Manager Responsibilities\n\u00b7 13.3 Human Resources (HR) Department Responsibilities\n"
   },
   {
-    "section_number": "14.0",
-    "heading": "14.0 Policy Administration",
-    "content": "\u00b7 14.1 Policy Exceptions\n\u00b7 14.2 Confidentiality\n\u00b7 14.3 Policy Interpretation and Governance\n",
-    "metadata": {
-      "parent_sections": [
-        "14.0 Policy Administration"
-      ],
-      "hierarchy_path": "14.0 Policy Administration > 14.0 Policy Administration",
-      "level": 1
-    }
+    "metadata_section_id": "14.0",
+    "metadata_title": "14.0 Policy Administration > 14.0 Policy Administration",
+    "content": "\u00b7 14.1 Policy Exceptions\n\u00b7 14.2 Confidentiality\n\u00b7 14.3 Policy Interpretation and Governance\n"
   },
   {
-    "section_number": "1.1",
-    "heading": "1.1 Purpose and Scope",
-    "content": "This document outlines the official leave policies and procedures for all employees of Cosmos Tech The purpose of this policy is to provide a clear, fair, and consistent framework for managing employee time off. It ensures that employees understand their entitlements and the processes they must follow to request and take leave. This policy is designed to support employee well-being while\nensuring operational continuity and business needs are met. This document supersedes all previous leave policies, whether written or verbal.\n",
-    "metadata": {
-      "parent_sections": [
-        "1.0 Jan 1, 2024"
-      ],
-      "hierarchy_path": "1.0 Jan 1, 2024 > 1.1 Purpose and Scope",
-      "level": 2
-    }
+    "metadata_section_id": "1.1",
+    "metadata_title": "1.0 Jan 1, 2024 > 1.1 Purpose and Scope",
+    "content": "This document outlines the official leave policies and procedures for all employees of Cosmos Tech The purpose of this policy is to provide a clear, fair, and consistent framework for managing employee time off. It ensures that employees understand their entitlements and the processes they must follow to request and take leave. This policy is designed to support employee well-being while\nensuring operational continuity and business needs are met. This document supersedes all previous leave policies, whether written or verbal.\n"
   },
   {
-    "section_number": "1.2",
-    "heading": "1.2 Our Philosophy on Work-Life Balance",
-    "content": "At Cosmos Tech we recognize that our employees are our most valuable asset. We are committed to fostering a supportive work environment that promotes a healthy work-life balance. We believe that adequate rest and time away from work are essential for employee health, morale, engagement, and productivity. Our leave policies are designed to provide employees with the flexibility to manage personal and family needs, pursue personal interests, and recharge.\n",
-    "metadata": {
-      "parent_sections": [
-        "1.0 Jan 1, 2024"
-      ],
-      "hierarchy_path": "1.0 Jan 1, 2024 > 1.2 Our Philosophy on Work-Life Balance",
-      "level": 2
-    }
+    "metadata_section_id": "1.2",
+    "metadata_title": "1.0 Jan 1, 2024 > 1.2 Our Philosophy on Work-Life Balance",
+    "content": "At Cosmos Tech we recognize that our employees are our most valuable asset. We are committed to fostering a supportive work environment that promotes a healthy work-life balance. We believe that adequate rest and time away from work are essential for employee health, morale, engagement, and productivity. Our leave policies are designed to provide employees with the flexibility to manage personal and family needs, pursue personal interests, and recharge.\n"
   },
   {
-    "section_number": "1.3",
-    "heading": "1.3 Applicability",
-    "content": "This policy applies to all full-time and part-time permanent employees of Cosmos Tech Contractual, temporary, and intern staff may have different leave entitlements as specified in their individual employment agreements. Specific provisions may vary based on local labor laws in the jurisdictions where we operate. In case of any conflict, local law shall prevail.\n",
-    "metadata": {
-      "parent_sections": [
-        "1.0 Jan 1, 2024"
-      ],
-      "hierarchy_path": "1.0 Jan 1, 2024 > 1.3 Applicability",
-      "level": 2
-    }
+    "metadata_section_id": "1.3",
+    "metadata_title": "1.0 Jan 1, 2024 > 1.3 Applicability",
+    "content": "This policy applies to all full-time and part-time permanent employees of Cosmos Tech Contractual, temporary, and intern staff may have different leave entitlements as specified in their individual employment agreements. Specific provisions may vary based on local labor laws in the jurisdictions where we operate. In case of any conflict, local law shall prevail.\n"
   },
   {
-    "section_number": "1.4",
-    "heading": "1.4 Key Definitions",
-    "content": "\u00b7 Employee: Any individual employed by Cosmos Techon a full-time or part-time permanent basis.\n\u00b7 Manager: An employee with direct supervisory responsibility for other employees.\n\u00b7 HR Department: The Human Resources department of Cosmos Tech\n. HRIS: The Human Resources Information System (e.g., Workday, SAP SuccessFactors) used for managing employee data, including leave requests and balances.\n\u00b7 Leave Year: The official 12-month period for which leave is calculated, running from January 1st to December 31st.\n\u00b7 Accrual: The process of earning leave credits over time.\n\u00b7 Medical Practitioner: A licensed and registered doctor or healthcare professional.\n",
-    "metadata": {
-      "parent_sections": [
-        "1.0 Jan 1, 2024"
-      ],
-      "hierarchy_path": "1.0 Jan 1, 2024 > 1.4 Key Definitions",
-      "level": 2
-    }
+    "metadata_section_id": "1.4",
+    "metadata_title": "1.0 Jan 1, 2024 > 1.4 Key Definitions",
+    "content": "\u00b7 Employee: Any individual employed by Cosmos Techon a full-time or part-time permanent basis.\n\u00b7 Manager: An employee with direct supervisory responsibility for other employees.\n\u00b7 HR Department: The Human Resources department of Cosmos Tech\n. HRIS: The Human Resources Information System (e.g., Workday, SAP SuccessFactors) used for managing employee data, including leave requests and balances.\n\u00b7 Leave Year: The official 12-month period for which leave is calculated, running from January 1st to December 31st.\n\u00b7 Accrual: The process of earning leave credits over time.\n\u00b7 Medical Practitioner: A licensed and registered doctor or healthcare professional.\n"
   },
   {
-    "section_number": "2.1",
-    "heading": "2.1 The Leave Year",
-    "content": "The leave year at Cosmos Techis the calendar year, commencing on January 1st and ending on December 31st. Leave entitlements are calculated based on this period. For employees joining mid- year, leave entitlement will be prorated for the remainder of the leave year.\n",
-    "metadata": {
-      "parent_sections": [
-        "2.0 General Leave Provisions"
-      ],
-      "hierarchy_path": "2.0 General Leave Provisions > 2.1 The Leave Year",
-      "level": 2
-    }
+    "metadata_section_id": "2.1",
+    "metadata_title": "2.0 General Leave Provisions > 2.1 The Leave Year",
+    "content": "The leave year at Cosmos Techis the calendar year, commencing on January 1st and ending on December 31st. Leave entitlements are calculated based on this period. For employees joining mid- year, leave entitlement will be prorated for the remainder of the leave year.\n"
   },
   {
-    "section_number": "2.2",
-    "heading": "2.2 Procedure for Requesting Leave",
-    "content": "\u00b7 All leave requests, with the exception of sudden emergencies like sickness, must be submitted in advance through the company's designated HRIS portal.\n\u00b7 Employees must provide the type of leave requested, start date, end date, and any relevant comments for the approver.\n\u00b7 Verbal or email requests are not considered official submissions but may be used for initial communication, especially in emergencies. An official HRIS request must follow as soon as practicable.\n",
-    "metadata": {
-      "parent_sections": [
-        "2.0 General Leave Provisions"
-      ],
-      "hierarchy_path": "2.0 General Leave Provisions > 2.2 Procedure for Requesting Leave",
-      "level": 2
-    }
+    "metadata_section_id": "2.2",
+    "metadata_title": "2.0 General Leave Provisions > 2.2 Procedure for Requesting Leave",
+    "content": "\u00b7 All leave requests, with the exception of sudden emergencies like sickness, must be submitted in advance through the company's designated HRIS portal.\n\u00b7 Employees must provide the type of leave requested, start date, end date, and any relevant comments for the approver.\n\u00b7 Verbal or email requests are not considered official submissions but may be used for initial communication, especially in emergencies. An official HRIS request must follow as soon as practicable.\n"
   },
   {
-    "section_number": "2.3",
-    "heading": "2.3 Approval Workflow",
-    "content": ". Leave requests submitted via the HRIS are routed directly to the employee's line manager for approval.\n\u00b7 Managers are responsible for reviewing leave requests in a timely manner, considering team workload, project deadlines, and overall business needs.\n\u00b7 If a manager is unavailable, a designated alternate approver will handle the request.\n\u00b7 Employees will receive an automated notification once their leave is approved or rejected. If rejected, the manager must provide a reason.\n",
-    "metadata": {
-      "parent_sections": [
-        "2.0 General Leave Provisions"
-      ],
-      "hierarchy_path": "2.0 General Leave Provisions > 2.3 Approval Workflow",
-      "level": 2
-    }
+    "metadata_section_id": "2.3",
+    "metadata_title": "2.0 General Leave Provisions > 2.3 Approval Workflow",
+    "content": ". Leave requests submitted via the HRIS are routed directly to the employee's line manager for approval.\n\u00b7 Managers are responsible for reviewing leave requests in a timely manner, considering team workload, project deadlines, and overall business needs.\n\u00b7 If a manager is unavailable, a designated alternate approver will handle the request.\n\u00b7 Employees will receive an automated notification once their leave is approved or rejected. If rejected, the manager must provide a reason.\n"
   },
   {
-    "section_number": "2.4",
-    "heading": "2.4 Leave Balance and Accrual",
-    "content": "Employees can view their current leave balances, accrual history, and future projections at any time through the HRIS employee self-service portal. Leave is accrued on a monthly or bi-weekly basis, depending on the payroll cycle, and credited to the employee's account.\n",
-    "metadata": {
-      "parent_sections": [
-        "2.0 General Leave Provisions"
-      ],
-      "hierarchy_path": "2.0 General Leave Provisions > 2.4 Leave Balance and Accrual",
-      "level": 2
-    }
+    "metadata_section_id": "2.4",
+    "metadata_title": "2.0 General Leave Provisions > 2.4 Leave Balance and Accrual",
+    "content": "Employees can view their current leave balances, accrual history, and future projections at any time through the HRIS employee self-service portal. Leave is accrued on a monthly or bi-weekly basis, depending on the payroll cycle, and credited to the employee's account.\n"
   },
   {
-    "section_number": "2.5",
-    "heading": "2.5 Leave Carry-Forward",
-    "content": "Employees are encouraged to utilize their full leave entitlement within the leave year. However, we understand this is not always possible.\n\u00b7 Paid Time Off (PTO): A maximum of 5\ndays of unused PTO can be carried forward to the next leave year.\n\u00b7 Sick Leave: Unused sick leave may be carried forward up to a maximum accumulation cap of 8 days to support employees during prolonged illness.\n\u00b7 Carried-forward leave must be utilized within the first quarter (by March 31st) of the subsequent year, after which it will lapse.\n",
-    "metadata": {
-      "parent_sections": [
-        "2.0 General Leave Provisions"
-      ],
-      "hierarchy_path": "2.0 General Leave Provisions > 2.5 Leave Carry-Forward",
-      "level": 2
-    }
+    "metadata_section_id": "2.5",
+    "metadata_title": "2.0 General Leave Provisions > 2.5 Leave Carry-Forward",
+    "content": "Employees are encouraged to utilize their full leave entitlement within the leave year. However, we understand this is not always possible.\n\u00b7 Paid Time Off (PTO): A maximum of 5\ndays of unused PTO can be carried forward to the next leave year.\n\u00b7 Sick Leave: Unused sick leave may be carried forward up to a maximum accumulation cap of 8 days to support employees during prolonged illness.\n\u00b7 Carried-forward leave must be utilized within the first quarter (by March 31st) of the subsequent year, after which it will lapse.\n"
   },
   {
-    "section_number": "2.6",
-    "heading": "2.6 Leave Encashment",
-    "content": "The company's policy is to encourage employees to take time off to rest. Therefore, encashment of leave is generally not permitted during the course of employment. Upon separation from the company, an employee's accrued and unused PTO will be paid out in their final settlement, subject to local laws.\n",
-    "metadata": {
-      "parent_sections": [
-        "2.0 General Leave Provisions"
-      ],
-      "hierarchy_path": "2.0 General Leave Provisions > 2.6 Leave Encashment",
-      "level": 2
-    }
+    "metadata_section_id": "2.6",
+    "metadata_title": "2.0 General Leave Provisions > 2.6 Leave Encashment",
+    "content": "The company's policy is to encourage employees to take time off to rest. Therefore, encashment of leave is generally not permitted during the course of employment. Upon separation from the company, an employee's accrued and unused PTO will be paid out in their final settlement, subject to local laws.\n"
   },
   {
-    "section_number": "2.7",
-    "heading": "2.7 Leave During Probation Period",
-    "content": "\u00b7 Employees on probation accrue leave as per the standard policy.\n. However, taking PTO during the probation period is generally discouraged and subject to manager discretion and critical business needs.\n\u00b7 Sick leave and other statutory leaves can be availed as per the policy.\n",
-    "metadata": {
-      "parent_sections": [
-        "2.0 General Leave Provisions"
-      ],
-      "hierarchy_path": "2.0 General Leave Provisions > 2.7 Leave During Probation Period",
-      "level": 2
-    }
+    "metadata_section_id": "2.7",
+    "metadata_title": "2.0 General Leave Provisions > 2.7 Leave During Probation Period",
+    "content": "\u00b7 Employees on probation accrue leave as per the standard policy.\n. However, taking PTO during the probation period is generally discouraged and subject to manager discretion and critical business needs.\n\u00b7 Sick leave and other statutory leaves can be availed as per the policy.\n"
   },
   {
-    "section_number": "2.8",
-    "heading": "2.8 Leave During Notice Period",
-    "content": "An employee serving their notice period is generally not permitted to take any leave, except in the case of a verified medical emergency. The manager, in consultation with HR, may approve pre- planned leave on a case-by-case basis. The company reserves the right to extend the notice period for any leave taken.\n",
-    "metadata": {
-      "parent_sections": [
-        "2.0 General Leave Provisions"
-      ],
-      "hierarchy_path": "2.0 General Leave Provisions > 2.8 Leave During Notice Period",
-      "level": 2
-    }
+    "metadata_section_id": "2.8",
+    "metadata_title": "2.0 General Leave Provisions > 2.8 Leave During Notice Period",
+    "content": "An employee serving their notice period is generally not permitted to take any leave, except in the case of a verified medical emergency. The manager, in consultation with HR, may approve pre- planned leave on a case-by-case basis. The company reserves the right to extend the notice period for any leave taken.\n"
   },
   {
-    "section_number": "2.9",
-    "heading": "2.9 Unauthorized Absence (Abandonment of Employment)",
-    "content": "An absence of three (3) or more consecutive workdays without any notification to the manager or HR will be considered an unauthorized absence. This may be treated as job abandonment and can lead to disciplinary action, up to and including termination of employment.\n",
-    "metadata": {
-      "parent_sections": [
-        "2.0 General Leave Provisions"
-      ],
-      "hierarchy_path": "2.0 General Leave Provisions > 2.9 Unauthorized Absence (Abandonment of Employment)",
-      "level": 2
-    }
+    "metadata_section_id": "2.9",
+    "metadata_title": "2.0 General Leave Provisions > 2.9 Unauthorized Absence (Abandonment of Employment)",
+    "content": "An absence of three (3) or more consecutive workdays without any notification to the manager or HR will be considered an unauthorized absence. This may be treated as job abandonment and can lead to disciplinary action, up to and including termination of employment.\n"
   },
   {
-    "section_number": "2.10",
-    "heading": "2.10 Contact During Leave",
-    "content": "Employees on leave are expected to be completely disengaged from work. However, for business continuity, employees should set up an out-of-office auto-reply on their email and voicemail, providing contact details for an alternate colleague. Managers should only contact an employee on leave in the case of a genuine business emergency that cannot be resolved by anyone else.\n",
-    "metadata": {
-      "parent_sections": [
-        "2.0 General Leave Provisions"
-      ],
-      "hierarchy_path": "2.0 General Leave Provisions > 2.10 Contact During Leave",
-      "level": 2
-    }
+    "metadata_section_id": "2.10",
+    "metadata_title": "2.0 General Leave Provisions > 2.10 Contact During Leave",
+    "content": "Employees on leave are expected to be completely disengaged from work. However, for business continuity, employees should set up an out-of-office auto-reply on their email and voicemail, providing contact details for an alternate colleague. Managers should only contact an employee on leave in the case of a genuine business emergency that cannot be resolved by anyone else.\n"
   },
   {
-    "section_number": "3.1",
-    "heading": "3.1 Purpose",
-    "content": "Paid Time Off (PTO) is provided for employees to take time away from work for rest, recreation, vacation, or to attend to personal matters.\n",
-    "metadata": {
-      "parent_sections": [
-        "3.0 Paid Time Off (PTO) / Annual Leave"
-      ],
-      "hierarchy_path": "3.0 Paid Time Off (PTO) / Annual Leave > 3.1 Purpose",
-      "level": 2
-    }
+    "metadata_section_id": "3.1",
+    "metadata_title": "3.0 Paid Time Off (PTO) / Annual Leave > 3.1 Purpose",
+    "content": "Paid Time Off (PTO) is provided for employees to take time away from work for rest, recreation, vacation, or to attend to personal matters.\n"
   },
   {
-    "section_number": "3.2",
-    "heading": "3.2 Eligibility and Entitlement",
-    "content": "All permanent employees are eligible for PTO. The annual entitlement is based on employment tenure:\nYears of Service\nAnnual PTO Entitlement (Days)\n0 - 2 years\n18\n2 - 5 years\n22\n5+ years\n25\nEntitlement for part-time employees is prorated based on their contracted hours.\n",
-    "metadata": {
-      "parent_sections": [
-        "3.0 Paid Time Off (PTO) / Annual Leave"
-      ],
-      "hierarchy_path": "3.0 Paid Time Off (PTO) / Annual Leave > 3.2 Eligibility and Entitlement",
-      "level": 2
-    }
+    "metadata_section_id": "3.2",
+    "metadata_title": "3.0 Paid Time Off (PTO) / Annual Leave > 3.2 Eligibility and Entitlement",
+    "content": "All permanent employees are eligible for PTO. The annual entitlement is based on employment tenure:\nYears of Service\nAnnual PTO Entitlement (Days)\n0 - 2 years\n18\n2 - 5 years\n22\n5+ years\n25\nEntitlement for part-time employees is prorated based on their contracted hours.\n"
   },
   {
-    "section_number": "3.3",
-    "heading": "3.3 Accrual Schedule",
-    "content": "PTO is accrued on a monthly basis. For an employee with 18 days of annual entitlement, they will accrue 1.5 days of PTO for each full month of service.\n",
-    "metadata": {
-      "parent_sections": [
-        "3.0 Paid Time Off (PTO) / Annual Leave"
-      ],
-      "hierarchy_path": "3.0 Paid Time Off (PTO) / Annual Leave > 3.3 Accrual Schedule",
-      "level": 2
-    }
+    "metadata_section_id": "3.3",
+    "metadata_title": "3.0 Paid Time Off (PTO) / Annual Leave > 3.3 Accrual Schedule",
+    "content": "PTO is accrued on a monthly basis. For an employee with 18 days of annual entitlement, they will accrue 1.5 days of PTO for each full month of service.\n"
   },
   {
-    "section_number": "3.4",
-    "heading": "3.4 Planning and Scheduling PTO",
-    "content": "\u00b7 Employees should request PTO at least two (2) weeks in advance for short leave (less than 5 days) and at least four (4) weeks in advance for long leave (5 days or more).\n\u00b7 Approval is subject to business requirements, team schedules, and ensuring adequate coverage.\n. During peak business periods or project deadlines, the company may implement blackout periods where PTO requests may be restricted.\n",
-    "metadata": {
-      "parent_sections": [
-        "3.0 Paid Time Off (PTO) / Annual Leave"
-      ],
-      "hierarchy_path": "3.0 Paid Time Off (PTO) / Annual Leave > 3.4 Planning and Scheduling PTO",
-      "level": 2
-    }
+    "metadata_section_id": "3.4",
+    "metadata_title": "3.0 Paid Time Off (PTO) / Annual Leave > 3.4 Planning and Scheduling PTO",
+    "content": "\u00b7 Employees should request PTO at least two (2) weeks in advance for short leave (less than 5 days) and at least four (4) weeks in advance for long leave (5 days or more).\n\u00b7 Approval is subject to business requirements, team schedules, and ensuring adequate coverage.\n. During peak business periods or project deadlines, the company may implement blackout periods where PTO requests may be restricted.\n"
   },
   {
-    "section_number": "3.5",
-    "heading": "3.5 Restrictions",
-    "content": "\u00b7 PTO must be taken in minimum increments of a half-day (4 hours).\n. An employee cannot have a negative PTO balance. Leave taken must not exceed the accrued balance at the time of leave.\n",
-    "metadata": {
-      "parent_sections": [
-        "3.0 Paid Time Off (PTO) / Annual Leave"
-      ],
-      "hierarchy_path": "3.0 Paid Time Off (PTO) / Annual Leave > 3.5 Restrictions",
-      "level": 2
-    }
+    "metadata_section_id": "3.5",
+    "metadata_title": "3.0 Paid Time Off (PTO) / Annual Leave > 3.5 Restrictions",
+    "content": "\u00b7 PTO must be taken in minimum increments of a half-day (4 hours).\n. An employee cannot have a negative PTO balance. Leave taken must not exceed the accrued balance at the time of leave.\n"
   },
   {
-    "section_number": "3.6",
-    "heading": "3.6 Case Example",
-    "content": "\u00b7 Scenario: Sarah, an employee with 3 years of service, wants to take a 10-day vacation to travel.\n\u00b7 Action: Six weeks before her planned trip, Sarah checks her PTO balance in the HRIS, which shows she has 12 accrued days. She submits a leave request for 10 working days. Her manager reviews the team's project schedule, sees that her absence will not cause a disruption, and approves the request. Sarah sets up her out-of-office notification before she leaves.\n",
-    "metadata": {
-      "parent_sections": [
-        "3.0 Paid Time Off (PTO) / Annual Leave"
-      ],
-      "hierarchy_path": "3.0 Paid Time Off (PTO) / Annual Leave > 3.6 Case Example",
-      "level": 2
-    }
+    "metadata_section_id": "3.6",
+    "metadata_title": "3.0 Paid Time Off (PTO) / Annual Leave > 3.6 Case Example",
+    "content": "\u00b7 Scenario: Sarah, an employee with 3 years of service, wants to take a 10-day vacation to travel.\n\u00b7 Action: Six weeks before her planned trip, Sarah checks her PTO balance in the HRIS, which shows she has 12 accrued days. She submits a leave request for 10 working days. Her manager reviews the team's project schedule, sees that her absence will not cause a disruption, and approves the request. Sarah sets up her out-of-office notification before she leaves.\n"
   },
   {
-    "section_number": "4.1",
-    "heading": "4.1 Purpose",
-    "content": "Sick leave is provided to allow employees to recover from their own illness or injury, or to attend necessary medical appointments.\n",
-    "metadata": {
-      "parent_sections": [
-        "4.0 Sick Leave"
-      ],
-      "hierarchy_path": "4.0 Sick Leave > 4.1 Purpose",
-      "level": 2
-    }
+    "metadata_section_id": "4.1",
+    "metadata_title": "4.0 Sick Leave > 4.1 Purpose",
+    "content": "Sick leave is provided to allow employees to recover from their own illness or injury, or to attend necessary medical appointments.\n"
   },
   {
-    "section_number": "4.2",
-    "heading": "4.2 Entitlement",
-    "content": "All full-time employees are entitled to 12 days of paid sick leave per leave year. This is not accrued and is available in full from the start of the leave year (or on a prorated basis upon joining).\n",
-    "metadata": {
-      "parent_sections": [
-        "4.0 Sick Leave"
-      ],
-      "hierarchy_path": "4.0 Sick Leave > 4.2 Entitlement",
-      "level": 2
-    }
+    "metadata_section_id": "4.2",
+    "metadata_title": "4.0 Sick Leave > 4.2 Entitlement",
+    "content": "All full-time employees are entitled to 12 days of paid sick leave per leave year. This is not accrued and is available in full from the start of the leave year (or on a prorated basis upon joining).\n"
   },
   {
-    "section_number": "4.3",
-    "heading": "4.3 Notification Procedure",
-    "content": ". If an employee is unable to work due to illness, they must notify their manager via phone call, text, or email as early as possible, preferably before their scheduled start time.\n\u00b7 A formal leave request must be submitted in the HRIS on the same day or upon their return to work.\n",
-    "metadata": {
-      "parent_sections": [
-        "4.0 Sick Leave"
-      ],
-      "hierarchy_path": "4.0 Sick Leave > 4.3 Notification Procedure",
-      "level": 2
-    }
+    "metadata_section_id": "4.3",
+    "metadata_title": "4.0 Sick Leave > 4.3 Notification Procedure",
+    "content": ". If an employee is unable to work due to illness, they must notify their manager via phone call, text, or email as early as possible, preferably before their scheduled start time.\n\u00b7 A formal leave request must be submitted in the HRIS on the same day or upon their return to work.\n"
   },
   {
-    "section_number": "4.4",
-    "heading": "4.4 Medical Certification Requirements",
-    "content": "\u00b7 For an absence of three (3) or more consecutive days, an employee must provide a medical certificate from a registered medical practitioner.\n\u00b7 The certificate should state the employee was unfit for duty and specify the dates of absence. It should not contain confidential medical details.\n\u00b7 The company reserves the right to request a medical certificate for shorter absences if there is a pattern of frequent, short-term sickness.\n",
-    "metadata": {
-      "parent_sections": [
-        "4.0 Sick Leave"
-      ],
-      "hierarchy_path": "4.0 Sick Leave > 4.4 Medical Certification Requirements",
-      "level": 2
-    }
+    "metadata_section_id": "4.4",
+    "metadata_title": "4.0 Sick Leave > 4.4 Medical Certification Requirements",
+    "content": "\u00b7 For an absence of three (3) or more consecutive days, an employee must provide a medical certificate from a registered medical practitioner.\n\u00b7 The certificate should state the employee was unfit for duty and specify the dates of absence. It should not contain confidential medical details.\n\u00b7 The company reserves the right to request a medical certificate for shorter absences if there is a pattern of frequent, short-term sickness.\n"
   },
   {
-    "section_number": "4.5",
-    "heading": "4.5 Long-Term Sickness",
-    "content": "If an employee requires an extended period of absence due to a serious illness or injury, they should contact HR to discuss options, which may include extended sick leave, disability benefits, or an unpaid leave of absence.\n",
-    "metadata": {
-      "parent_sections": [
-        "4.0 Sick Leave"
-      ],
-      "hierarchy_path": "4.0 Sick Leave > 4.5 Long-Term Sickness",
-      "level": 2
-    }
+    "metadata_section_id": "4.5",
+    "metadata_title": "4.0 Sick Leave > 4.5 Long-Term Sickness",
+    "content": "If an employee requires an extended period of absence due to a serious illness or injury, they should contact HR to discuss options, which may include extended sick leave, disability benefits, or an unpaid leave of absence.\n"
   },
   {
-    "section_number": "4.6",
-    "heading": "4.6 Return to Work",
-    "content": "For absences exceeding [e.g., 10] working days, a fitness-to-work certificate may be required before the employee can resume their duties. This is to ensure the employee's well-being and a safe return to the workplace.\n",
-    "metadata": {
-      "parent_sections": [
-        "4.0 Sick Leave"
-      ],
-      "hierarchy_path": "4.0 Sick Leave > 4.6 Return to Work",
-      "level": 2
-    }
+    "metadata_section_id": "4.6",
+    "metadata_title": "4.0 Sick Leave > 4.6 Return to Work",
+    "content": "For absences exceeding [e.g., 10] working days, a fitness-to-work certificate may be required before the employee can resume their duties. This is to ensure the employee's well-being and a safe return to the workplace.\n"
   },
   {
-    "section_number": "4.7",
-    "heading": "4.7 Case Example",
-    "content": "\u00b7 Scenario: John wakes up with a high fever and is unable to work.\n\u00b7 Action: At 8:00 AM, John calls his manager to inform her he is unwell and will not be coming in. His illness lasts for four days. Upon his return on the fifth day, he submits a sick leave request in the HRIS for the four days of absence and uploads a scanned copy of his doctor's certificate as required.\n(This continues for all sections, building out the detailed content to reach the desired length and comprehensiveness)\n",
-    "metadata": {
-      "parent_sections": [
-        "4.0 Sick Leave"
-      ],
-      "hierarchy_path": "4.0 Sick Leave > 4.7 Case Example",
-      "level": 2
-    }
+    "metadata_section_id": "4.7",
+    "metadata_title": "4.0 Sick Leave > 4.7 Case Example",
+    "content": "\u00b7 Scenario: John wakes up with a high fever and is unable to work.\n\u00b7 Action: At 8:00 AM, John calls his manager to inform her he is unwell and will not be coming in. His illness lasts for four days. Upon his return on the fifth day, he submits a sick leave request in the HRIS for the four days of absence and uploads a scanned copy of his doctor's certificate as required.\n(This continues for all sections, building out the detailed content to reach the desired length and comprehensiveness)\n"
   },
   {
-    "section_number": "15.0",
-    "heading": "15.0 Frequently Asked Questions (FAQs)",
-    "content": "Q1: How do I apply for leave?\nA: All leave must be applied for through the company's HRIS portal. Navigate to the \"Time Off\" or \"Leave Request\" section, select the type and dates of leave, and submit it for your manager's approval.\nQ2: Can my manager deny my PTO request?\nA: Yes. While we encourage all employees to take their PTO, approval is subject to business needs. Your manager may deny a request if it conflicts with critical deadlines, a major project, or if too many team members have requested the same time off. Your manager must provide a reason for the denial and should work with you to find an alternative time.\nQ3: What happens if I fall sick while on PTO?\nA: If you become ill for three or more consecutive days during your PTO and can provide a valid medical certificate, those days can be reclassified as Sick Leave. You must notify your manager and HR as soon as possible and update your leave request in the HRIS upon your return. The corresponding PTO days will be credited back to your balance.\nQ4: Do I get paid for public holidays?\nA: Yes, all designated public holidays are paid days off for all permanent employees.\nQ5: What is the difference between Compassionate Leave and Bereavement Leave?\nA: Bereavement Leave is specifically for time off following the death of a family member. Compassionate Leave is for situations where you need to provide care and support to a family member suffering from a serious illness or injury.\nQ6: Can I combine different types of leave?\nA: Yes, it is often possible to combine leave types. For example, you might combine PTO with a public holiday to extend your vacation. All such requests must be clearly indicated in the HRIS and are subject to standard approval procedures.\n",
-    "metadata": {
-      "parent_sections": [
-        "15.0 Frequently Asked Questions (FAQs)"
-      ],
-      "hierarchy_path": "15.0 Frequently Asked Questions (FAQs) > 15.0 Frequently Asked Questions (FAQs)",
-      "level": 1
-    }
+    "metadata_section_id": "15.0",
+    "metadata_title": "15.0 Frequently Asked Questions (FAQs) > 15.0 Frequently Asked Questions (FAQs)",
+    "content": "Q1: How do I apply for leave?\nA: All leave must be applied for through the company's HRIS portal. Navigate to the \"Time Off\" or \"Leave Request\" section, select the type and dates of leave, and submit it for your manager's approval.\nQ2: Can my manager deny my PTO request?\nA: Yes. While we encourage all employees to take their PTO, approval is subject to business needs. Your manager may deny a request if it conflicts with critical deadlines, a major project, or if too many team members have requested the same time off. Your manager must provide a reason for the denial and should work with you to find an alternative time.\nQ3: What happens if I fall sick while on PTO?\nA: If you become ill for three or more consecutive days during your PTO and can provide a valid medical certificate, those days can be reclassified as Sick Leave. You must notify your manager and HR as soon as possible and update your leave request in the HRIS upon your return. The corresponding PTO days will be credited back to your balance.\nQ4: Do I get paid for public holidays?\nA: Yes, all designated public holidays are paid days off for all permanent employees.\nQ5: What is the difference between Compassionate Leave and Bereavement Leave?\nA: Bereavement Leave is specifically for time off following the death of a family member. Compassionate Leave is for situations where you need to provide care and support to a family member suffering from a serious illness or injury.\nQ6: Can I combine different types of leave?\nA: Yes, it is often possible to combine leave types. For example, you might combine PTO with a public holiday to extend your vacation. All such requests must be clearly indicated in the HRIS and are subject to standard approval procedures.\n"
   },
   {
-    "section_number": "16.0",
-    "heading": "16.0 Revision History",
-    "content": "Version Date of Revision Summary of Changes Approved By\nInitial release of the comprehensive 2024 Leave Policy. Board of Directors\n",
-    "metadata": {
-      "parent_sections": [
-        "16.0 Revision History"
-      ],
-      "hierarchy_path": "16.0 Revision History > 16.0 Revision History",
-      "level": 1
-    }
+    "metadata_section_id": "16.0",
+    "metadata_title": "16.0 Revision History > 16.0 Revision History",
+    "content": "Version Date of Revision Summary of Changes Approved By\nInitial release of the comprehensive 2024 Leave Policy. Board of Directors\n"
   }
 ]
