@@ -51,3 +51,8 @@ class InputDetails(BaseModel):
 
 class UploadRequest(BaseModel):
     filename: str
+
+class RagasData(BaseModel):
+    inpQuestion : str
+    retrievedContext : List[str]
+    llmResponse : str

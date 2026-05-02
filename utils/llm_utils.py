@@ -1,11 +1,11 @@
 import os, logging, sys, inspect, re, json, hashlib
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
-from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, ToolMessage
 from langgraph.graph import MessagesState
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
-from utils.model_contracts import EmployeeMasterResponseModel, EmployeeLeaveResponseModel, WeatherDataResponse, RagDataResponseModel, RagData
+from utils.model_contracts import EmployeeMasterResponseModel, EmployeeLeaveResponseModel, WeatherDataResponse, RagDataResponseModel, RagasData
 from mcp.server.fastmcp import FastMCP
 from typing import List, Dict
 from langchain_core.documents import Document
@@ -260,16 +260,20 @@ def build_nodes(llm_with_tools):
         count = state.get('tool_execution_count',0)
         if getattr(response, 'tool_calls', None):
             count += 1
-            return {
-                'messages':[HUMAN_MESSAGE, response],
-                'tool_execution_count' : count
-            }
         
-        # extract_rag_data(state, response)
+        ragas_data = None
+
+        if not getattr(response, 'tool_calls', None):
+            ragas_data = extract_rag_data(state, response)
+
+            if ragas_data:
+                log.info(f'RAGAS DATA CAPTURED: {ragas_data.model_dump()}')
+
         return {
-                'messages':[HUMAN_MESSAGE, response],
-                'tool_execution_count' : count
-            }
+            'messages':[HUMAN_MESSAGE, response],
+            'tool_execution_count' : count,
+            'ragas_data': ragas_data  # optional: propagate forward
+        }
     
     return {
         'node_generate_answer_from_llm' : node_generate_answer_from_llm
@@ -388,40 +392,12 @@ def getAzureSecrets(key:str) -> str:
 
 def get_chunks(di_data:dict, file_name:str) -> List[Document]:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    # full_text = ''
-    # for doc in file_data:
-    #     full_text += doc.page_content
-
-    # pattern = r'(?m)^[•]?\s*(\d+(?:\.\d+)+)\s+([^\n]+)'
-    # matches = list(re.finditer(pattern, full_text))
-
-    # langchain_doc = []
-
-    # for i, match in enumerate(matches):
-    #     section_id = match.group(1)
-    #     title = match.group(2).strip()
-
-    #     start = match.end()
-    #     end = matches[i + 1].start() if i + 1 < len(matches) else len(full_text)
-
-    #     content = full_text[start:end].strip()
-    #     if content:
-    #         page_content = f'{section_id} {title}\n{content}'
-    #         metadata = {
-    #             'metadata_section_id' : section_id,
-    #             'metadata_title' : title,
-    #             'metadata_doc_name' : file_path.stem.replace(' ', '')
-    #         }
-    #         langchain_doc.append(
-    #             Document(page_content=page_content, metadata=metadata)
-    #         )
     langchain_doc = []
     paragraphs = di_data.get("paragraphs", [])
 
     # -------------------------------
     # Helpers
     # -------------------------------
-
     def extract_section_number(text):
         text = text.strip()
 
@@ -430,13 +406,10 @@ def get_chunks(di_data:dict, file_name:str) -> List[Document]:
 
         if match:
             return match.group(1)
-
         return None
-
 
     def section_sort_key(section_number):
         return [int(x) for x in section_number.split('.')]
-
 
     def get_level(section_number):
         parts = section_number.split('.')
@@ -454,7 +427,6 @@ def get_chunks(di_data:dict, file_name:str) -> List[Document]:
 
             if parent in section_map:
                 return section_map[parent]
-
         return None
 
     def is_probable_toc_line(text):
@@ -463,7 +435,6 @@ def get_chunks(di_data:dict, file_name:str) -> List[Document]:
     # -------------------------------
     # Pass 1: Build section map
     # -------------------------------
-
     section_map = {}
 
     for para in paragraphs:
@@ -478,7 +449,6 @@ def get_chunks(di_data:dict, file_name:str) -> List[Document]:
     # -------------------------------
     # Pass 2: Chunking
     # -------------------------------
-
     chunks = []
     current_chunk = None
 
@@ -500,15 +470,8 @@ def get_chunks(di_data:dict, file_name:str) -> List[Document]:
                 "section_id": sec_num,
                 "title": f"{parent} > {text}" if parent else text,
                 "content": ""
-                # "metadata": {
-                #     "parent_sections": [parent] if parent else [],
-                #     "hierarchy_path": f"{parent} > {text}" if parent else text,
-                #     "level": get_level(sec_num)
-                # }
             }
-
             chunks.append(current_chunk)
-
         # ---------------------------
         # Skip TOC-like junk
         # ---------------------------
@@ -528,9 +491,7 @@ def get_chunks(di_data:dict, file_name:str) -> List[Document]:
     # -------------------------------
     # Optional: Clean empty chunks
     # -------------------------------
-
     chunks = [c for c in chunks if c["content"].strip()]
-
     for chunk in chunks:
         page_content = f'{chunk['section_id']} {chunk['title']}\n{chunk['content']}'
         metadata = {
@@ -545,31 +506,38 @@ def get_chunks(di_data:dict, file_name:str) -> List[Document]:
     return langchain_doc
 
 def extract_rag_data(state, response):
-    from langchain_core.messages import ToolMessage
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    try:
+        question = state.get("question", "")
+        messages = state["messages"]
 
-    messages = state["messages"]
-    rag_msgs = [
-        m for m in messages
-        if isinstance(m, ToolMessage) and m.name == "get_rag_document_tool"
-    ]
+        rag_msgs = [
+            m for m in messages
+            if isinstance(m, ToolMessage) and m.name == "get_rag_document_tool"
+        ]
 
-    if rag_msgs:
+        if not rag_msgs:
+            return None
+
         latest_tool_msg = rag_msgs[-1]
-        idx = messages.index(latest_tool_msg)
-        log.info(f'CUSTOM LOG all messages are {messages} and value of idx is {idx} and length {len(messages)} and response is {response}')
 
-        if idx + 1 < len(messages):
-            next_msg = messages[idx + 1]
-            if isinstance(next_msg, AIMessage) and not getattr(next_msg, "tool_calls", None):
-                answer = next_msg.content
-                log.info(f'CUSTOM LOG . Data in the extract_rag AI MESSAGE is {answer}')
         try:
-            log.info(f'CUSTOM LOG . raw data before parsing is {rag_msgs[-1]} with type {type(rag_msgs[-1])} and type {type(rag_msgs[-1].content)}')
-            parsed = RagDataResponseModel.model_validate_json(rag_msgs[-1].content)
-            log.info(f'CUSTOM LOG . Data in the extract_rag is {parsed}')
-
+            parsed = RagDataResponseModel.model_validate_json(latest_tool_msg.content)
+            contexts = [r.text for r in parsed.results]
         except Exception:
-            log.exception("RAG extraction failed")
+            contexts = []
+
+        llm_answer = response.content if hasattr(response, "content") else str(response)
+
+        ragas_obj = RagasData(
+            inpQuestion=question,
+            retrievedContext=contexts,
+            llmResponse=llm_answer
+        )
+        log.info(f'CUSTOM LOG - Ragas object captured is  : {ragas_obj.inpQuestion} : {ragas_obj.retrievedContext} : {ragas_obj.llmResponse}')
+        return ragas_obj
+    except Exception as err:
+        log.info(f'CUSTOM LOG - Errored in {inspect.currentframe().f_code.co_name} with error {err}')
 
 def get_llm_answer_for_ragas(question:str, context:list):
     context_text = "\n\n".join(context)
