@@ -44,7 +44,8 @@ class RagData(BaseModel):
     docName:Optional[str] = ''
 class RagDataResponseModel(BaseModel):
     dataFound : Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'NOT FOUND'
-    results : List[RagData] = []
+    results : List[RagData] | None = None
+    formattedContext : str | None = None
 
 class InputDetails(BaseModel):
     inp_query:str

@@ -210,39 +210,12 @@ def build_tools(mcp_server: FastMCP):
                                     arguments={'inp_question':inp_question}
         )
         try:
-            log.info(f'response retrieved inside build_tools is {resp[0].text} with type {type(resp[0].text)} and {resp} with type {type(resp)}') 
-            # resp_content = RagDataResponseModel.model_validate_json(resp[0].text)
-            
-            resp_dict = json.loads(resp[0].text)
-            results = resp_dict.get("results", [])
-            parsed_chunks = [
-                {
-                    "text": r.get("text", ""),
-                    "title": r.get("title", ""),
-                    "docName": r.get("docName", ""),
-                    "score": r.get("score", 0.0)
-                }
-                for r in results
-            ]
-
-            contexts = [
-                f"""
-            [Source {i+1}]
-            Document: {c['docName']}
-            Title: {c['title']}
-
-            {c['text']}
-            """
-                for i, c in enumerate(parsed_chunks)
-            ]
-            context_text = "\n\n---\n\n".join(contexts)
-            log.info(f'CUSTOM LOGS - {context_text}')
+            parsed = RagDataResponseModel.model_validate_json(resp[0].text)
+            return parsed.formatted_context
 
         except Exception as err:
             log.info(f'Errored in {inspect.currentframe().f_code.co_name} with error {err}')
             return RagDataResponseModel()
-        
-        return context_text
 
     return [get_weather_tool, get_rag_document_tool, get_employee_master_record_tool, get_employee_leave_record_tool]
 
@@ -265,9 +238,6 @@ def build_nodes(llm_with_tools):
 
         if not getattr(response, 'tool_calls', None):
             ragas_data = extract_rag_data(state, response)
-
-            if ragas_data:
-                log.info(f'RAGAS DATA CAPTURED: {ragas_data.model_dump()}')
 
         return {
             'messages':[HUMAN_MESSAGE, response],
@@ -534,7 +504,7 @@ def extract_rag_data(state, response):
             retrievedContext=contexts,
             llmResponse=llm_answer
         )
-        log.info(f'CUSTOM LOG - Ragas object captured is  : {ragas_obj.inpQuestion} : {ragas_obj.retrievedContext} : {ragas_obj.llmResponse}')
+        log.info(f'RAGAS DATA CAPTURED: {ragas_obj.model_dump()}')
         return ragas_obj
     except Exception as err:
         log.info(f'CUSTOM LOG - Errored in {inspect.currentframe().f_code.co_name} with error {err}')

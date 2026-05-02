@@ -79,6 +79,7 @@ def register_tools(mcp_server:FastMCP):
     async def get_rag_document(inp_question: str):
         log.info(f'CUSTOM LOG - Entered MCP tool: {inspect.currentframe().f_code.co_name} with parameter {inp_question}')
         rag_response = RagDataResponseModel()
+        contexts = []
         try:
             openai_client = get_azure_openai_client()
             query_embeddings = openai_client.embeddings.create(
@@ -107,18 +108,27 @@ def register_tools(mcp_server:FastMCP):
                 select=['id', 'content_text', 'metadata_title', 'metadata_doc_name']
             )
             result_list = list(result)
-            for result in result_list:
+            for i, result in enumerate(result_list):
                 rag_response.dataFound = 'FOUND'
                 rag_response.results.append(
                     RagData(
                         score = result['@search.score'],
                         text = result['content_text'],
                         title = result['metadata_title'],
-                        docName = result['metadata_doc_name']
+                        docName = result['metadata_doc_name'],
                     )
                 )
-            # if len(result_list) > 0:
-            #     write_ragas_data(inp_question, rag_response.results)
+                # formatted version for LLM
+                contexts.append( 
+                    f"""
+                    [Source {i+1}]
+                    Document: {result['metadata_doc_name']}
+                    Title: {result['metadata_title']}
+                    {result['content_text']}
+                    """
+                )
+            context_text = "\n\n---\n\n".join(contexts)
+            rag_response.formattedContext = context_text
             return rag_response.model_dump_json()
         except Exception:
             log.exception(f'CUSTOM LOG - Error in MCP tool {inspect.currentframe().f_code.co_name}')
