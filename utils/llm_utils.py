@@ -526,7 +526,11 @@ def calculate_ragas_metrics(ragas_inp : RagasInp):
         embeddings = LangchainEmbeddingsWrapper(
         LCOpenAIEmbeddings(model="text-embedding-3-small")
         )
-        dataset = Dataset.from_dict(ragas_inp.model_dump())
+        dataset = Dataset.from_dict({
+            "question": [ragas_inp.inpQuestion],
+            "answer": [ragas_inp.llmResponse],
+            "contexts": [ragas_inp.retrievedContext]
+        })
         metrics = evaluate(dataset=dataset,
                 metrics=[_Faithfulness, _ResponseRelevancy],
                 llm=llm,
@@ -534,8 +538,8 @@ def calculate_ragas_metrics(ragas_inp : RagasInp):
         )
         scores = metrics._scores_dict
         ragas_metrics = RagasMetrics(
-            faithfullness = scores.get('faithfullness'),
-            relevancy = scores.get('answer_relevancy')
+            faithfullness = scores.get('faithfulness', 0.0),
+            relevancy = scores.get('answer_relevancy', 0.0)
         )
 
         ragas_data = RagasData(
@@ -557,7 +561,7 @@ def calculate_ragas_metrics(ragas_inp : RagasInp):
         except:
             json_blob_client.create_append_blob()
 
-        line = json.dumps(ragas_data) + "\n"
+        line = json.dumps(ragas_data.model_dump()) + "\n"
         json_blob_client.append_block(line.encode("utf-8"))
 
     except Exception as err:
