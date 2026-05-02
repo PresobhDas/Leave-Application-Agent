@@ -211,7 +211,7 @@ def build_tools(mcp_server: FastMCP):
         )
         try:
             parsed = RagDataResponseModel.model_validate_json(resp[0].text)
-            return parsed.formatted_context
+            return parsed.formattedContext
 
         except Exception as err:
             log.info(f'Errored in {inspect.currentframe().f_code.co_name} with error {err}')
