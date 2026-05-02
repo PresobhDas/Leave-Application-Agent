@@ -19,7 +19,7 @@ from azure.data.tables import TableClient
 from azure.core.exceptions import ResourceNotFoundError
 from datasets import Dataset
 from ragas import evaluate
-from ragas.metrics import _Faithfulness, _ResponseRelevancy
+from ragas.metrics import faithfulness, answer_relevancy
 from ragas.llms import LangchainLLMWrapper
 from langchain_openai import OpenAIEmbeddings as LCOpenAIEmbeddings
 from ragas.embeddings import LangchainEmbeddingsWrapper 
@@ -532,7 +532,7 @@ def calculate_ragas_metrics(ragas_inp : RagasInp):
             "contexts": [ragas_inp.retrievedContext]
         })
         metrics = evaluate(dataset=dataset,
-                metrics=[_Faithfulness, _ResponseRelevancy],
+                metrics=[faithfulness, answer_relevancy],
                 llm=llm,
                 embeddings=embeddings
         )
