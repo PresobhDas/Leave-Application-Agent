@@ -538,8 +538,8 @@ def calculate_ragas_metrics(ragas_inp : RagasInp):
         )
         scores = metrics._scores_dict
         ragas_metrics = RagasMetrics(
-            faithfullness = scores.get('faithfulness', 0.0),
-            relevancy = scores.get('answer_relevancy', 0.0)
+            faithfulness = float(scores.get('faithfulness', [0.0])[0]),
+            relevancy = float(scores.get('answer_relevancy', [0.0])[0])
         )
 
         ragas_data = RagasData(

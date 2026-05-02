@@ -59,7 +59,7 @@ class RagasInp(BaseModel):
     llmResponse : str
 
 class RagasMetrics(BaseModel):
-    faithfullness : float = Field(default=0.0)
+    faithfulness : float = Field(default=0.0)
     relevancy : float  = Field(default=0.0)
 
 class RagasData(BaseModel):
