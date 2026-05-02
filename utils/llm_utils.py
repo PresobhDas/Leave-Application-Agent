@@ -1,4 +1,4 @@
-import os, logging, sys, inspect, re, json, hashlib
+import os, logging, sys, inspect, re, json, hashlib, asyncio
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, ToolMessage
@@ -510,7 +510,7 @@ def extract_ragas_data(state, response):
             llmResponse=llm_answer
         )
 
-        calculate_ragas_metrics(ragas_inp)
+        asyncio.create_task(calculate_ragas_metrics_async(ragas_inp))
 
         log.info(f'RAGAS DATA CAPTURED: {ragas_inp.model_dump()}')
         return ragas_inp
@@ -566,6 +566,16 @@ def calculate_ragas_metrics(ragas_inp : RagasInp):
 
     except Exception as err:
         log.exception(f'Errored in {inspect.currentframe().f_code.co_name} with error : {err}')
+
+
+async def calculate_ragas_metrics_async(ragas_inp):
+    loop = asyncio.get_running_loop()
+
+    return await loop.run_in_executor(
+        None,
+        calculate_ragas_metrics,
+        ragas_inp
+    )
 
 def get_llm_answer_for_ragas(question:str, context:list):
     context_text = "\n\n".join(context)
