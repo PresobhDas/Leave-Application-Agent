@@ -5,7 +5,7 @@ from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, Tool
 from langgraph.graph import MessagesState
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
-from utils.model_contracts import EmployeeMasterResponseModel, EmployeeLeaveResponseModel, WeatherDataResponse, RagDataResponseModel, RagasData
+from utils.model_contracts import EmployeeMasterResponseModel, EmployeeLeaveResponseModel, WeatherDataResponse, RagDataResponseModel, RagasInp, RagasMetrics, RagasData
 from mcp.server.fastmcp import FastMCP
 from typing import List, Dict
 from langchain_core.documents import Document
@@ -17,7 +17,13 @@ from pathlib import Path
 from azure.ai.textanalytics import TextAnalyticsClient
 from azure.data.tables import TableClient
 from azure.core.exceptions import ResourceNotFoundError
-
+from datasets import Dataset
+from ragas import evaluate
+from ragas.metrics import _Faithfulness, _ResponseRelevancy
+from ragas.llms import LangchainLLMWrapper
+from langchain_openai import OpenAIEmbeddings as LCOpenAIEmbeddings
+from ragas.embeddings import LangchainEmbeddingsWrapper 
+from azure.storage.blob import BlobServiceClient
 
 VAULT_URL = os.environ.get('VAULT_URL')
 
@@ -236,7 +242,7 @@ def build_nodes(llm_with_tools):
         ragas_data = None
 
         if not getattr(response, 'tool_calls', None):
-            ragas_data = extract_rag_data(state, response)
+            ragas_data = extract_ragas_data(state, response)
 
         return {
             'messages':[HUMAN_MESSAGE, response],
@@ -474,7 +480,7 @@ def get_chunks(di_data:dict, file_name:str) -> List[Document]:
 
     return langchain_doc
 
-def extract_rag_data(state, response):
+def extract_ragas_data(state, response):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     try:
         question = state.get("question", "")
@@ -498,15 +504,64 @@ def extract_rag_data(state, response):
 
         llm_answer = response.content if hasattr(response, "content") else str(response)
 
-        ragas_obj = RagasData(
+        ragas_inp = RagasInp(
             inpQuestion=question,
             retrievedContext=contexts,
             llmResponse=llm_answer
         )
-        log.info(f'RAGAS DATA CAPTURED: {ragas_obj.model_dump()}')
-        return ragas_obj
+
+        calculate_ragas_metrics(ragas_inp)
+
+        log.info(f'RAGAS DATA CAPTURED: {ragas_inp.model_dump()}')
+        return ragas_inp
     except Exception as err:
         log.info(f'CUSTOM LOG - Errored in {inspect.currentframe().f_code.co_name} with error {err}')
+
+def calculate_ragas_metrics(ragas_inp : RagasInp):
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    try:
+        chat_client = get_chat_model()
+
+        llm = LangchainLLMWrapper(chat_client)
+        embeddings = LangchainEmbeddingsWrapper(
+        LCOpenAIEmbeddings(model="text-embedding-3-small")
+        )
+        dataset = Dataset.from_dict(ragas_inp.model_dump())
+        metrics = evaluate(dataset=dataset,
+                metrics=[_Faithfulness, _ResponseRelevancy],
+                llm=llm,
+                embeddings=embeddings
+        )
+        scores = metrics._scores_dict
+        ragas_metrics = RagasMetrics(
+            faithfullness = scores.get('faithfullness'),
+            relevancy = scores.get('answer_relevancy')
+        )
+
+        ragas_data = RagasData(
+            ragasInp=ragas_inp,
+            ragasMetrics=ragas_metrics
+        )
+
+        blob_service_client = BlobServiceClient(
+                account_url = os.environ.get('BLOB_ACCOUNT_URL'),
+                credential = DefaultAzureCredential()
+            )
+        json_blob_client = blob_service_client.get_blob_client(
+            container='ragas-json',
+            blob=f'ragasmetrics.json'
+        )
+
+        try:
+            json_blob_client.get_blob_properties()
+        except:
+            json_blob_client.create_append_blob()
+
+        line = json.dumps(ragas_data) + "\n"
+        json_blob_client.append_block(line.encode("utf-8"))
+
+    except Exception as err:
+        log.exception(f'Errored in {inspect.currentframe().f_code.co_name} with error : {err}')
 
 def get_llm_answer_for_ragas(question:str, context:list):
     context_text = "\n\n".join(context)

@@ -53,7 +53,15 @@ class InputDetails(BaseModel):
 class UploadRequest(BaseModel):
     filename: str
 
-class RagasData(BaseModel):
+class RagasInp(BaseModel):
     inpQuestion : str
     retrievedContext : List[str]
     llmResponse : str
+
+class RagasMetrics(BaseModel):
+    faithfullness : float = Field(default=0.0)
+    relevancy : float  = Field(default=0.0)
+
+class RagasData(BaseModel):
+    ragasInp : RagasInp
+    ragasMetrics : RagasMetrics
