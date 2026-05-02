@@ -120,12 +120,11 @@ def register_tools(mcp_server:FastMCP):
                 )
                 # formatted version for LLM
                 contexts.append( 
-                    f"""
-                    [Source {i+1}]
-                    Document: {result['metadata_doc_name']}
-                    Title: {result['metadata_title']}
-                    {result['content_text']}
-                    """
+                    f"""[Source {i+1}]
+                Document: {result['metadata_doc_name']}
+                Title: {result['metadata_title']}
+
+                {result['content_text']}"""
                 )
             context_text = "\n\n---\n\n".join(contexts)
             rag_response.formattedContext = context_text

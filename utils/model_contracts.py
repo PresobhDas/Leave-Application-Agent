@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Literal, Optional, List
 
 class WeatherData(BaseModel):
@@ -44,7 +44,7 @@ class RagData(BaseModel):
     docName:Optional[str] = ''
 class RagDataResponseModel(BaseModel):
     dataFound : Literal['FOUND', 'NOT FOUND', 'ERROR'] = 'NOT FOUND'
-    results : List[RagData] | None = None
+    results : List[RagData] = Field(default_factory=list)
     formattedContext : str | None = None
 
 class InputDetails(BaseModel):
