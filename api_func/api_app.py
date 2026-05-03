@@ -187,67 +187,43 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
 
     return result
 
-@api_server.post('/evaluate')
+@api_server.get('/evaluate')
 async def call_evaluate():
-    from ragas.llms import LangchainLLMWrapper
-    from langchain_openai import OpenAIEmbeddings as LCOpenAIEmbeddings
-    from ragas.embeddings import LangchainEmbeddingsWrapper 
-    import math
-
-    chat_client = get_chat_model()
-
-    llm = LangchainLLMWrapper(chat_client)
-    embeddings = LangchainEmbeddingsWrapper(
-    LCOpenAIEmbeddings(model="text-embedding-3-small")
-    )
-
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-
     try:
-        with open('utils/leave_policy_litigation_dataset.json', 'r') as f:
-            dataset_list = json.load(f)
+        blob_service_client = BlobServiceClient(
+        account_url = os.environ.get('BLOB_ACCOUNT_URL'),
+        credential = DefaultAzureCredential()
+        )
+        json_blob_client = blob_service_client.get_blob_client(
+            container='ragas-json',
+            blob='ragasmetrics.jsonl'
+        )
 
-        ragas_data = {
-            'question' : [],
-            'contexts' : [],
-            'ground_truth' : [],
-            'response' : []
-        }
+        if json_blob_client.exists():
+            blob_jsonl = json_blob_client.download_blob().readall().decode('utf-8')
 
-        for item in dataset_list:
-            ragas_data["question"].append(item["question"])
-            ragas_data["ground_truth"].append(item["groundtruth"])
-            resp = await rag_retreival_function(inp_question = item["question"])
-            resp_data = RagDataResponseModel.model_validate_json(resp)
-            ragas_data['contexts'].append([data.text for data in resp_data.results])
-            llm_answer = get_llm_answer_for_ragas(item["question"], [data.text for data in resp_data.results])
-            ragas_data["response"].append(llm_answer)
+        faithfulness_list = []
+        relevancy_list = []
+        for line in blob_jsonl.splitlines():
+            json_line = json.loads(line)
+            if not json_line.strip():
+                continue
+            faithfulness_list.append(json_line.get('ragasMetrics', {}).get('faithfulness', 0.0))
+            relevancy_list.append(json_line.get('ragasMetrics', {}).get('relevancy', 0.0))
 
-        log.info(f'CUSTOM LOG - ragas data is {ragas_data}')
-        dataset = Dataset.from_dict(ragas_data)
+        if faithfulness_list:
+            faithfulness_avg = sum(faithfulness_list) / len(faithfulness_list)
 
-        def run_ragas():
-            return evaluate(
-                dataset,
-                metrics=[
-                    _ContextPrecision(),
-                    _ContextRecall(),
-                    _ContextRelevance(),
-                    _Faithfulness(),
-                    _ResponseRelevancy()
-                ],
-                llm=llm,
-                embeddings=embeddings
-            )
-        
-        result = await asyncio.to_thread(run_ragas)
-        log.info(f'CUSTOM LOGS - RAGAS result is {result}')
-        result_dict = result._scores_dict
-        reponse = {
-                k: (v if not (isinstance(v, float) and math.isnan(v)) else 0.0)
-                for k, v in result_dict.items()
-                }
-        return reponse
+        if relevancy_list:
+            relevancy_avg = sum(relevancy_list) / len(relevancy_list)
+
+        log.info(f'CUSTOM LOG - Evaluation metrics. Faithfulness : {faithfulness_avg}, Relevancy : {relevancy_avg}')
+
+        return {
+            'faithfulness' : faithfulness_avg,
+            'relevancy' : relevancy_avg
+        }        
 
     except Exception:
         log.exception(f'CUSTOM LOG - Errored in {inspect.currentframe().f_code.co_name}')
