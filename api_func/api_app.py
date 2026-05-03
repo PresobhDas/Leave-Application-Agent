@@ -1,4 +1,4 @@
-import logging, sys, inspect, os, tempfile, json, asyncio
+import logging, sys, inspect, os, tempfile, json, math
 from fastapi import FastAPI, Body, Request
 from typing import Annotated
 from langgraph.graph import START, END, StateGraph
@@ -206,11 +206,18 @@ async def call_evaluate():
         faithfulness_list = []
         relevancy_list = []
         for line in blob_jsonl.splitlines():
-            json_line = json.loads(line)
-            if not json_line.strip():
+            line = line.strip()
+            if not line:
                 continue
-            faithfulness_list.append(json_line.get('ragasMetrics', {}).get('faithfulness', 0.0))
-            relevancy_list.append(json_line.get('ragasMetrics', {}).get('relevancy', 0.0))
+            json_line = json.loads(line)
+            faithfulness_line = json_line.get('ragasMetrics', {}).get('faithfulness', 0.0)
+            relevancy_line = json_line.get('ragasMetrics', {}).get('relevancy', 0.0)
+            
+            if isinstance(faithfulness_line, float) and not math.isnan(faithfulness_line):
+                faithfulness_list.append(faithfulness_line)
+            if isinstance(relevancy_line, float) and not math.isnan(relevancy_line):
+                relevancy_list.append(relevancy_line)
+
 
         if faithfulness_list:
             faithfulness_avg = sum(faithfulness_list) / len(faithfulness_list)
