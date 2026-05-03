@@ -212,12 +212,11 @@ async def call_evaluate():
             json_line = json.loads(line)
             faithfulness_line = json_line.get('ragasMetrics', {}).get('faithfulness', 0.0)
             relevancy_line = json_line.get('ragasMetrics', {}).get('relevancy', 0.0)
-            
+
             if isinstance(faithfulness_line, float) and not math.isnan(faithfulness_line):
                 faithfulness_list.append(faithfulness_line)
             if isinstance(relevancy_line, float) and not math.isnan(relevancy_line):
                 relevancy_list.append(relevancy_line)
-
 
         if faithfulness_list:
             faithfulness_avg = sum(faithfulness_list) / len(faithfulness_list)
