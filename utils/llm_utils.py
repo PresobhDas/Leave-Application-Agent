@@ -561,7 +561,7 @@ def calculate_ragas_metrics(ragas_inp : RagasInp):
         except:
             json_blob_client.create_append_blob()
 
-        line = json.dumps(ragas_data.model_dump(), separators=(",", ":"), indent=2) + "\n"
+        line = json.dumps(ragas_data.model_dump(), separators=(",", ":")) + "\n"
         json_blob_client.append_block(line.encode("utf-8"))
 
     except Exception as err:
