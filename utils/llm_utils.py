@@ -329,7 +329,7 @@ def generate_embeddings(doc_chunks:List[Document]) -> List:
                 input=doc_chunk.page_content
             )
             vector_db_index = {
-                'id' : f'{doc_chunk.metadata.get('metadata_doc_name')}_{i}',
+                'id' : f"{doc_chunk.metadata.get('metadata_doc_name')}_{i}",
                 'metadata_section_id' : doc_chunk.metadata.get('metadata_section_id'),
                 'metadata_title' : doc_chunk.metadata.get('metadata_title'),
                 'metadata_doc_name' : doc_chunk.metadata.get('metadata_doc_name'),
@@ -337,10 +337,10 @@ def generate_embeddings(doc_chunks:List[Document]) -> List:
                 'embedding' : embedding.data[0].embedding
             }
             vector_db_index_list.append(vector_db_index)
-            log.info(f'CUSTOM LOG - hash for {doc_chunk.metadata.get('metadata_doc_name')}_{i} is {chunk_hash}')
+            log.info(f"CUSTOM LOG - hash for {doc_chunk.metadata.get('metadata_doc_name')}_{i} is {chunk_hash}")
             operations.append(('create', {"PartitionKey": "hashkey", "RowKey": chunk_hash}))
         else:
-            log.info(f'CUSTOM LOG - Hash key for chunk {doc_chunk.metadata.get('metadata_doc_name')}_{i} already present. Skipping embedding')
+            log.info(f"CUSTOM LOG - Hash key for chunk {doc_chunk.metadata.get('metadata_doc_name')}_{i} already present. Skipping embedding")
     if operations:
         table_client.submit_transaction(operations=operations)
     return vector_db_index_list
@@ -468,7 +468,7 @@ def get_chunks(di_data:dict, file_name:str) -> List[Document]:
     # -------------------------------
     chunks = [c for c in chunks if c["content"].strip()]
     for chunk in chunks:
-        page_content = f'{chunk['section_id']} {chunk['title']}\n{chunk['content']}'
+        page_content = f"{chunk['section_id']} {chunk['title']}\n{chunk['content']}"
         metadata = {
             'metadata_section_id' : chunk['section_id'],
             'metadata_title' : chunk['title'],
@@ -553,7 +553,7 @@ def calculate_ragas_metrics(ragas_inp : RagasInp):
             )
         json_blob_client = blob_service_client.get_blob_client(
             container='ragas-json',
-            blob=f'ragasmetrics.json'
+            blob='ragasmetrics.jsonl'
         )
 
         try:
@@ -561,7 +561,7 @@ def calculate_ragas_metrics(ragas_inp : RagasInp):
         except:
             json_blob_client.create_append_blob()
 
-        line = json.dumps(ragas_data.model_dump()['ragasInp'], indent=2) + "\n"
+        line = json.dumps(ragas_data.model_dump(), separators=(",", ":")) + "\n"
         json_blob_client.append_block(line.encode("utf-8"))
 
     except Exception as err:
