@@ -58,6 +58,7 @@ def register_tools(mcp_server:FastMCP):
             params = {
                 'latitude':lat,
                 'longitude':long,
+                'temperature_unit':'fahrenheit',
                 'current_weather':True
             }
             log.info(f'CUSTOM LOG - Calling external API : {url}')
