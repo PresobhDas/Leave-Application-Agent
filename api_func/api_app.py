@@ -3,8 +3,8 @@ from fastapi import FastAPI, Body, Request
 from typing import Annotated
 from langgraph.graph import START, END, StateGraph
 from langgraph.prebuilt import ToolNode
-from utils.llm_utils import get_chat_model, build_nodes, check_tool_condition, build_tools, get_chunks, generate_embeddings, write_embeddings, get_azure_openai_client, get_llm_answer_for_ragas, RagState,  delete_existing_embeddings
-from utils.model_contracts import InputDetails, UploadRequest
+from utils.llm_utils import get_chat_model, build_nodes, check_tool_condition, build_tools, get_chunks, generate_embeddings, write_embeddings, get_azure_openai_client, get_llm_answer_for_ragas, delete_existing_embeddings, node_capture_rag_context
+from utils.model_contracts import InputDetails, UploadRequest, RagState
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
 from api_func.mcp_app import register_tools
@@ -164,8 +164,9 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
 
     graph = StateGraph(RagState)
     graph.add_node('node_generate_answer_from_llm', nodes['node_generate_answer_from_llm'])
-    node_tool_execution = ToolNode(tools=tools)
-    graph.add_node('node_tool_execution', node_tool_execution)
+    graph.add_node('node_tool_execution', ToolNode(tools=tools))
+    graph.add_node('node_capture_rag_context', node_capture_rag_context)
+
     graph.add_edge(START, 'node_generate_answer_from_llm')
     graph.add_conditional_edges(
         'node_generate_answer_from_llm',
@@ -175,7 +176,8 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
             'end': END
         }
     )
-    graph.add_edge('node_tool_execution', 'node_generate_answer_from_llm')
+    graph.add_edge('node_tool_execution', 'node_capture_rag_context')
+    graph.add_edge('node_capture_rag_context', 'node_generate_answer_from_llm')
     graph_app = graph.compile()
     log.info(f'CUSTOM LOG - Graph compiled and created inside : {inspect.currentframe().f_code.co_name}')
     result = await graph_app.ainvoke(

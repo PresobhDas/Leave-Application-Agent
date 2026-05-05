@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
-from typing import Literal, Optional, List
+from typing import Literal, Optional, List, TypedDict, Annotated
+from langchain_core.messages import BaseMessage
+from operator import add
 
 class WeatherData(BaseModel):
     latitude: float
@@ -65,3 +67,10 @@ class RagasMetrics(BaseModel):
 class RagasData(BaseModel):
     ragasInp : RagasInp
     ragasMetrics : RagasMetrics
+
+class RagState(TypedDict):
+    messages: Annotated[List[BaseMessage], add]
+    question:str
+    context:List[str]
+    llmResponse:str
+    tool_execution_count: int

@@ -5,7 +5,7 @@ from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, Tool
 from langgraph.graph import MessagesState
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
-from utils.model_contracts import EmployeeMasterResponseModel, EmployeeLeaveResponseModel, WeatherDataResponse, RagDataResponseModel, RagasInp, RagasMetrics, RagasData
+from utils.model_contracts import EmployeeMasterResponseModel, EmployeeLeaveResponseModel, WeatherDataResponse, RagDataResponseModel, RagasInp, RagasMetrics, RagasData, RagState
 from mcp.server.fastmcp import FastMCP
 from typing import List, Dict
 from langchain_core.documents import Document
@@ -40,9 +40,11 @@ if not log.handlers:
     log.addHandler(h)
 
 azure_ai_search_endpoint = os.environ.get('AZURE_AI_SEARCH_CONNECTION_STRING')
-class RagState(MessagesState):
-    question:str
-    tool_execution_count: int
+# class RagState(MessagesState):
+#     question:str
+#     context:List[str]
+#     llmResponse:str
+#     tool_execution_count: int
 
 def get_prompts(prompt_name:str, question:str|None=None):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
@@ -130,6 +132,16 @@ async def check_tool_condition(state: RagState):
         return 'node_tool_execution'
     else:
         return 'end'
+
+async def node_capture_rag_context(state: RagState):
+    context = []
+
+    for msg in reversed(state.get("messages", [])):
+        if isinstance(msg, ToolMessage) and msg.name == "get_rag_document_tool":
+            context.append(msg.content)
+            break
+
+    return {"context": context}
 
 def build_tools(mcp_server: FastMCP):
     @tool
@@ -233,7 +245,7 @@ def build_nodes(llm_with_tools):
         inp_human_message = get_prompts('input_prompt_human', question=state.get('question', ''))
         SYSTEM_MESSAGE = SystemMessage(content=inp_system_message)
         HUMAN_MESSAGE = HumanMessage(content=inp_human_message)
-        response = await llm_with_tools.ainvoke(state['messages'] + [SYSTEM_MESSAGE, HUMAN_MESSAGE])
+        response = await llm_with_tools.ainvoke(state.get('messages', []) + [SYSTEM_MESSAGE, HUMAN_MESSAGE])
         log.info(f'CUSTOM LOG - THIS IS THE RESPONSE BACK FROM THE LLM CALL {response}')
         count = state.get('tool_execution_count',0)
         if getattr(response, 'tool_calls', None):
@@ -241,13 +253,14 @@ def build_nodes(llm_with_tools):
         
         ragas_data = None
 
-        if not getattr(response, 'tool_calls', None):
-            ragas_data = extract_ragas_data(state, response)
+        # if not getattr(response, 'tool_calls', None):
+        #     ragas_data = extract_ragas_data(state, response)
 
         return {
-            'messages':[HUMAN_MESSAGE, response],
-            'tool_execution_count' : count,
-            'ragas_data': ragas_data  # optional: propagate forward
+            "messages": [SYSTEM_MESSAGE, HUMAN_MESSAGE, response],
+            "tool_execution_count": count,
+            "llmResponse": getattr(response, "content", ""),
+            "ragas_data": ragas_data  # optional propagation
         }
     
     return {
