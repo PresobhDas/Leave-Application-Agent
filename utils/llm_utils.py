@@ -584,7 +584,7 @@ async def write_ragas_with_session_history(response : dict):
 
         cosmos_history_item = {
             'id' : str(uuid.uuid4()),
-            'user_id' : 'a',
+            'user_id' : response.get('userId'),
             'timestamp' : datetime.utcnow().isoformat(),
             **ragas_data.model_dump()
         }

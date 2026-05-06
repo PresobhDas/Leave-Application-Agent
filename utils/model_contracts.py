@@ -51,6 +51,7 @@ class RagDataResponseModel(BaseModel):
 
 class InputDetails(BaseModel):
     inp_query:str
+    user_id: str
 
 class UploadRequest(BaseModel):
     filename: str
@@ -69,6 +70,7 @@ class RagasData(BaseModel):
     ragasMetrics : RagasMetrics
 
 class RagState(TypedDict):
+    userId : str
     messages: Annotated[List[BaseMessage], add]
     question:str
     context:List[str]

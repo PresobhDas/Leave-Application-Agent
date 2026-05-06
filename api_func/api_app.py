@@ -182,6 +182,7 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
     log.info(f'CUSTOM LOG - Graph compiled and created inside : {inspect.currentframe().f_code.co_name}')
     result = await graph_app.ainvoke(
         {
+            'userId' : inp_details.user_id,
             'question' : inp_details.inp_query,
             'tool_execution_count' : 0
         }
