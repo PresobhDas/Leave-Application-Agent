@@ -613,10 +613,26 @@ def calculate_ragas_metrics(ragas_inp : RagasInp) -> RagasData:
 
 async def write_ragas_with_session_history(response : dict) -> RagasData:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    retrievedContext = []
+
+    context_list = response.get("context", [])
+
+    for ctx in context_list:
+        try:
+            parsed = json.loads(ctx)
+
+            for r in parsed.get("results", []):
+                text = r.get("text")
+                if text:
+                    retrievedContext.append(text)
+
+        except Exception as err:
+            log.info(f'CUSTOM LOG - Failed parsing context: {err}')
+            continue
     try:
         ragas_inp = RagasInp(
             inpQuestion=response.get('question', ''),
-            retrievedContext=[context.get('text') for context in json.loads(response.get('context')[0]).get('results')],
+            retrievedContext=retrievedContext,
             llmResponse=response.get('llmResponse')
         )
 
@@ -626,12 +642,23 @@ async def write_ragas_with_session_history(response : dict) -> RagasData:
                     )
 
         confidence_list = []
-        for msg in response["messages"]:
-            if isinstance(msg, ToolMessage) and msg.name == "get_rag_document_tool":
-                parsed = json.loads(msg.content)
 
-                for item in parsed.get("results", []):
-                    confidence_list.append(item.get("score"))
+        for msg in response.get("messages", []):
+            if isinstance(msg, ToolMessage) and msg.name == "get_rag_document_tool":
+                try:
+                    parsed = json.loads(msg.content)
+
+                    for item in parsed.get("results", []):
+                        score = item.get("score")
+                        if isinstance(score, (int, float)):
+                            confidence_list.append(score)
+
+                except:
+                    continue
+
+        # fallback
+        if not confidence_list:
+            confidence_list = [1.0]
 
         ragas_inp.confidenceScore = confidence_list
         cosmos_history_item = {

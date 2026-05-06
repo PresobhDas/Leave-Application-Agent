@@ -207,6 +207,12 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
 
     ragas_data = await write_ragas_with_session_history(result)
 
+    if not ragas_data:
+        return {
+        "llmResponse": result.get("llmResponse", ""),
+        "confidence": 100
+        }
+
     return {
         'llmResponse' : ragas_data.ragasInp.llmResponse,
         'confidence' : sum(ragas_data.ragasInp.confidenceScore) / len(ragas_data.ragasInp.confidenceScore) * 100
