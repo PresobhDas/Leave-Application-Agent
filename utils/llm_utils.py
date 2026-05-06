@@ -604,7 +604,6 @@ def calculate_ragas_metrics(ragas_inp : RagasInp) -> RagasData:
             ragasMetrics=ragas_metrics
         )
 
-        line = json.dumps(ragas_data.model_dump(), separators=(",", ":")) + "\n"
         return ragas_data
 
     except Exception as err:
@@ -635,12 +634,12 @@ async def write_ragas_with_session_history(response : dict) -> RagasData:
             retrievedContext=retrievedContext,
             llmResponse=response.get('llmResponse')
         )
-
+        log.info(f'CUSTOM LOG - Value of ragas_inp is {ragas_inp}')
         ragas_data = await asyncio.to_thread(
                         calculate_ragas_metrics,
                         ragas_inp
                     )
-
+        log.info(f'CUSTOM LOG - Value of ragas_data is {ragas_data}')
         confidence_list = []
 
         for msg in response.get("messages", []):
@@ -667,7 +666,7 @@ async def write_ragas_with_session_history(response : dict) -> RagasData:
             'timestamp' : datetime.utcnow().isoformat(),
             **ragas_data.model_dump()
         }
-
+        log.info(f'CUSTOM LOG - Value of cosmos_history_item is {cosmos_history_item}')
         cosmos_client = CosmosClient(
             url=os.environ.get('COSMOS_DB_CONN_STR'),
             credential=DefaultAzureCredential()
