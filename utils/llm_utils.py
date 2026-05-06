@@ -221,6 +221,7 @@ def build_tools(mcp_server: FastMCP):
                                     arguments={'inp_question':inp_question}
         )
         try:
+            log.info(f"CUSTOM LOG RAG TOOL OUTPUT: {resp[0].text}")
             return resp[0].text
 
         except Exception as err:
@@ -255,7 +256,7 @@ def build_nodes(llm_with_tools):
         context = state.get("context", [])
         scores = []
 
-        for msg in reversed(state.get("messages", [])):
+        for msg in state.get("messages", []):
             if isinstance(msg, ToolMessage) and msg.name == "get_rag_document_tool":
                 context.append(msg.content)
                 try:
@@ -312,11 +313,19 @@ def build_nodes(llm_with_tools):
 
     async def node_collect_sub_answer(state: RagState):
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-        answer = state.get("llmResponse", "")
+        messages = state.get("messages", [])
+
+        final_answer = ""
+
+        for msg in reversed(messages):
+            if isinstance(msg, AIMessage) and msg.content:
+                final_answer = msg.content
+                break
 
         return {
             **state,
-            "sub_answers": state.get("sub_answers", []) + [answer]
+            "sub_answers": state.get("sub_answers", []) + [final_answer],
+            "llmResponse": final_answer  
         }
 
     async def node_synthesize_final(state: RagState):
