@@ -42,7 +42,7 @@ if not log.handlers:
 
 azure_ai_search_endpoint = os.environ.get('AZURE_AI_SEARCH_CONNECTION_STRING')
 
-def get_prompts(prompt_name:str, question:str|None=None, context:List[str]|None=None):
+def get_prompts(prompt_name:str, question:str|None=None, context_text:List[str]|None=None):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     prompt_dict = dict()
 
@@ -71,7 +71,7 @@ def get_prompts(prompt_name:str, question:str|None=None, context:List[str]|None=
             DO NOT call any tool
             Use the CONTEXT to generate the final answer
             Only call tools if CONTEXT is empty OR does not contain the required information
-        CONTEXT : {context}
+        CONTEXT : {context_text if context_text else "No context available"}
     '''
 
     return prompt_dict.get(prompt_name, 'Invalid prompt passed')
@@ -243,8 +243,7 @@ def build_nodes(llm_with_tools):
 
     async def node_generate_answer_from_llm(state:RagState):
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-        context_list = state.get("context", [])
-        context_text = "\n".join(context_list) if context_list else "No context available."
+        context_text = "\n\n---\n\n".join(state.get("formatted_contexts", []))
         inp_system_message = get_prompts('input_prompt_system', context=context_text)
         inp_human_message = get_prompts('input_prompt_human', question=state.get("current_sub_question") or state.get('question', ''))
         SYSTEM_MESSAGE = SystemMessage(content=inp_system_message)
@@ -281,21 +280,35 @@ def build_nodes(llm_with_tools):
     
     async def node_capture_rag_context(state: RagState):
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-        context = state.get("context", [])
+        context = state.get("context", [])              # raw JSON (keep if needed)
+        formatted_contexts = state.get("formatted_contexts", [])  # 👈 NEW
         scores = []
 
         for msg in state.get("messages", []):
             if isinstance(msg, ToolMessage) and msg.name == "get_rag_document_tool":
+
+                # keep raw JSON if you still need it
                 context.append(msg.content)
+
                 try:
                     parsed = json.loads(msg.content)
+
+                    fc = parsed.get("formattedContext")
+                    if fc:
+                        formatted_contexts.append(fc)
+
                     for r in parsed.get("results", []):
-                        scores.append(r.get("score", 0.0))
-                except:
-                    pass
+                        score = r.get("score")
+                        if isinstance(score, (int, float)):
+                            scores.append(score)
+
+                except Exception as err:
+                    log.info(f'CUSTOM LOG - Failed parsing tool output: {err}')
+                    continue
 
         return {
-            "context": context,
+            "context": context,   # optional (raw)
+            "formatted_contexts": formatted_contexts,  # 👈 USE THIS FOR LLM
             "confidenceScore": state.get("confidenceScore", []) + scores
         }
     

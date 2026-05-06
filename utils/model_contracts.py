@@ -78,6 +78,7 @@ class RagState(TypedDict):
     current_sub_question: Optional[str]
     messages: List[BaseMessage]
     context:List[str]
+    formatted_contexts: List[str]
     llmResponse:str
     confidenceScore : List[float]
     tool_execution_count: int
