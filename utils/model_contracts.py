@@ -60,7 +60,7 @@ class RagasInp(BaseModel):
     inpQuestion : str
     retrievedContext : List[str]
     llmResponse : str
-    confidence_score : List[float] = Field(default_factory=lambda: [1.0])
+    confidenceScore : List[float] = Field(default_factory=lambda: [1.0])
 
 class RagasMetrics(BaseModel):
     faithfulness : float = Field(default=0.0)

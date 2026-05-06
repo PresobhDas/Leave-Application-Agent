@@ -187,7 +187,7 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
 
     return {
         'llmResponse' : ragas_data.ragasInp.llmResponse,
-        'confidence' : sum(ragas_data.ragasInp.confidence_score) / len(ragas_data.ragasInp.confidence_score) * 100
+        'confidence' : sum(ragas_data.ragasInp.confidenceScore) / len(ragas_data.ragasInp.confidenceScore) * 100
     }
 
 @api_server.get('/history')
@@ -204,7 +204,7 @@ async def get_history(user_id: str):
 
         # 🔍 Query (partition key = sessionId = user_id)
         query = """
-        SELECT c.ragasInp.inpQuestion, c.ragasInp.llmResponse, c.timestamp
+        SELECT c.ragasInp.inpQuestion, c.ragasInp.llmResponse, c.ragasInp.confidenceScore, c.timestamp
         FROM c
         WHERE c.user_id = @user_id
         ORDER BY c.timestamp ASC
@@ -216,14 +216,18 @@ async def get_history(user_id: str):
             enable_cross_partition_query=False  # efficient if partition key is correct
         ))
 
-        # 🔄 Transform to frontend format
-        history = [
-            {
+        history = []
+
+        for item in items:
+            scores = item.get("confidenceScore", [])
+
+            avg_conf = sum(scores) / len(scores) * 100 if scores else 0.0
+
+            history.append({
                 "question": item.get("inpQuestion", ""),
-                "answer": item.get("llmResponse", "")
-            }
-            for item in items
-        ]
+                "answer": item.get("llmResponse", ""),
+                "confidence": avg_conf
+            })
 
         return history
 

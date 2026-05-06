@@ -541,7 +541,7 @@ async def write_ragas_with_session_history(response : dict) -> RagasData:
                 for item in parsed.get("results", []):
                     confidence_list.append(item.get("score"))
 
-        ragas_inp.confidence_score = confidence_list
+        ragas_inp.confidenceScore = confidence_list
         cosmos_history_item = {
             'id' : str(uuid.uuid4()),
             'user_id' : response.get('userId'),
