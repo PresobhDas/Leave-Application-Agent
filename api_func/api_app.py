@@ -193,7 +193,7 @@ async def get_history(user_id: str):
     try:
         # 🔐 Cosmos client (Managed Identity)
         client = CosmosClient(
-            url=os.environ["COSMOS_URI"],
+            url=os.environ["COSMOS_DB_CONN_STR"],
             credential=DefaultAzureCredential()
         )
 
