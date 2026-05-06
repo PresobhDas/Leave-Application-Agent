@@ -187,7 +187,7 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
 
     return {
         'llmResponse' : ragas_data.ragasInp.llmResponse,
-        'confidence' : ragas_data.ragasInp.confidence_score * 100
+        'confidence' : sum(ragas_data.ragasInp.confidence_score) / len(ragas_data.ragasInp.confidence_score) * 100
     }
 
 @api_server.get('/history')
