@@ -530,7 +530,7 @@ def extract_ragas_data(state, response):
     except Exception as err:
         log.info(f'CUSTOM LOG - Errored in {inspect.currentframe().f_code.co_name} with error {err}')
 
-def calculate_ragas_metrics(ragas_inp : RagasInp):
+def calculate_ragas_metrics(ragas_inp : RagasInp) -> RagasData:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     try:
         chat_client = get_chat_model()
@@ -560,27 +560,24 @@ def calculate_ragas_metrics(ragas_inp : RagasInp):
             ragasMetrics=ragas_metrics
         )
 
-        blob_service_client = BlobServiceClient(
-                account_url = os.environ.get('BLOB_ACCOUNT_URL'),
-                credential = DefaultAzureCredential()
-            )
-        json_blob_client = blob_service_client.get_blob_client(
-            container='ragas-json',
-            blob='ragasmetrics.jsonl'
-        )
-
-        try:
-            json_blob_client.get_blob_properties()
-        except:
-            json_blob_client.create_append_blob()
-
         line = json.dumps(ragas_data.model_dump(), separators=(",", ":")) + "\n"
-        json_blob_client.append_block(line.encode("utf-8"))
+        return ragas_data
 
     except Exception as err:
         log.exception(f'Errored in {inspect.currentframe().f_code.co_name} with error : {err}')
 
 
 async def write_ragas_with_session_history(response : dict):
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    try:
+        ragas_inp = RagasInp(
+            inpQuestion=response.get('question', ''),
+            retrievedContext=[context.get('text') for context in json.loads(response.get('context')[0]).get('results')],
+            llmResponse=response.get('llmResponse')
+        )
 
-    pass
+        ragas_data = calculate_ragas_metrics(ragas_inp=ragas_inp)
+
+        log.info(f'CUSTOM LOG - Value of ragas_data is {ragas_data}')
+    except Exception as err:
+        log.exception(f'Errored in {inspect.currentframe().f_code.co_name} with error : {err}')
