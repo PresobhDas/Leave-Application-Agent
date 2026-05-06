@@ -42,7 +42,7 @@ if not log.handlers:
 
 azure_ai_search_endpoint = os.environ.get('AZURE_AI_SEARCH_CONNECTION_STRING')
 
-def get_prompts(prompt_name:str, question:str|None=None):
+def get_prompts(prompt_name:str, question:str|None=None, context:List[str]|None=None):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     prompt_dict = dict()
 
@@ -67,6 +67,7 @@ def get_prompts(prompt_name:str, question:str|None=None):
         b) If the question is regular conversaion, respond naturally and conversationally as no information retrieval is needed.
         c) Try to answer based on your internal knowledge. Do this ONLY if tool call is NOT applicable.
         d) If NONE of the THE ABOVE works, say 'I Don't know the answer'.   
+        CONTEXT : {context}
     '''
 
     return prompt_dict.get(prompt_name, 'Invalid prompt passed')
@@ -235,8 +236,9 @@ def build_nodes(llm_with_tools):
 
     async def node_generate_answer_from_llm(state:RagState):
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-
-        inp_system_message = get_prompts('input_prompt_system')
+        context_list = state.get("context", [])
+        context_text = "\n".join(context_list) if context_list else "No context available."
+        inp_system_message = get_prompts('input_prompt_system', context=context_text)
         inp_human_message = get_prompts('input_prompt_human', question=state.get("current_sub_question") or state.get('question', ''))
         SYSTEM_MESSAGE = SystemMessage(content=inp_system_message)
         HUMAN_MESSAGE = HumanMessage(content=inp_human_message)
@@ -261,6 +263,7 @@ def build_nodes(llm_with_tools):
                                                     "tool_choice": "auto" 
                                                 }
                     )
+        log.info(f"Input to LLM is messages: {messages}")
         log.info(f"LLM RESPONSE: {response}")
         log.info(f"TOOL CALLS: {getattr(response, 'tool_calls', None)}")
         count = state.get('tool_execution_count',0)
