@@ -240,7 +240,13 @@ def build_nodes(llm_with_tools):
         SYSTEM_MESSAGE = SystemMessage(content=inp_system_message)
         HUMAN_MESSAGE = HumanMessage(content=inp_human_message)
         messages = state.get('messages', []) + [SYSTEM_MESSAGE, HUMAN_MESSAGE]
-        response = await llm_with_tools.ainvoke(messages)
+        response = await llm_with_tools.ainvoke(messages,
+                                                config={
+                                                    "tool_choice": "auto" 
+                                                }
+                    )
+        log.info(f"LLM RESPONSE: {response}")
+        log.info(f"TOOL CALLS: {getattr(response, 'tool_calls', None)}")
         count = state.get('tool_execution_count',0)
         if getattr(response, 'tool_calls', None):
             count += 1
