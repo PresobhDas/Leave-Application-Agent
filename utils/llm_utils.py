@@ -67,6 +67,10 @@ def get_prompts(prompt_name:str, question:str|None=None, context:List[str]|None=
         b) If the question is regular conversaion, respond naturally and conversationally as no information retrieval is needed.
         c) Try to answer based on your internal knowledge. Do this ONLY if tool call is NOT applicable.
         d) If NONE of the THE ABOVE works, say 'I Don't know the answer'.   
+        e) If CONTEXT is present and contains relevant information:
+            DO NOT call any tool
+            Use the CONTEXT to generate the final answer
+            Only call tools if CONTEXT is empty OR does not contain the required information
         CONTEXT : {context}
     '''
 
@@ -261,11 +265,7 @@ def build_nodes(llm_with_tools):
                 clean_messages.append(msg)
 
         messages = clean_messages + [SYSTEM_MESSAGE, HUMAN_MESSAGE]
-        response = await llm_with_tools.ainvoke(messages,
-                                                config={
-                                                    "tool_choice": "auto" 
-                                                }
-                    )
+        response = await llm_with_tools.ainvoke(messages)
         log.info(f"Input to LLM is messages: {messages}")
         log.info(f"LLM RESPONSE: {response}")
         log.info(f"TOOL CALLS: {getattr(response, 'tool_calls', None)}")
