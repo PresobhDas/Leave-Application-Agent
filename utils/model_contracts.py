@@ -72,8 +72,11 @@ class RagasData(BaseModel):
 
 class RagState(TypedDict):
     userId : str
-    messages: Annotated[List[BaseMessage], add]
     question:str
+    sub_questions: List[str]          # 👈 new
+    sub_answers: List[str] 
+    current_sub_question: Optional[str]
+    # messages: Annotated[List[BaseMessage], add]
     context:List[str]
     llmResponse:str
     tool_execution_count: int

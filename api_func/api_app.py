@@ -158,11 +158,24 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
     log.info(f'CUSTOM LOG - Nodes built inside : {inspect.currentframe().f_code.co_name}')
 
     graph = StateGraph(RagState)
+    
     graph.add_node('node_generate_answer_from_llm', nodes['node_generate_answer_from_llm'])
     graph.add_node('node_tool_execution', ToolNode(tools=tools))
-    graph.add_node('node_capture_rag_context', node_capture_rag_context)
+    graph.add_node('node_capture_rag_context', nodes['node_capture_rag_context'])
+    graph.add_node('node_decompose_question', nodes['node_decompose_question'])
+    graph.add_node('node_pick_next_question', nodes['node_pick_next_question'])
+    graph.add_node('node_collect_sub_answer', nodes['node_collect_sub_answer'])
+    graph.add_node('node_synthesize_final', nodes['node_synthesize_final'])
 
     graph.add_edge(START, 'node_generate_answer_from_llm')
+    graph.add_conditional_edges(
+        'node_pick_next_question',
+        lambda state: "process" if state.get("current_sub_question") else "done",
+        {
+            "process": "node_generate_answer_from_llm",
+            "done": "node_synthesize_final"
+        }
+    )
     graph.add_conditional_edges(
         'node_generate_answer_from_llm',
         check_tool_condition,
@@ -173,6 +186,9 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
     )
     graph.add_edge('node_tool_execution', 'node_capture_rag_context')
     graph.add_edge('node_capture_rag_context', 'node_generate_answer_from_llm')
+    graph.add_edge('node_collect_sub_answer', 'node_pick_next_question')
+    graph.add_edge('node_synthesize_final', END)
+
     graph_app = graph.compile()
     log.info(f'CUSTOM LOG - Graph compiled and created inside : {inspect.currentframe().f_code.co_name}')
     result = await graph_app.ainvoke(

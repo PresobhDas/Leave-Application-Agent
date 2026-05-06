@@ -129,16 +129,6 @@ async def check_tool_condition(state: RagState):
     else:
         return 'end'
 
-async def node_capture_rag_context(state: RagState):
-    context = []
-
-    for msg in reversed(state.get("messages", [])):
-        if isinstance(msg, ToolMessage) and msg.name == "get_rag_document_tool":
-            context.append(msg.content)
-            break
-
-    return {"context": context}
-
 def build_tools(mcp_server: FastMCP):
     @tool
     async def get_weather_tool(city: str):
@@ -238,7 +228,7 @@ def build_nodes(llm_with_tools):
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
 
         inp_system_message = get_prompts('input_prompt_system')
-        inp_human_message = get_prompts('input_prompt_human', question=state.get('question', ''))
+        inp_human_message = get_prompts('input_prompt_human', question=state.get("current_sub_question") or state.get('question', ''))
         SYSTEM_MESSAGE = SystemMessage(content=inp_system_message)
         HUMAN_MESSAGE = HumanMessage(content=inp_human_message)
         response = await llm_with_tools.ainvoke(state.get('messages', []) + [SYSTEM_MESSAGE, HUMAN_MESSAGE])
@@ -252,8 +242,90 @@ def build_nodes(llm_with_tools):
             "llmResponse": getattr(response, "content", "")
         }
     
+    async def node_capture_rag_context(state: RagState):
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+        context = []
+
+        for msg in reversed(state.get("messages", [])):
+            if isinstance(msg, ToolMessage) and msg.name == "get_rag_document_tool":
+                context.append(msg.content)
+                break
+
+        return {"context": context}
+    
+    async def node_decompose_question(state: RagState):
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+        question = state["question"]
+
+        prompt = f"""
+        Break the following question into smaller independent questions if needed.
+        If not needed, return the original question as a single item list.
+
+        Question: {question}
+        """
+        chat_model = get_chat_model()
+        resp = await chat_model.ainvoke(prompt)
+
+        try:
+            sub_questions = json.loads(resp.content)
+        except:
+            sub_questions = [question]
+
+        return {
+            **state,
+            "sub_questions": sub_questions,
+            "sub_answers": []
+        }
+    
+    async def node_pick_next_question(state: RagState):
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+        if not state["sub_questions"]:
+            return {**state, "current_sub_question": None}
+
+        next_q = state["sub_questions"][0]
+
+        return {
+            **state,
+            "current_sub_question": next_q,
+            "sub_questions": state["sub_questions"][1:]
+        }
+
+    async def node_collect_sub_answer(state: RagState):
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+        answer = state.get("llmResponse", "")
+
+        return {
+            **state,
+            "sub_answers": state.get("sub_answers", []) + [answer]
+        }
+
+    async def node_synthesize_final(state: RagState):
+        log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+        answers = state.get("sub_answers", [])
+
+        if len(answers) <= 1:
+            return state
+
+        prompt = f"""
+        Combine the following answers into a single coherent response:
+
+        {answers}
+        """
+        chat_model = get_chat_model()
+        resp = await chat_model.ainvoke(prompt)
+
+        return {
+            **state,
+            "llmResponse": resp.content
+        }
+
     return {
-        'node_generate_answer_from_llm' : node_generate_answer_from_llm
+        'node_generate_answer_from_llm' : node_generate_answer_from_llm,
+        'node_capture_rag_context' : node_capture_rag_context,
+        'node_decompose_question' : node_decompose_question,
+        'node_pick_next_question' : node_pick_next_question,
+        'node_collect_sub_answer' : node_collect_sub_answer,
+        'node_synthesize_final' : node_synthesize_final
     }
 
 def delete_existing_embeddings(file_name:str):
