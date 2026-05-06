@@ -196,7 +196,7 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
     {
         "userId": inp_details.user_id,
         "question": inp_details.inp_query,
-        "messages": [],            # ✅ REQUIRED
+        "messages": [],            
         "context": [],
         "confidenceScore": [],
         "tool_execution_count": 0,

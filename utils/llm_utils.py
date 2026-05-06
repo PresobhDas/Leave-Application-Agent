@@ -253,7 +253,7 @@ def build_nodes(llm_with_tools):
             count += 1
 
         return {
-            "messages": messages + [response],
+            "messages": state.get("messages", []) + [SYSTEM_MESSAGE, HUMAN_MESSAGE, response],
             "tool_execution_count": count,
             "llmResponse": getattr(response, "content", "")
         }
