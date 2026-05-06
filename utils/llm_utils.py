@@ -66,7 +66,7 @@ def get_prompts(prompt_name:str, question:str|None=None):
                 Description: get_weather_tool to retrieve the weather information for any given location. 
         b) If the question is regular conversaion, respond naturally and conversationally as no information retrieval is needed.
         c) Try to answer based on your internal knowledge. Do this ONLY if tool call is NOT applicable.
-        d) If NONE of the THE ABOVE works, say 'I Don't know the answer'.     
+        d) If NONE of the THE ABOVE works, say 'I Don't know the answer'.   
     '''
 
     return prompt_dict.get(prompt_name, 'Invalid prompt passed')
@@ -120,14 +120,21 @@ def redact_pii(content_to_redact:Dict):
 
 async def check_tool_condition(state: RagState):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    if state.get('tool_execution_count',0) >= 5:
+
+    if state.get('tool_execution_count', 0) >= 3:
         return 'end'
-    last_AIMessage = state['messages'][-1]
-    tool_calls = getattr(last_AIMessage, 'tool_calls', None)
+
+    messages = state.get("messages", [])
+    if not messages:
+        return "end"
+
+    last_msg = messages[-1]
+    tool_calls = getattr(last_msg, "tool_calls", None)
+
     if tool_calls:
-        return 'node_tool_execution'
-    else:
-        return 'end'
+        return "node_tool_execution"
+
+    return "end"
 
 def build_tools(mcp_server: FastMCP):
     @tool
@@ -231,27 +238,37 @@ def build_nodes(llm_with_tools):
         inp_human_message = get_prompts('input_prompt_human', question=state.get("current_sub_question") or state.get('question', ''))
         SYSTEM_MESSAGE = SystemMessage(content=inp_system_message)
         HUMAN_MESSAGE = HumanMessage(content=inp_human_message)
-        response = await llm_with_tools.ainvoke(state.get('messages', []) + [SYSTEM_MESSAGE, HUMAN_MESSAGE])
+        messages = state.get('messages', []) + [SYSTEM_MESSAGE, HUMAN_MESSAGE]
+        response = await llm_with_tools.ainvoke(messages)
         count = state.get('tool_execution_count',0)
         if getattr(response, 'tool_calls', None):
             count += 1
 
         return {
-            "messages": [SYSTEM_MESSAGE, HUMAN_MESSAGE, response],
+            "messages": messages + [response],
             "tool_execution_count": count,
             "llmResponse": getattr(response, "content", "")
         }
     
     async def node_capture_rag_context(state: RagState):
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-        context = []
+        context = state.get("context", [])
+        scores = []
 
         for msg in reversed(state.get("messages", [])):
             if isinstance(msg, ToolMessage) and msg.name == "get_rag_document_tool":
                 context.append(msg.content)
-                break
+                try:
+                    parsed = json.loads(msg.content)
+                    for r in parsed.get("results", []):
+                        scores.append(r.get("score", 0.0))
+                except:
+                    pass
 
-        return {"context": context}
+        return {
+            "context": context,
+            "confidenceScore": state.get("confidenceScore", []) + scores
+        }
     
     async def node_decompose_question(state: RagState):
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
@@ -287,7 +304,10 @@ def build_nodes(llm_with_tools):
         return {
             **state,
             "current_sub_question": next_q,
-            "sub_questions": state["sub_questions"][1:]
+            "sub_questions": state["sub_questions"][1:],
+            "messages": [],              
+            "context": [],              
+            "tool_execution_count": 0    
         }
 
     async def node_collect_sub_answer(state: RagState):

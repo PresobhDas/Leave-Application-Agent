@@ -167,7 +167,8 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
     graph.add_node('node_collect_sub_answer', nodes['node_collect_sub_answer'])
     graph.add_node('node_synthesize_final', nodes['node_synthesize_final'])
 
-    graph.add_edge(START, 'node_generate_answer_from_llm')
+    graph.add_edge(START, 'node_decompose_question')
+    graph.add_edge('node_decompose_question', 'node_pick_next_question')
     graph.add_conditional_edges(
         'node_pick_next_question',
         lambda state: "process" if state.get("current_sub_question") else "done",
@@ -181,7 +182,7 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
         check_tool_condition,
         {
             'node_tool_execution': 'node_tool_execution',
-            'end': END
+            'end': 'node_collect_sub_answer'
         }
     )
     graph.add_edge('node_tool_execution', 'node_capture_rag_context')
@@ -192,12 +193,17 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
     graph_app = graph.compile()
     log.info(f'CUSTOM LOG - Graph compiled and created inside : {inspect.currentframe().f_code.co_name}')
     result = await graph_app.ainvoke(
-        {
-            'userId' : inp_details.user_id,
-            'question' : inp_details.inp_query,
-            'tool_execution_count' : 0
-        }
-    )
+    {
+        "userId": inp_details.user_id,
+        "question": inp_details.inp_query,
+        "messages": [],            # ✅ REQUIRED
+        "context": [],
+        "confidenceScore": [],
+        "tool_execution_count": 0,
+        "sub_questions": [],
+        "sub_answers": []
+    }
+)
 
     ragas_data = await write_ragas_with_session_history(result)
 

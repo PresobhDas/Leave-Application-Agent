@@ -76,7 +76,8 @@ class RagState(TypedDict):
     sub_questions: List[str]          # 👈 new
     sub_answers: List[str] 
     current_sub_question: Optional[str]
-    # messages: Annotated[List[BaseMessage], add]
+    tool_execution_required: bool
     context:List[str]
     llmResponse:str
+    confidenceScore : List[float]
     tool_execution_count: int
