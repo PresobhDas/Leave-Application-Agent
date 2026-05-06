@@ -523,7 +523,7 @@ def extract_ragas_data(state, response):
             llmResponse=llm_answer
         )
 
-        asyncio.create_task(calculate_ragas_metrics_async(ragas_inp))
+        # asyncio.create_task(calculate_ragas_metrics_async(ragas_inp))
 
         log.info(f'RAGAS DATA CAPTURED: {ragas_inp.model_dump()}')
         return ragas_inp
@@ -581,29 +581,6 @@ def calculate_ragas_metrics(ragas_inp : RagasInp):
         log.exception(f'Errored in {inspect.currentframe().f_code.co_name} with error : {err}')
 
 
-async def calculate_ragas_metrics_async(ragas_inp):
-    loop = asyncio.get_running_loop()
+async def write_ragas_with_session_history(response : dict):
 
-    return await loop.run_in_executor(
-        None,
-        calculate_ragas_metrics,
-        ragas_inp
-    )
-
-def get_llm_answer_for_ragas(question:str, context:list):
-    context_text = "\n\n".join(context)
-    messages = [
-    SystemMessage(content="You are an helpful AI Agent. Answer ONLY using the provided context. If unsure, say 'I don't know'."),
-    HumanMessage(content=f"""
-    Context:
-    {context_text}
-
-    Question:
-    {question}
-    """)
-    ]
-
-    open_ai_client = get_chat_model()
-    response = open_ai_client.invoke(messages)
-
-    return response.content
+    pass
