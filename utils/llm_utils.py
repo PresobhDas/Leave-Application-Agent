@@ -44,6 +44,7 @@ azure_ai_search_endpoint = os.environ.get('AZURE_AI_SEARCH_CONNECTION_STRING')
 
 def get_prompts(prompt_name:str, question:str|None=None, context_text:List[str]|None=None):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    log.info(f'CUSTOM LOG context_text is inside is {context_text}')
     prompt_dict = dict()
 
     prompt_dict['input_prompt_human'] = f"""This is the question : {question}."""
@@ -244,6 +245,7 @@ def build_nodes(llm_with_tools):
     async def node_generate_answer_from_llm(state:RagState):
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
         context_text = "\n\n---\n\n".join(state.get("formatted_contexts", []))
+        log.info(f'CUTOM LOG context_text is {context_text}')
         inp_system_message = get_prompts('input_prompt_system', context_text==context_text)
         inp_human_message = get_prompts('input_prompt_human', question=state.get("current_sub_question") or state.get('question', ''))
         SYSTEM_MESSAGE = SystemMessage(content=inp_system_message)
