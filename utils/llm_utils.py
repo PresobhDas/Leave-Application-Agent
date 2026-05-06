@@ -294,7 +294,7 @@ def build_nodes(llm_with_tools):
             sub_questions = json.loads(resp.content)
         except:
             sub_questions = [question]
-
+        log.info(f'CUSTOM LOG Sub_questions are {sub_questions}')
         return {
             **state,
             "sub_questions": sub_questions,
@@ -304,10 +304,11 @@ def build_nodes(llm_with_tools):
     async def node_pick_next_question(state: RagState):
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
         if not state["sub_questions"]:
+            log.info(f'CUSTOM LOG no next question')
             return {**state, "current_sub_question": None}
 
         next_q = state["sub_questions"][0]
-
+        log.info(f'CUSTOM LOG next question is  {next_q}')
         return {
             **state,
             "current_sub_question": next_q,
