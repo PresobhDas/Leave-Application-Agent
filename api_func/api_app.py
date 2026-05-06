@@ -183,9 +183,12 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
         }
     )
 
-    await write_ragas_with_session_history(result)
+    ragas_data = await write_ragas_with_session_history(result)
 
-    return result
+    return {
+        'llmResponse' : ragas_data.ragasInp.llmResponse,
+        'confidence' : ragas_data.ragasInp.confidence_score * 100
+    }
 
 @api_server.get('/history')
 async def get_history(user_id: str):

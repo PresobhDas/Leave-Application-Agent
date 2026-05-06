@@ -41,11 +41,6 @@ if not log.handlers:
     log.addHandler(h)
 
 azure_ai_search_endpoint = os.environ.get('AZURE_AI_SEARCH_CONNECTION_STRING')
-# class RagState(MessagesState):
-#     question:str
-#     context:List[str]
-#     llmResponse:str
-#     tool_execution_count: int
 
 def get_prompts(prompt_name:str, question:str|None=None):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
@@ -247,7 +242,6 @@ def build_nodes(llm_with_tools):
         SYSTEM_MESSAGE = SystemMessage(content=inp_system_message)
         HUMAN_MESSAGE = HumanMessage(content=inp_human_message)
         response = await llm_with_tools.ainvoke(state.get('messages', []) + [SYSTEM_MESSAGE, HUMAN_MESSAGE])
-        log.info(f'CUSTOM LOG - THIS IS THE RESPONSE BACK FROM THE LLM CALL {response}')
         count = state.get('tool_execution_count',0)
         if getattr(response, 'tool_calls', None):
             count += 1
@@ -525,7 +519,7 @@ def calculate_ragas_metrics(ragas_inp : RagasInp) -> RagasData:
         log.exception(f'Errored in {inspect.currentframe().f_code.co_name} with error : {err}')
 
 
-async def write_ragas_with_session_history(response : dict):
+async def write_ragas_with_session_history(response : dict) -> RagasData:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     try:
         ragas_inp = RagasInp(
@@ -539,6 +533,16 @@ async def write_ragas_with_session_history(response : dict):
                         ragas_inp
                     )
 
+        confidence_list = []
+        for msg in response["messages"]:
+            if isinstance(msg, ToolMessage) and msg.name == "get_rag_document_tool":
+                parsed = json.loads(msg.content)
+
+                for item in parsed.get("results", []):
+                    confidence_list.append(item.get("score"))
+
+        confidence_score = sum(confidence_list) / len(confidence_list)
+        ragas_inp.confidence_score = confidence_score
         cosmos_history_item = {
             'id' : str(uuid.uuid4()),
             'user_id' : response.get('userId'),
@@ -553,6 +557,8 @@ async def write_ragas_with_session_history(response : dict):
 
         container = cosmos_client.get_database_client('session_history').get_container_client('user_session')
         container.create_item(cosmos_history_item)
+
+        return ragas_data
 
     except Exception as err:
         log.exception(f'Errored in {inspect.currentframe().f_code.co_name} with error : {err}')
