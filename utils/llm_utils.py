@@ -576,7 +576,10 @@ async def write_ragas_with_session_history(response : dict):
             llmResponse=response.get('llmResponse')
         )
 
-        ragas_data = calculate_ragas_metrics(ragas_inp=ragas_inp)
+        ragas_data = await asyncio.to_thread(
+                        calculate_ragas_metrics,
+                        ragas_inp
+                    )
 
         log.info(f'CUSTOM LOG - Value of ragas_data is {ragas_data}')
     except Exception as err:
