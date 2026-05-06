@@ -244,7 +244,7 @@ def build_nodes(llm_with_tools):
     async def node_generate_answer_from_llm(state:RagState):
         log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
         context_text = "\n\n---\n\n".join(state.get("formatted_contexts", []))
-        inp_system_message = get_prompts('input_prompt_system', context=context_text)
+        inp_system_message = get_prompts('input_prompt_system', context_text==context_text)
         inp_human_message = get_prompts('input_prompt_human', question=state.get("current_sub_question") or state.get('question', ''))
         SYSTEM_MESSAGE = SystemMessage(content=inp_system_message)
         HUMAN_MESSAGE = HumanMessage(content=inp_human_message)
