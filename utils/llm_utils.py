@@ -612,6 +612,7 @@ def calculate_ragas_metrics(ragas_inp : RagasInp) -> RagasData:
 
 async def write_ragas_with_session_history(response : dict) -> RagasData:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    log.info(f'CUSTOM LOG Value of response is {response}')
     retrievedContext = []
 
     context_list = response.get("context", [])
