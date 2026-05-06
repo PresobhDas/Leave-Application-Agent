@@ -1,4 +1,4 @@
-import os, logging, sys, inspect, re, json, hashlib, asyncio
+import os, logging, sys, inspect, re, json, hashlib, asyncio, uuid
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, ToolMessage
@@ -23,7 +23,8 @@ from ragas.metrics import faithfulness, answer_relevancy
 from ragas.llms import LangchainLLMWrapper
 from langchain_openai import OpenAIEmbeddings as LCOpenAIEmbeddings
 from ragas.embeddings import LangchainEmbeddingsWrapper 
-from azure.storage.blob import BlobServiceClient
+from datetime import datetime
+from azure.cosmos import CosmosClient
 
 VAULT_URL = os.environ.get('VAULT_URL')
 
@@ -580,6 +581,21 @@ async def write_ragas_with_session_history(response : dict):
                         calculate_ragas_metrics,
                         ragas_inp
                     )
+
+        cosmos_history_item = {
+            'id' : str(uuid.uuid4()),
+            'user_id' : 'a',
+            'timestamp' : datetime.utcnow().isoformat(),
+            **ragas_data.model_dump()
+        }
+
+        cosmos_client = CosmosClient(
+            url=os.environ.get('COSMOS_DB_CONN_STR'),
+            credential=DefaultAzureCredential()
+        )
+
+        container = cosmos_client.get_database_client('session_history').get_container_client('user_session')
+        container.create_item(cosmos_history_item)
 
         log.info(f'CUSTOM LOG - Value of ragas_data is {ragas_data}')
     except Exception as err:

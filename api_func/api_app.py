@@ -187,7 +187,6 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
         }
     )
 
-    log.info(f'CUSTOM - LOG : Final State data is {result}')
     await write_ragas_with_session_history(result)
 
     return result
