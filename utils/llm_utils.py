@@ -128,10 +128,13 @@ async def check_tool_condition(state: RagState):
 
     messages = state.get("messages", [])
     if not messages:
+        log.info(f'CUSTOM LOG no messages found')
         return "end"
 
     last_msg = messages[-1]
+    log.info(f'CUSTOM LOG Value of last_msg in tool_condition is {last_msg}')
     tool_calls = getattr(last_msg, "tool_calls", None)
+    log.info(f'CUSTOM LOG Value of tool_calls in tool_condition is {tool_calls}')
 
     if tool_calls:
         return "node_tool_execution"
