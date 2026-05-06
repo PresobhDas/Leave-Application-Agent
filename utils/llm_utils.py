@@ -120,6 +120,7 @@ def redact_pii(content_to_redact:Dict):
 
 async def check_tool_condition(state: RagState):
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    log.info(f'CUSTOM LOG Value of state in tool_condition is {state}')
 
     if state.get('tool_execution_count', 0) >= 3:
         return 'end'
