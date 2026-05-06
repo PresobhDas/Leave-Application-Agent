@@ -47,7 +47,7 @@ def get_prompts(prompt_name:str, question:str|None=None, context:List[str]|None=
     prompt_dict = dict()
 
     prompt_dict['input_prompt_human'] = f"""This is the question : {question}."""
-    prompt_dict['input_prompt_system'] = '''
+    prompt_dict['input_prompt_system'] = f'''
     You are a helpful AI bot that does the following.
     1. Understand the question given to you by the user.
     2. Take the following actions ONLY with priority in the given order:
