@@ -285,15 +285,17 @@ def build_nodes(llm_with_tools):
         scores = []
 
         for msg in state.get("messages", []):
+            log.info(f'CUSTOM LOG -capture rag - msg : {msg}')
             if isinstance(msg, ToolMessage) and msg.name == "get_rag_document_tool":
 
                 # keep raw JSON if you still need it
                 context.append(msg.content)
-
+                log.info(f'CUSTOM LOG -capture rag - context : {msg}')
                 try:
                     parsed = json.loads(msg.content)
-
+                    log.info(f'CUSTOM LOG -capture rag - parsed : {parsed}')
                     fc = parsed.get("formattedContext")
+                    log.info(f'CUSTOM LOG -capture rag - fc : {fc}')
                     if fc:
                         formatted_contexts.append(fc)
 
