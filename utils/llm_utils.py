@@ -251,17 +251,11 @@ def build_nodes(llm_with_tools):
         count = state.get('tool_execution_count',0)
         if getattr(response, 'tool_calls', None):
             count += 1
-        
-        ragas_data = None
-
-        # if not getattr(response, 'tool_calls', None):
-        #     ragas_data = extract_ragas_data(state, response)
 
         return {
             "messages": [SYSTEM_MESSAGE, HUMAN_MESSAGE, response],
             "tool_execution_count": count,
-            "llmResponse": getattr(response, "content", ""),
-            "ragas_data": ragas_data  # optional propagation
+            "llmResponse": getattr(response, "content", "")
         }
     
     return {
@@ -494,43 +488,6 @@ def get_chunks(di_data:dict, file_name:str) -> List[Document]:
 
     return langchain_doc
 
-def extract_ragas_data(state, response):
-    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
-    try:
-        question = state.get("question", "")
-        messages = state["messages"]
-
-        rag_msgs = [
-            m for m in messages
-            if isinstance(m, ToolMessage) and m.name == "get_rag_document_tool"
-        ]
-
-        if not rag_msgs:
-            return None
-
-        latest_tool_msg = rag_msgs[-1]
-
-        try:
-            parsed = RagDataResponseModel.model_validate_json(latest_tool_msg.content)
-            contexts = [r.text for r in parsed.results]
-        except Exception:
-            contexts = []
-
-        llm_answer = response.content if hasattr(response, "content") else str(response)
-
-        ragas_inp = RagasInp(
-            inpQuestion=question,
-            retrievedContext=contexts,
-            llmResponse=llm_answer
-        )
-
-        # asyncio.create_task(calculate_ragas_metrics_async(ragas_inp))
-
-        log.info(f'RAGAS DATA CAPTURED: {ragas_inp.model_dump()}')
-        return ragas_inp
-    except Exception as err:
-        log.info(f'CUSTOM LOG - Errored in {inspect.currentframe().f_code.co_name} with error {err}')
-
 def calculate_ragas_metrics(ragas_inp : RagasInp) -> RagasData:
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     try:
@@ -597,6 +554,5 @@ async def write_ragas_with_session_history(response : dict):
         container = cosmos_client.get_database_client('session_history').get_container_client('user_session')
         container.create_item(cosmos_history_item)
 
-        log.info(f'CUSTOM LOG - Value of ragas_data is {ragas_data}')
     except Exception as err:
         log.exception(f'Errored in {inspect.currentframe().f_code.co_name} with error : {err}')

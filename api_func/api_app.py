@@ -232,48 +232,24 @@ async def get_history(user_id: str):
 async def call_evaluate():
     log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
     try:
-        blob_service_client = BlobServiceClient(
-        account_url = os.environ.get('BLOB_ACCOUNT_URL'),
-        credential = DefaultAzureCredential()
-        )
-        json_blob_client = blob_service_client.get_blob_client(
-            container='ragas-json',
-            blob='ragasmetrics.jsonl'
+        client = CosmosClient(
+            url=os.environ["COSMOS_DB_CONN_STR"],
+            credential=DefaultAzureCredential()
         )
 
-        if json_blob_client.exists():
-            blob_jsonl = json_blob_client.download_blob().readall().decode('utf-8')
+        container = client.get_database_client("session_history").get_container_client("user_session")
+        items = list(container.read_all_items())
 
-        faithfulness_list = []
-        relevancy_list = []
-        for line in blob_jsonl.splitlines():
-            line = line.strip()
-            if not line:
-                continue
-            json_line = json.loads(line)
-            faithfulness_line = json_line.get('ragasMetrics', {}).get('faithfulness', 0.0)
-            relevancy_line = json_line.get('ragasMetrics', {}).get('relevancy', 0.0)
-
-            if isinstance(faithfulness_line, float) and not math.isnan(faithfulness_line):
-                faithfulness_list.append(faithfulness_line)
-            if isinstance(relevancy_line, float) and not math.isnan(relevancy_line):
-                relevancy_list.append(relevancy_line)
-
-        if faithfulness_list:
-            faithfulness_avg = sum(faithfulness_list) / len(faithfulness_list)
-
-        if relevancy_list:
-            relevancy_avg = sum(relevancy_list) / len(relevancy_list)
-
-        log.info(f'CUSTOM LOG - Evaluation metrics. Faithfulness : {faithfulness_avg}, Relevancy : {relevancy_avg}')
+        faithfulness_list = [item.get('ragasMetrics').get('faithfulness', 0.0) for item in items]
+        relevancy_list = [item.get('ragasMetrics').get('relevancy', 0.0) for item in items]
 
         return {
-            'faithfulness' : faithfulness_avg,
-            'relevancy' : relevancy_avg
+            'faithfulness' : sum(faithfulness_list) / len(faithfulness_list),
+            'relevancy' : sum(relevancy_list) / len(relevancy_list)
         }        
 
-    except Exception:
-        log.exception(f'CUSTOM LOG - Errored in {inspect.currentframe().f_code.co_name}')
+    except Exception as err:
+        log.exception(f'CUSTOM LOG - Errored in {inspect.currentframe().f_code.co_name} with error {err}')
     
 
 
