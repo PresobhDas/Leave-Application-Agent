@@ -240,7 +240,22 @@ def build_nodes(llm_with_tools):
         inp_human_message = get_prompts('input_prompt_human', question=state.get("current_sub_question") or state.get('question', ''))
         SYSTEM_MESSAGE = SystemMessage(content=inp_system_message)
         HUMAN_MESSAGE = HumanMessage(content=inp_human_message)
-        messages = state.get('messages', []) + [SYSTEM_MESSAGE, HUMAN_MESSAGE]
+        clean_messages = []
+        last_was_tool_call = False
+
+        for msg in state.get("messages", []):
+            if isinstance(msg, AIMessage) and getattr(msg, "tool_calls", None):
+                clean_messages.append(msg)
+                last_was_tool_call = True
+
+            elif isinstance(msg, ToolMessage) and last_was_tool_call:
+                clean_messages.append(msg)
+                last_was_tool_call = False
+
+            elif not isinstance(msg, ToolMessage):
+                clean_messages.append(msg)
+
+        messages = clean_messages + [SYSTEM_MESSAGE, HUMAN_MESSAGE]
         response = await llm_with_tools.ainvoke(messages,
                                                 config={
                                                     "tool_choice": "auto" 
