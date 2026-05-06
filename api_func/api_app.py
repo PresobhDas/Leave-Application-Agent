@@ -14,10 +14,7 @@ from urllib.parse import urlparse, unquote
 from fastapi.middleware.cors import CORSMiddleware
 from azure.storage.blob import generate_blob_sas, BlobSasPermissions
 from datetime import datetime, timedelta
-from datasets import Dataset
-from ragas import evaluate
-from ragas.metrics import _ContextPrecision, _ContextRecall, _ContextRelevance, _Faithfulness, _ResponseRelevancy
-from utils.model_contracts import RagDataResponseModel
+from azure.cosmos import CosmosClient
 from azure.ai.documentintelligence import DocumentIntelligenceClient
 
 log = logging.getLogger(__name__)
@@ -148,8 +145,6 @@ async def ingest_pipeline(request:Request):
         log.exception(f'CUSTOM LOG - Exception occurred at {inspect.currentframe().f_code.co_name}')
         return {'status' : 'Errored'}
 
-
-
     return {'status' : 'uploaded'}
 
 @api_server.post('/agent')
@@ -191,6 +186,47 @@ async def call_agent(request:Request, inp_details : Annotated[InputDetails, Body
     await write_ragas_with_session_history(result)
 
     return result
+
+@api_server.get('/history')
+async def get_history(user_id: str):
+    log.info(f'CUSTOM LOG - Entered : {inspect.currentframe().f_code.co_name}')
+    try:
+        # 🔐 Cosmos client (Managed Identity)
+        client = CosmosClient(
+            url=os.environ["COSMOS_URI"],
+            credential=DefaultAzureCredential()
+        )
+
+        container = client.get_database_client("session_history").get_container_client("user_session")
+
+        # 🔍 Query (partition key = sessionId = user_id)
+        query = """
+        SELECT c.ragasInp.inpQuestion, c.ragasInp.llmResponse, c.timestamp
+        FROM c
+        WHERE c.user_id = @user_id
+        ORDER BY c.timestamp ASC
+        """
+
+        items = list(container.query_items(
+            query=query,
+            parameters=[{"name": "@user_id", "value": user_id}],
+            enable_cross_partition_query=False  # efficient if partition key is correct
+        ))
+
+        # 🔄 Transform to frontend format
+        history = [
+            {
+                "question": item.get("inpQuestion", ""),
+                "answer": item.get("llmResponse", "")
+            }
+            for item in items
+        ]
+
+        return history
+
+    except Exception as err:
+        log.exception(f'CUSTOM LOG - Errored in {inspect.currentframe().f_code.co_name} with error {err}')
+        return []
 
 @api_server.get('/evaluate')
 async def call_evaluate():
